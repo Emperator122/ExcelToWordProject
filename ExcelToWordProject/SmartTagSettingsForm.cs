@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Media;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -13,6 +14,16 @@ namespace ExcelToWordProject
 {
     partial class SmartTagSettingsForm : Form
     {
+        // Настройки для генерации таблички с параметрами тегов
+        string[] names = new string[] { "indexTextBox", "tagTextBox" };
+        string[] titles = new string[] { "Индекс стобца", "Тег", "Тип тега", "Описание", "Скопировать" };
+        int defaultTextBoxWidth = 180;
+        int defaultMargin = 10;
+
+        Bitmap infoIcon = Properties.Resources.information;
+        Bitmap clipboardIcon = Properties.Resources.clipboards;
+
+
         public SyllabusParameters syllabusParameters;
         public SmartTagSettingsForm(SyllabusParameters syllabusParameters)
         {
@@ -85,13 +96,6 @@ namespace ExcelToWordProject
         {
             List<Control> result = new List<Control>();
 
-
-            int defaultTextBoxWidth = 180; 
-            int defaultMargin = 10;
-
-            // Список хедеров
-            string[] titles = new string[] { "Индекс стобца", "Тег", "Тип тега"};
-
             Panel headerPanel = new Panel();
             headerPanel.Height = 20;
             headerPanel.Width = parent.Width;
@@ -113,53 +117,96 @@ namespace ExcelToWordProject
 
 
             // Поля для ввода (и не только) инфы о смарт тегах
-            string[] names = new string[] { "indexTextBox", "tagTextBox"};
             for (int i = 0; i < smartSyllabusTags.Count(); i++)
             {
                 // текущий тег
                 SmartSyllabusTag tag = smartSyllabusTags[i];
 
-                Panel panel = new Panel();
-                panel.Height = 25;
-                panel.Width = parent.Width;
-                panel.AutoSize = true;
-                panel.Left = 0;
-                panel.Enabled = tag.Active;
-                panel.Top = (i+1) * (panel.Height + defaultMargin);
 
-                // Добавим все тектовые поля
-                string[] textBoxValues = new string[] { tag.ColumnIndex.ToString(), tag.Key };
-                for (int j = 0; j < names.Length; j++)
-                {
-                    TextBox textBox = new TextBox();
-                    textBox.Width = defaultTextBoxWidth;
-                    textBox.Top = 0;
-                    textBox.Left = j * (textBox.Width + defaultMargin) + defaultMargin;
-                    textBox.Name = names[j];
-                    textBox.Text = textBoxValues[j];
-
-                    panel.Controls.Add(textBox);
-                }
-
-
-                // И инфу о типе тега
-                Label label = new Label();
-                label.Width = defaultTextBoxWidth;
-                label.Top = 0;
-                label.Left = (titles.Length-1) * (label.Width + defaultMargin) + defaultMargin;
-                label.Text = tag.Type.ToString();
-                label.Font = new Font(FontFamily.GenericSansSerif, 10, FontStyle.Italic);
-                label.AutoSize = true;
-                panel.Tag = tag;
-
-
-                panel.Controls.Add(label);
-
-                result.Add(panel);
+                Panel row = GenerateSmartTagRow(i, tag, parent);
+                result.Add(row);
             }
 
             return result.ToArray();
         }
+
+        protected Panel GenerateSmartTagRow(int i, SmartSyllabusTag tag, Control parent)
+        {
+            Panel panel = new Panel();
+            panel.Height = 25;
+            panel.Width = parent.Width;
+            panel.AutoSize = true;
+            panel.Left = 0;
+            panel.Enabled = tag.Active;
+            panel.Top = (i + 1) * (panel.Height + defaultMargin);
+
+            // Добавим все тектовые поля
+            string[] textBoxValues = new string[] { tag.ColumnIndex.ToString(), tag.Key };
+            for (int j = 0; j < names.Length; j++)
+            {
+                TextBox textBox = new TextBox();
+                textBox.Width = defaultTextBoxWidth;
+                textBox.Top = 0;
+                textBox.Left = j * (textBox.Width + defaultMargin) + defaultMargin;
+                textBox.Name = names[j];
+                textBox.Text = textBoxValues[j];
+
+                panel.Controls.Add(textBox);
+            }
+
+
+            // Инфу о типе тега
+            Label label = new Label();
+            label.Width = defaultTextBoxWidth;
+            label.Top = 0;
+            label.Left = (titles.Length - 3) * (label.Width + defaultMargin) + defaultMargin;
+            label.Text = tag.Type.ToString();
+            label.Font = new Font(FontFamily.GenericSansSerif, 10, FontStyle.Italic);
+            label.AutoSize = true;
+            panel.Tag = tag;
+            panel.Controls.Add(label);
+
+            // Кнопку информации
+            PictureBox infoButton = new PictureBox()
+            {
+                Width = 26,
+                Height = 26,
+                Top = 0,
+                Left = (titles.Length - 2) * (defaultTextBoxWidth + defaultMargin) + defaultMargin + 20,
+                Image = infoIcon,
+                Cursor = Cursors.Hand,
+                SizeMode = PictureBoxSizeMode.StretchImage,
+            };
+            infoButton.Click += (Object sender, EventArgs e) =>
+            {
+                MessageBox.Show(tag.Description, "Описание", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            };
+            panel.Controls.Add(infoButton);
+
+
+            // Кнопку копирования
+            PictureBox copyButton = new PictureBox() {
+                Width = 26,
+                Height = 26,
+                Top = 0,
+                Left = (titles.Length - 1) * (defaultTextBoxWidth + defaultMargin) + defaultMargin + 20,
+                Image = clipboardIcon,
+                Cursor = Cursors.Hand,
+                SizeMode = PictureBoxSizeMode.StretchImage,
+            };
+            copyButton.Click += (Object sender, EventArgs e) =>
+            {
+                Clipboard.SetData(DataFormats.Text, tag.Tag);
+                SystemSounds.Beep.Play();
+            };
+            panel.Controls.Add(copyButton);
+
+
+            
+
+            return panel;
+        }
+
 
         private void Button1_Click(object sender, EventArgs e)
         {

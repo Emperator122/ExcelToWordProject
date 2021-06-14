@@ -35,6 +35,7 @@
             this.constantsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.bodyPanel = new System.Windows.Forms.Panel();
             this.bodyGroupBox = new System.Windows.Forms.GroupBox();
+            this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.resultFilePrefixLabel = new System.Windows.Forms.Label();
             this.templateFilePathButton = new System.Windows.Forms.PictureBox();
             this.resultFilePrefixTextBox = new System.Windows.Forms.TextBox();
@@ -47,9 +48,9 @@
             this.resultFolderPathTextBox = new System.Windows.Forms.TextBox();
             this.filePathLabel = new System.Windows.Forms.Label();
             this.filePathTextBox = new System.Windows.Forms.TextBox();
-            this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.status = new System.Windows.Forms.ToolStripStatusLabel();
+            this.списокТеговToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.bodyPanel.SuspendLayout();
             this.bodyGroupBox.SuspendLayout();
@@ -63,7 +64,8 @@
             // menuStrip1
             // 
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripMenuItem1});
+            this.toolStripMenuItem1,
+            this.списокТеговToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Padding = new System.Windows.Forms.Padding(9, 2, 0, 2);
@@ -84,22 +86,23 @@
             // defaultТегиToolStripMenuItem
             // 
             this.defaultТегиToolStripMenuItem.Name = "defaultТегиToolStripMenuItem";
-            this.defaultТегиToolStripMenuItem.Size = new System.Drawing.Size(154, 22);
+            this.defaultТегиToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.defaultТегиToolStripMenuItem.Text = "Обычные теги";
             this.defaultТегиToolStripMenuItem.Click += new System.EventHandler(this.DefaultТегиToolStripMenuItem_Click);
             // 
             // smartTagsToolStripMenuItem
             // 
             this.smartTagsToolStripMenuItem.Name = "smartTagsToolStripMenuItem";
-            this.smartTagsToolStripMenuItem.Size = new System.Drawing.Size(154, 22);
+            this.smartTagsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.smartTagsToolStripMenuItem.Text = "\"Умные\" теги";
             this.smartTagsToolStripMenuItem.Click += new System.EventHandler(this.SmartTagsToolStripMenuItem_Click);
             // 
             // constantsToolStripMenuItem
             // 
             this.constantsToolStripMenuItem.Name = "constantsToolStripMenuItem";
-            this.constantsToolStripMenuItem.Size = new System.Drawing.Size(154, 22);
+            this.constantsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.constantsToolStripMenuItem.Text = "Константы";
+            this.constantsToolStripMenuItem.Visible = false;
             // 
             // bodyPanel
             // 
@@ -137,6 +140,15 @@
             this.bodyGroupBox.Size = new System.Drawing.Size(596, 356);
             this.bodyGroupBox.TabIndex = 1;
             this.bodyGroupBox.TabStop = false;
+            // 
+            // progressBar1
+            // 
+            this.progressBar1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.progressBar1.Location = new System.Drawing.Point(13, 320);
+            this.progressBar1.Name = "progressBar1";
+            this.progressBar1.Size = new System.Drawing.Size(468, 27);
+            this.progressBar1.TabIndex = 10;
             // 
             // resultFilePrefixLabel
             // 
@@ -279,15 +291,6 @@
             this.filePathTextBox.Size = new System.Drawing.Size(542, 26);
             this.filePathTextBox.TabIndex = 0;
             // 
-            // progressBar1
-            // 
-            this.progressBar1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.progressBar1.Location = new System.Drawing.Point(13, 320);
-            this.progressBar1.Name = "progressBar1";
-            this.progressBar1.Size = new System.Drawing.Size(468, 27);
-            this.progressBar1.TabIndex = 10;
-            // 
             // statusStrip1
             // 
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -303,6 +306,13 @@
             this.status.Name = "status";
             this.status.Size = new System.Drawing.Size(73, 17);
             this.status.Text = "Ожидание...";
+            // 
+            // списокТеговToolStripMenuItem
+            // 
+            this.списокТеговToolStripMenuItem.Name = "списокТеговToolStripMenuItem";
+            this.списокТеговToolStripMenuItem.Size = new System.Drawing.Size(92, 20);
+            this.списокТеговToolStripMenuItem.Text = "Список тегов";
+            this.списокТеговToolStripMenuItem.Click += new System.EventHandler(this.СписокТеговToolStripMenuItem_Click);
             // 
             // MainForm
             // 
@@ -358,6 +368,7 @@
         private System.Windows.Forms.ProgressBar progressBar1;
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripStatusLabel status;
+        private System.Windows.Forms.ToolStripMenuItem списокТеговToolStripMenuItem;
     }
 }
 

@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Xceed.Document.NET;
 using Xceed.Words.NET;
 
 namespace ExcelToWordProject
@@ -86,7 +87,7 @@ namespace ExcelToWordProject
                 int i = 0;
                 foreach(Module module in modules)
                 {
-                    string safeName = PathUtils.RemoveIllegalFileNameCharacters(fileNamePrefix + module.Name + ".docx");
+                    string safeName = PathUtils.RemoveIllegalFileNameCharacters(fileNamePrefix + module.Index + " " + module.Name + ".docx");
                     string resultFilePath = Path.Combine(resultFolderPath, safeName);
                     baseDocument = DocX.Load(baseDocumentPath);
                     baseDocument.SaveAs(resultFilePath);
@@ -113,12 +114,17 @@ namespace ExcelToWordProject
                             {
                                 SmartSyllabusTag smartTag = tag as SmartSyllabusTag;
                                 tagValue = smartTag.ExtractDataFromModule(module, contentList, properties);
+
+                                // Для компетенций используется доп. хендлер
+                                if (smartTag.Type == SmartTagType.Content || smartTag.Type == SmartTagType.ExtendedContent)
+                                    ContentHandler(doc, smartTag, tagValue);
                             }
                             else
                             {
                                 tagValue = ExtractDefaultTagData(tag as DefaultSyllabusTag);
                             }
-                            doc.ReplaceText("<"+tag.Key+">", tagValue);
+                            
+                            doc.ReplaceText(tag.Tag, tagValue);
                         }                     
                     }
                     doc.Save();
@@ -130,7 +136,9 @@ namespace ExcelToWordProject
             }
             else // просто заменяем теги
             {
-                string resultFilePath = Path.Combine(resultFolderPath, fileNamePrefix + ".docx");
+                fileNamePrefix = fileNamePrefix == "" ? "UnsetFileName" : fileNamePrefix;
+                string safeName = PathUtils.RemoveIllegalFileNameCharacters(fileNamePrefix +".docx");
+                string resultFilePath = Path.Combine(resultFolderPath, safeName);
                 baseDocument.SaveAs(resultFilePath);
                 DocX doc = DocX.Load(resultFilePath);
                 // бежим по списку тегов
@@ -138,7 +146,7 @@ namespace ExcelToWordProject
                 {
                     // и заполняем каждый активный тег
                     if (tag is DefaultSyllabusTag && tag.Active)
-                        doc.ReplaceText("<" + tag.Key + ">", ExtractDefaultTagData(tag as DefaultSyllabusTag));
+                        doc.ReplaceText(tag.Tag, ExtractDefaultTagData(tag as DefaultSyllabusTag));
 
                 }
                 doc.Save();
@@ -199,6 +207,42 @@ namespace ExcelToWordProject
             }
 
             return modules;
+        }
+
+        
+        /// <summary>
+        /// Реализация костыля для раздела компетенций.
+        /// Заменяет все одинокие теги на параграфы из tagValue, сплитнутого по \n.
+        /// </summary>
+        /// <param name="doc">Документ DocX</param>
+        /// <param name="contentTag">Тег</param>
+        /// <param name="tagValue">Строка, которая будет сплитнута по \n</param>
+        protected void ContentHandler(DocX doc, SmartSyllabusTag contentTag, string tagValue)
+        {
+            try
+            {
+                string[] lines = tagValue.Split('\n');
+                string tagString = contentTag.Tag;
+                foreach (Paragraph paragraph in doc.Paragraphs)
+                {
+                    if (paragraph.Text.Trim() == tagString)
+                    {
+                        Paragraph p = paragraph.InsertParagraphAfterSelf(paragraph);
+                        for (int i = 0; i < lines.Length; i++)
+                        {
+                            p.ReplaceText(tagString, lines[i]);
+                            if (i != lines.Length - 1)
+                                p = p.InsertParagraphAfterSelf(paragraph);
+
+                        }
+                        paragraph.Remove(false);
+                    }
+                }
+            }
+            catch
+            {
+
+            }
         }
     }
 }

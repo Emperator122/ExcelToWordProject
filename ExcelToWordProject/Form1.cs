@@ -15,6 +15,10 @@ namespace ExcelToWordProject
 {
     public partial class MainForm : Form
     {
+        bool LockButtons = false;
+        DefaultTagSettingsForm DefaultTagSettingsForm;
+        SmartTagSettingsForm SmartTagSettingsForm;
+        TagListForm TagListForm;
         SyllabusParameters syllabusParameters;
         public MainForm()
         {
@@ -31,20 +35,29 @@ namespace ExcelToWordProject
 
         private async void ConvertButton_Click(object sender, EventArgs e)
         {
+            if (LockButtons)
+                return;
+            LockButtons = true;
             string selectedFilePath = filePathTextBox.Text;
             string templateFilePath = templateFilePathTextBox.Text;
             string resultFolderPath = resultFolderPathTextBox.Text;
-            SyllabusReader syllabusReader = new SyllabusReader(selectedFilePath, syllabusParameters);
-            status.Text = "Генерация файлов...";
+            SyllabusReader syllabusReader = null;
             try
             {
+                syllabusReader = new SyllabusReader(selectedFilePath, syllabusParameters);
+                status.Text = "Генерация файлов...";
                 await Task.Run(()=> syllabusReader.ConvertToDocx(resultFolderPath, templateFilePath, resultFilePrefixTextBox.Text,
                     new Progress<int>(percent => progressBar1.Value = percent)));
             }
+            catch(Exception ex)
+            {
+                MessageBox.Show("Произошла ошибка:\r\n" + ex.Message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
             finally
             {
-                syllabusReader.CloseStreams();
+                syllabusReader?.CloseStreams();
                 status.Text = "Ожидание...";
+                LockButtons = false;
             }
         }
 
@@ -79,14 +92,35 @@ namespace ExcelToWordProject
 
         private void SmartTagsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            SmartTagSettingsForm smartTagSettingsForm = new SmartTagSettingsForm(syllabusParameters);
-            smartTagSettingsForm.Show();
+            if (SmartTagSettingsForm == null || SmartTagSettingsForm.IsDisposed)
+            {
+                SmartTagSettingsForm = new SmartTagSettingsForm(syllabusParameters);
+                SmartTagSettingsForm.Show();
+            }
+            else
+                SmartTagSettingsForm.Focus();
         }
 
         private void DefaultТегиToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            DefaultTagSettingsForm defaultTagSettingsForm = new DefaultTagSettingsForm(syllabusParameters);
-            defaultTagSettingsForm.Show();
+            if (DefaultTagSettingsForm == null || DefaultTagSettingsForm.IsDisposed)
+            {
+                DefaultTagSettingsForm = new DefaultTagSettingsForm(syllabusParameters);
+                DefaultTagSettingsForm.Show();
+            }
+            else
+                DefaultTagSettingsForm.Focus();
+        }
+
+        private void СписокТеговToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (TagListForm == null || TagListForm.IsDisposed)
+            {
+                TagListForm = new TagListForm(syllabusParameters.Tags);
+                TagListForm.Show();
+            }
+            else
+                TagListForm.Focus();
         }
     }
 }

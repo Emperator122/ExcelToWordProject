@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Media;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -15,9 +16,13 @@ namespace ExcelToWordProject
     {
         // Настройки для генерации таблички с параметрами тегов
         string[] names = new string[] { "rowIndexTextBox", "columnIndexTextBox", "tagTextBox", "listTextBox" };
-        string[] titles = new string[] { "Индекс стобца", "Индекс строки", "Тег", "Рабочий лист", "Удалить" };
+        string[] titles = new string[] { "Индекс стобца", "Индекс строки", "Тег", "Рабочий лист",  "Описание", "Копировать", "Удалить" };
         int defaultTextBoxWidth = 180;
         int defaultMargin = 10;
+
+        Bitmap clipboardIcon = Properties.Resources.clipboards;
+        Bitmap infoIcon = Properties.Resources.information;
+        Bitmap removeIcon = Properties.Resources.remove;
 
 
         public SyllabusParameters syllabusParameters;
@@ -105,22 +110,64 @@ namespace ExcelToWordProject
             }
 
 
-            // И кнопку удаления
-            PictureBox removeButton = new PictureBox();
-            removeButton.Width = 26;
-            removeButton.Height = 26;
-            removeButton.Top = 0;
-            removeButton.Name = "removeButton";
-            removeButton.Left = (titles.Length - 1) * (defaultTextBoxWidth + defaultMargin) + defaultMargin + 20;
-            removeButton.Image = Properties.Resources.remove;
-            removeButton.Cursor = Cursors.Hand;
-            removeButton.SizeMode = PictureBoxSizeMode.StretchImage;
+            // Кнопку информации
+            PictureBox infoButton = new PictureBox()
+            {
+                Width = 26,
+                Height = 26,
+                Top = 0,
+                Left = (titles.Length - 3) * (defaultTextBoxWidth + defaultMargin) + defaultMargin + 20,
+                Image = infoIcon,
+                Cursor = Cursors.Hand,
+                SizeMode = PictureBoxSizeMode.StretchImage,
+            };
+            infoButton.Click += (Object sender, EventArgs e) =>
+            {
+                DescriptionEditForm editForm = new DescriptionEditForm(tag);
+                editForm.ShowDialog();
+                
+
+            };
+            panel.Controls.Add(infoButton);
+
+
+            // Кнопку копирования
+            PictureBox copyButton = new PictureBox()
+            {
+                Width = 26,
+                Height = 26,
+                Top = 0,
+                Left = (titles.Length - 2) * (defaultTextBoxWidth + defaultMargin) + defaultMargin + 20,
+                Image = clipboardIcon,
+                Cursor = Cursors.Hand,
+                SizeMode = PictureBoxSizeMode.StretchImage,
+            };
+            copyButton.Click += (Object sender, EventArgs e) =>
+            {
+                Clipboard.SetData(DataFormats.Text, tag.Tag);
+                SystemSounds.Beep.Play();
+            };
+            panel.Controls.Add(copyButton);
+
+
+            // Кнопку удаления
+            PictureBox removeButton = new PictureBox()
+            {
+                Width = 26,
+                Height = 26,
+                Top = 0,
+                Name = "removeButton",
+                Left = (titles.Length - 1) * (defaultTextBoxWidth + defaultMargin) + defaultMargin + 20,
+                Image = removeIcon,
+                Cursor = Cursors.Hand,
+                SizeMode = PictureBoxSizeMode.StretchImage
+            };
+
             removeButton.Click += (Object sender, EventArgs e) => {
                 syllabusParameters.Tags.Remove(tag);
                 panel.Dispose();
                 parent.Controls.Remove(panel);
             };
-
 
             panel.Controls.Add(removeButton);
 
@@ -167,8 +214,12 @@ namespace ExcelToWordProject
         {
             DefaultSyllabusTag tag = new DefaultSyllabusTag(0, 0, "", "");
             syllabusParameters.Tags.Add(tag);
-            defaultTagsPanel.Controls.Add(GenerateSmartTagRow(defaultTagsPanel.Controls.Count, tag, defaultTagsPanel));
+            Panel row = GenerateSmartTagRow(defaultTagsPanel.Controls.Count, tag, defaultTagsPanel);
+            row.Visible = false;
+            defaultTagsPanel.Controls.Add(row);
             defaultTagsPanel.Controls[defaultTagsPanel.Controls.Count - 1].BringToFront();
+            row.Visible = true;
         }
+
     }
 }

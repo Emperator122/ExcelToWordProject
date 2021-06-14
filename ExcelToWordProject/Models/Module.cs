@@ -84,7 +84,7 @@ namespace ExcelToWordProject
 
             // если мы не нашли нужную строку
             if (rowIndex == rows.Count)
-                return new ModuleProperties("error", "error", ControlForm.Error, -1);
+                return new ModuleProperties("error", "error", new List<ControlForm>(), -1);
 
             // Тянем доп данные
 
@@ -96,16 +96,17 @@ namespace ExcelToWordProject
             SmartSyllabusTag controlTag =
                 parameters.Tags.Find(
                     tag => tag is SmartSyllabusTag && (tag as SmartSyllabusTag).Type == SmartTagType.Control) as SmartSyllabusTag; 
-            properties.Control = ControlForm.Error;
             if (rows[rowIndex][controlTag.ColumnIndex] as string != null && rows[rowIndex][controlTag.ColumnIndex] as string != "")
             {
-                properties.Control = ControlForm.Exam;
-            } else if(rows[rowIndex][controlTag.ColumnIndex+2] as string != null && rows[rowIndex][controlTag.ColumnIndex+2] as string != "")
+                properties.Control.Add(ControlForm.Exam);
+            }
+            if (rows[rowIndex][controlTag.ColumnIndex+2] as string != null && rows[rowIndex][controlTag.ColumnIndex+2] as string != "")
             {
-                properties.Control = ControlForm.GradedCredit;
-            } else if(rows[rowIndex][controlTag.ColumnIndex + 1] as string != null && rows[rowIndex][controlTag.ColumnIndex + 1] as string != "")
+                properties.Control.Add(ControlForm.GradedCredit);
+            }
+            if (rows[rowIndex][controlTag.ColumnIndex + 1] as string != null && rows[rowIndex][controlTag.ColumnIndex + 1] as string != "")
             {
-                properties.Control = ControlForm.Credit;
+                properties.Control.Add(ControlForm.Credit);
             }
 
             // Зачетные единицы
