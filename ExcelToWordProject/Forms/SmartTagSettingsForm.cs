@@ -1,4 +1,5 @@
-﻿using ExcelToWordProject.Utils;
+﻿using ExcelToWordProject.Syllabus;
+using ExcelToWordProject.Utils;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -22,6 +23,7 @@ namespace ExcelToWordProject
 
         Bitmap infoIcon = Properties.Resources.information;
         Bitmap clipboardIcon = Properties.Resources.clipboards;
+
 
 
         public SyllabusParameters syllabusParameters;
@@ -150,6 +152,7 @@ namespace ExcelToWordProject
                 textBox.Left = j * (textBox.Width + defaultMargin) + defaultMargin;
                 textBox.Name = names[j];
                 textBox.Text = textBoxValues[j];
+                textBox.Enabled = !(j == 0 && textBoxValues[j] == "-1"); 
 
                 panel.Controls.Add(textBox);
             }

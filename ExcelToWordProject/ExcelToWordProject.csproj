@@ -62,30 +62,40 @@
     <Compile Include="Components\MyTreeView.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="DefaultTagSettingsForm.cs">
+    <Compile Include="Forms\DefaultTagSettingsForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="DefaultTagSettingsForm.Designer.cs">
+    <Compile Include="Forms\DefaultTagSettingsForm.Designer.cs">
       <DependentUpon>DefaultTagSettingsForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="DescriptionEditForm.cs">
+    <Compile Include="Forms\DescriptionEditForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="DescriptionEditForm.Designer.cs">
+    <Compile Include="Forms\DescriptionEditForm.Designer.cs">
       <DependentUpon>DescriptionEditForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="SmartTagSettingsForm.cs">
+    <Compile Include="Forms\RegularExpressionEditForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="SmartTagSettingsForm.Designer.cs">
+    <Compile Include="Forms\RegularExpressionEditForm.Designer.cs">
+      <DependentUpon>RegularExpressionEditForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ExcelTableList.cs" />
+    <Compile Include="Models\RegExpData.cs" />
+    <Compile Include="Models\TempDictionaryItem.cs" />
+    <Compile Include="Forms\SmartTagSettingsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\SmartTagSettingsForm.Designer.cs">
       <DependentUpon>SmartTagSettingsForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="SyllabusParameters.cs" />
-    <Compile Include="SyllabusReader.cs" />
-    <Compile Include="Form1.cs">
+    <Compile Include="Syllabus\SyllabusExcelReader.cs" />
+    <Compile Include="Syllabus\SyllabusParameters.cs" />
+    <Compile Include="Syllabus\SyllabusDocWriter.cs" />
+    <Compile Include="Forms\Form1.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Form1.Designer.cs">
+    <Compile Include="Forms\Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
     <Compile Include="Models\Content.cs" />
@@ -93,23 +103,27 @@
     <Compile Include="Models\ModuleProperties.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TagListForm.cs">
+    <Compile Include="Forms\TagListForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="TagListForm.Designer.cs">
+    <Compile Include="Forms\TagListForm.Designer.cs">
       <DependentUpon>TagListForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Utils\ConfigManager.cs" />
     <Compile Include="Utils\ExcelUtils.cs" />
+    <Compile Include="Utils\OtherUtils.cs" />
     <Compile Include="Utils\PathUtils.cs" />
-    <EmbeddedResource Include="DefaultTagSettingsForm.resx">
+    <EmbeddedResource Include="Forms\DefaultTagSettingsForm.resx">
       <DependentUpon>DefaultTagSettingsForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="DescriptionEditForm.resx">
+    <EmbeddedResource Include="Forms\DescriptionEditForm.resx">
       <DependentUpon>DescriptionEditForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Form1.resx">
+    <EmbeddedResource Include="Forms\Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\RegularExpressionEditForm.resx">
+      <DependentUpon>RegularExpressionEditForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -121,10 +135,10 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
-    <EmbeddedResource Include="SmartTagSettingsForm.resx">
+    <EmbeddedResource Include="Forms\SmartTagSettingsForm.resx">
       <DependentUpon>SmartTagSettingsForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="TagListForm.resx">
+    <EmbeddedResource Include="Forms\TagListForm.resx">
       <DependentUpon>TagListForm.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="packages.config" />
@@ -164,6 +178,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\information.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\regExp.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

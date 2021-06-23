@@ -9,11 +9,40 @@ namespace ExcelToWordProject.Models
 {
     public class ModuleProperties
     {
+        public int TotalLessonsHours { get => LecturesHours + PracticalLessonsHours + LaboratoryLessonsHours; } // Итого аудиторных занятий
+        public List<int> Years // Курсы, на которых преподается модуль
+        {
+            get
+            {
+                List<int> years = new List<int>();
+                Semesters.ForEach(semester =>
+                {
+                    int year = semester % 2 == 0 ? semester / 2 : semester / 2 + 1;
+                    if (!years.Contains(year))
+                        years.Add(year);
+                });
+
+                return years;
+            }
+        }
+
         public int BlockNumber = -1;
         public string BlockName = "";
         public string PartName = "";
         public List<ControlForm> Control = new List<ControlForm>();
         public int CreditUnits = -1;
+
+        public List<int> Semesters = new List<int>();
+        public int LecturesHours = 0;
+        public int PracticalLessonsHours = 0;
+        public int LaboratoryLessonsHours = 0;
+        public int IndependentWorkHours = 0;
+        public int ControlHours = 0;
+        public int TotalHoursByPlan = 0;
+        
+
+
+
 
         public ModuleProperties() { }
 
@@ -25,29 +54,6 @@ namespace ExcelToWordProject.Models
             Control = controlForm;
             CreditUnits = creditUnits;
         }
-
-        public ModuleProperties(string parentModuleIndex, char del = '.')
-        {
-            string[] props = parentModuleIndex.Split(del);
-
-            if (props.Length > 0)
-            {
-                BlockName = props[0];
-
-                string temp = Regex.Replace(BlockName, @"[^\d]+", "");
-                BlockNumber = (temp != "") ? Convert.ToInt32(temp) : -1;
-
-                PartName = "";
-            }
-            else // если ничего не получилось распарсить
-            {
-                BlockName = "";
-                BlockNumber = -1;
-                PartName = "";
-            }
-
-        }
-
     }
 
     // Формы контроля: Экзамен, Зачет, Зачет с оценкой

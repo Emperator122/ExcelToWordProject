@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ExcelToWordProject.Syllabus;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -24,7 +25,9 @@ namespace ExcelToWordProject
         public TagListForm(List<BaseSyllabusTag> tags)
         {
             InitializeComponent();
-            Tags = tags;
+            Tags = new List<BaseSyllabusTag>();
+            Tags.AddRange(tags);
+            Tags.Sort((el1, el2) => el1.Key.CompareTo(el2.Key));
             tagsPanel.Controls.AddRange(GenerateSmartTagsSettingsElements(tagsPanel));
             topMostCheckBox.Checked = TopMost;
         }

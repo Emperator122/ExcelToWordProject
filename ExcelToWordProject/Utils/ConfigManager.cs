@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ExcelToWordProject.Syllabus;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -29,6 +30,9 @@ namespace ExcelToWordProject.Utils
                 {
                     XmlSerializer serializer = new XmlSerializer(typeof(SyllabusParameters));
                     settings = (SyllabusParameters)serializer.Deserialize(stream);
+                    // десариализуем словарь
+                    settings.planListHeaderNames = settings.tempPlanListHeaderNames
+                                        .ToDictionary(i => i.Name, i => i.Value);
                     return settings;
                 }
             }

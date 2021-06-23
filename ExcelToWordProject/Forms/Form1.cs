@@ -1,4 +1,5 @@
 ﻿using ExcelToWordProject.Models;
+using ExcelToWordProject.Syllabus;
 using ExcelToWordProject.Utils;
 using System;
 using System.Collections.Generic;
@@ -31,6 +32,10 @@ namespace ExcelToWordProject
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            Module module = new Module("0", "ваыва", "фваываыва;ываыва");
+            Type moduleType = module.GetType();
+            moduleType.GetField("Name");
+
         }
 
         private async void ConvertButton_Click(object sender, EventArgs e)
@@ -41,12 +46,21 @@ namespace ExcelToWordProject
             string selectedFilePath = filePathTextBox.Text;
             string templateFilePath = templateFilePathTextBox.Text;
             string resultFolderPath = resultFolderPathTextBox.Text;
-            SyllabusReader syllabusReader = null;
+            SyllabusExcelReader syllabusExcelReader = null;
+            SyllabusDocWriter syllabusDocWriter = null;
+            /*
+            syllabusExcelReader = new SyllabusExcelReader(selectedFilePath, syllabusParameters);
+            syllabusDocWriter = new SyllabusDocWriter(syllabusExcelReader, syllabusParameters);
+            status.Text = "Генерация файлов...";
+            syllabusDocWriter.ConvertToDocx(resultFolderPath, templateFilePath, resultFilePrefixTextBox.Text,
+                new Progress<int>(percent => progressBar1.Value = percent));
+            */
             try
             {
-                syllabusReader = new SyllabusReader(selectedFilePath, syllabusParameters);
+                syllabusExcelReader = new SyllabusExcelReader(selectedFilePath, syllabusParameters);
+                syllabusDocWriter = new SyllabusDocWriter(syllabusExcelReader, syllabusParameters);
                 status.Text = "Генерация файлов...";
-                await Task.Run(()=> syllabusReader.ConvertToDocx(resultFolderPath, templateFilePath, resultFilePrefixTextBox.Text,
+                await Task.Run(()=> syllabusDocWriter.ConvertToDocx(resultFolderPath, templateFilePath, resultFilePrefixTextBox.Text,
                     new Progress<int>(percent => progressBar1.Value = percent)));
             }
             catch(Exception ex)
@@ -55,7 +69,7 @@ namespace ExcelToWordProject
             }
             finally
             {
-                syllabusReader?.CloseStreams();
+                syllabusExcelReader?.CloseStreams();
                 status.Text = "Ожидание...";
                 LockButtons = false;
             }

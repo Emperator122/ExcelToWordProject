@@ -1,4 +1,6 @@
-﻿using ExcelToWordProject.Utils;
+﻿using ExcelToWordProject.Forms;
+using ExcelToWordProject.Syllabus;
+using ExcelToWordProject.Utils;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -15,14 +17,15 @@ namespace ExcelToWordProject
     public partial class DefaultTagSettingsForm : Form
     {
         // Настройки для генерации таблички с параметрами тегов
-        string[] names = new string[] { "rowIndexTextBox", "columnIndexTextBox", "tagTextBox", "listTextBox" };
-        string[] titles = new string[] { "Индекс стобца", "Индекс строки", "Тег", "Рабочий лист",  "Описание", "Копировать", "Удалить" };
+        string[] names = new string[] { "rowIndexTextBox", "columnIndexTextBox", "tagTextBox", "listTextBox"};
+        string[] titles = new string[] { "Индекс строки", "Индекс столбца", "Тег", "Рабочий лист", "Рег. выражение",  "Описание", "Копировать", "Удалить" };
         int defaultTextBoxWidth = 180;
         int defaultMargin = 10;
 
         Bitmap clipboardIcon = Properties.Resources.clipboards;
         Bitmap infoIcon = Properties.Resources.information;
         Bitmap removeIcon = Properties.Resources.remove;
+        Bitmap regexIcon = Properties.Resources.regExp;
 
 
         public SyllabusParameters syllabusParameters;
@@ -109,6 +112,23 @@ namespace ExcelToWordProject
                 panel.Controls.Add(textBox);
             }
 
+            // Кнопку регулярок
+            PictureBox regExpButton = new PictureBox()
+            {
+                Width = 26,
+                Height = 26,
+                Top = 0,
+                Left = (titles.Length - 4) * (defaultTextBoxWidth + defaultMargin) + defaultMargin + 20,
+                Image = regexIcon,
+                Cursor = Cursors.Hand,
+                SizeMode = PictureBoxSizeMode.StretchImage,
+            };
+            regExpButton.Click += (Object sender, EventArgs e) =>
+            {
+                RegularExpressionEditForm regularExpressionEditForm = new RegularExpressionEditForm(tag);
+                regularExpressionEditForm.ShowDialog();
+            };
+            panel.Controls.Add(regExpButton);
 
             // Кнопку информации
             PictureBox infoButton = new PictureBox()
@@ -200,7 +220,6 @@ namespace ExcelToWordProject
                     tag.ColumnIndex = Convert.ToInt32((child.Controls["columnIndexTextBox"] as TextBox).Text);
                     tag.Key = (child.Controls["tagTextBox"] as TextBox).Text;
                     tag.ListName = (child.Controls["listTextBox"] as TextBox).Text;
-
                     i++;
                 }
             }

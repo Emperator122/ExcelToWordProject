@@ -35,20 +35,20 @@
             // 
             // descriptionTextBox
             // 
-            this.descriptionTextBox.Location = new System.Drawing.Point(16, 18);
-            this.descriptionTextBox.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.descriptionTextBox.Location = new System.Drawing.Point(18, 16);
+            this.descriptionTextBox.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.descriptionTextBox.Multiline = true;
             this.descriptionTextBox.Name = "descriptionTextBox";
             this.descriptionTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.descriptionTextBox.Size = new System.Drawing.Size(433, 336);
+            this.descriptionTextBox.Size = new System.Drawing.Size(487, 303);
             this.descriptionTextBox.TabIndex = 0;
             // 
             // SaveButton
             // 
-            this.SaveButton.Location = new System.Drawing.Point(16, 364);
-            this.SaveButton.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.SaveButton.Location = new System.Drawing.Point(18, 328);
+            this.SaveButton.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.SaveButton.Name = "SaveButton";
-            this.SaveButton.Size = new System.Drawing.Size(193, 35);
+            this.SaveButton.Size = new System.Drawing.Size(217, 31);
             this.SaveButton.TabIndex = 1;
             this.SaveButton.Text = "Сохранить и закрыть";
             this.SaveButton.UseVisualStyleBackColor = true;
@@ -56,10 +56,10 @@
             // 
             // CancelButton1
             // 
-            this.CancelButton1.Location = new System.Drawing.Point(256, 364);
-            this.CancelButton1.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.CancelButton1.Location = new System.Drawing.Point(288, 328);
+            this.CancelButton1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.CancelButton1.Name = "CancelButton1";
-            this.CancelButton1.Size = new System.Drawing.Size(193, 35);
+            this.CancelButton1.Size = new System.Drawing.Size(217, 31);
             this.CancelButton1.TabIndex = 2;
             this.CancelButton1.Text = "Отмена";
             this.CancelButton1.UseVisualStyleBackColor = true;
@@ -67,15 +67,15 @@
             // 
             // DescriptionEditForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 18F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(466, 418);
+            this.ClientSize = new System.Drawing.Size(524, 376);
             this.Controls.Add(this.CancelButton1);
             this.Controls.Add(this.SaveButton);
             this.Controls.Add(this.descriptionTextBox);
-            this.Font = new System.Drawing.Font("Arial Narrow", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
-            this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.Name = "DescriptionEditForm";
             this.Text = "Редактирование описания";
             this.ResumeLayout(false);

@@ -33,6 +33,7 @@
             this.defaultТегиToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.smartTagsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.constantsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.списокТеговToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.bodyPanel = new System.Windows.Forms.Panel();
             this.bodyGroupBox = new System.Windows.Forms.GroupBox();
             this.progressBar1 = new System.Windows.Forms.ProgressBar();
@@ -50,7 +51,6 @@
             this.filePathTextBox = new System.Windows.Forms.TextBox();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.status = new System.Windows.Forms.ToolStripStatusLabel();
-            this.списокТеговToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.bodyPanel.SuspendLayout();
             this.bodyGroupBox.SuspendLayout();
@@ -86,23 +86,30 @@
             // defaultТегиToolStripMenuItem
             // 
             this.defaultТегиToolStripMenuItem.Name = "defaultТегиToolStripMenuItem";
-            this.defaultТегиToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.defaultТегиToolStripMenuItem.Size = new System.Drawing.Size(154, 22);
             this.defaultТегиToolStripMenuItem.Text = "Обычные теги";
             this.defaultТегиToolStripMenuItem.Click += new System.EventHandler(this.DefaultТегиToolStripMenuItem_Click);
             // 
             // smartTagsToolStripMenuItem
             // 
             this.smartTagsToolStripMenuItem.Name = "smartTagsToolStripMenuItem";
-            this.smartTagsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.smartTagsToolStripMenuItem.Size = new System.Drawing.Size(154, 22);
             this.smartTagsToolStripMenuItem.Text = "\"Умные\" теги";
             this.smartTagsToolStripMenuItem.Click += new System.EventHandler(this.SmartTagsToolStripMenuItem_Click);
             // 
             // constantsToolStripMenuItem
             // 
             this.constantsToolStripMenuItem.Name = "constantsToolStripMenuItem";
-            this.constantsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.constantsToolStripMenuItem.Size = new System.Drawing.Size(154, 22);
             this.constantsToolStripMenuItem.Text = "Константы";
             this.constantsToolStripMenuItem.Visible = false;
+            // 
+            // списокТеговToolStripMenuItem
+            // 
+            this.списокТеговToolStripMenuItem.Name = "списокТеговToolStripMenuItem";
+            this.списокТеговToolStripMenuItem.Size = new System.Drawing.Size(92, 20);
+            this.списокТеговToolStripMenuItem.Text = "Список тегов";
+            this.списокТеговToolStripMenuItem.Click += new System.EventHandler(this.СписокТеговToolStripMenuItem_Click);
             // 
             // bodyPanel
             // 
@@ -306,13 +313,6 @@
             this.status.Name = "status";
             this.status.Size = new System.Drawing.Size(73, 17);
             this.status.Text = "Ожидание...";
-            // 
-            // списокТеговToolStripMenuItem
-            // 
-            this.списокТеговToolStripMenuItem.Name = "списокТеговToolStripMenuItem";
-            this.списокТеговToolStripMenuItem.Size = new System.Drawing.Size(92, 20);
-            this.списокТеговToolStripMenuItem.Text = "Список тегов";
-            this.списокТеговToolStripMenuItem.Click += new System.EventHandler(this.СписокТеговToolStripMenuItem_Click);
             // 
             // MainForm
             // 
