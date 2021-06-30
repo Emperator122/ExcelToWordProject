@@ -48,12 +48,11 @@ namespace ExcelToWordProject.Syllabus
         /// <param name="progress">Прогресс (для отображения вне потока)</param>
         public void ConvertToDocx(string resultFolderPath, string baseDocumentPath, string fileNamePrefix = "", IProgress<int> progress = null)
         {
-            bool hasActiveSmartTags = Parameters.Tags.FindIndex(el => el is SmartSyllabusTag && el.Active) != -1;
             DocX baseDocument = DocX.Load(baseDocumentPath);
 
             FindTablesTags(baseDocument);
 
-            if (hasActiveSmartTags)
+            if (Parameters.HasActiveSmartTags)
             {
                 // Есть ли смарт-теги, работающие со списком компетенций
                 bool hasSmartModulesContentTags =

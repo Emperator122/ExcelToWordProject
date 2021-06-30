@@ -14,6 +14,24 @@ namespace ExcelToWordProject.Syllabus
 {
     class SyllabusExcelReader : IDisposable
     {
+        /// <summary>
+        /// Является ли данный файл файлом расписания.
+        /// </summary>
+        public bool IsSyllabusFile { get {
+                try
+                {
+                    string flagValue = ExcelData.Tables[0].Rows[11][8] as string ?? "";
+                    if (flagValue.ToLower() != "учебный план")
+                        return false;
+                    return true;
+                }
+                catch
+                {
+                    return false;
+                }
+            }
+        }
+
         public string FilePath { get; }
         public DataSet ExcelData; // ExcelData.Tables["Name"].Rows[11][0] - пример
         SyllabusParameters Parameters;

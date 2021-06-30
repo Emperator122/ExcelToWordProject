@@ -185,9 +185,14 @@ namespace ExcelToWordProject
             };
 
             removeButton.Click += (Object sender, EventArgs e) => {
-                syllabusParameters.Tags.Remove(tag);
-                panel.Dispose();
-                parent.Controls.Remove(panel);
+                DialogResult dialogResult = MessageBox.Show("Вы уверены, что хотите удалить " +
+                    "данный тег?", "Внимание", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                if (dialogResult == DialogResult.Yes)
+                {
+                    syllabusParameters.Tags.Remove(tag);
+                    panel.Dispose();
+                    parent.Controls.Remove(panel);
+                }
             };
 
             panel.Controls.Add(removeButton);

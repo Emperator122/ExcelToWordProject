@@ -12,6 +12,12 @@ namespace ExcelToWordProject.Syllabus
 {
     public class SyllabusParameters
     {
+        [System.Xml.Serialization.XmlIgnore]
+        public bool HasActiveSmartTags
+        {
+            get { return Tags.FindIndex(el => el is SmartSyllabusTag && el.Active)  != -1; }
+        }
+
         public string ModulesContentListName;
         public string PlanListName;
         public string ModulesListName;
@@ -176,6 +182,18 @@ namespace ExcelToWordProject.Syllabus
                             new RegExpData(){ Expression = @".*: (.*)",
                                 GroupIndex = 1, RegexOptions = System.Text.RegularExpressions.RegexOptions.Multiline }),
             };
+        }
+
+        /// <summary>
+        /// Отключить все смарт теги
+        /// </summary>
+        public void DisableSmartTags()
+        {
+            Tags.ForEach(el =>
+            {
+                if (el is SmartSyllabusTag)
+                    el.Active = false;
+            });
         }
     }
 

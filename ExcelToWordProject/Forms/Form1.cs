@@ -71,6 +71,24 @@ namespace ExcelToWordProject
             {
                 syllabusExcelReader = new SyllabusExcelReader(selectedFilePath, syllabusParameters);
                 syllabusDocWriter = new SyllabusDocWriter(syllabusExcelReader, syllabusParameters);
+
+                // Проверка на активные смарт теги при неправильном файле
+                if (syllabusParameters.HasActiveSmartTags && !syllabusExcelReader.IsSyllabusFile)
+                {
+                    DialogResult dialogResult = MessageBox.Show("Возможно данный файл не является " +
+                        "файлом учебного плана, но у вас активны \"умные\" теги. Это может стать причиной " +
+                        "сбоя в работе программы.\r\nОтключить \"умные\" теги?", "Внимание!", MessageBoxButtons.YesNoCancel);
+                    switch (dialogResult)
+                    {
+                        case DialogResult.Yes:
+                            syllabusParameters.DisableSmartTags();
+                            break;
+                        case DialogResult.Cancel:
+                            return;
+                    }
+                }
+
+                
                 status.Text = "Генерация файлов...";
                 await Task.Run(()=> syllabusDocWriter.ConvertToDocx(resultFolderPath, templateFilePath, resultFilePrefixTextBox.Text,
                     new Progress<int>(percent => progressBar1.Value = percent)));
