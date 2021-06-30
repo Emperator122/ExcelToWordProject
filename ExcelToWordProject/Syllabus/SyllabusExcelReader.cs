@@ -137,6 +137,7 @@ namespace ExcelToWordProject.Syllabus
 
             ExcelTableList planList = new ExcelTableList(Parameters.PlanListName, ExcelData, Parameters.PlanListHeaderRowIndex);
 
+            // Поиск строки с дисциплиной и парсинг имени блока и части
             for (rowIndex = Parameters.PlanListHeaderRowIndex + 1; rowIndex < rows.Count; rowIndex++)
             {
                 string val = rows[rowIndex][0] as string;
@@ -179,17 +180,26 @@ namespace ExcelToWordProject.Syllabus
             string temp = Regex.Replace(properties.BlockName, @"[^\d]+", "");
             properties.BlockNumber = (temp != "") ? Convert.ToInt32(temp) : -1;
 
-            // Форма контроля
+            // Формы контроля по семестрам
             SmartSyllabusTag controlTag =
                 Parameters.Tags.Find(
                     tag => tag is SmartSyllabusTag && (tag as SmartSyllabusTag).Type == SmartTagType.Control) as SmartSyllabusTag;
             Array enumValues = Enum.GetValues(typeof(ControlForm));
             for (int i = 0; i < enumValues.Length - 1; i++)
             {
+                ControlForm controlForm = (ControlForm)enumValues.GetValue(i);
                 string val = (rows[rowIndex][controlTag.ColumnIndex + i] as string) ?? "";
+                properties.ControlFormsBySemesters[controlForm] = new List<int>();
                 if (val != "")
-                    properties.Control.Add((ControlForm)enumValues.GetValue(i));
+                    properties.ControlFormsBySemesters[controlForm].AddRange(OtherUtils.StrToListInt(val).Distinct().ToList());  
             }
+
+            // Будет ли курсовая работа
+            SmartSyllabusTag courseWorkTag =
+                Parameters.Tags.Find(
+                    tag => tag is SmartSyllabusTag && (tag as SmartSyllabusTag).Type == SmartTagType.isCourseWork) as SmartSyllabusTag;
+            properties.isCourseWork = ((rows[rowIndex][courseWorkTag.ColumnIndex] as string) ?? "") != "";
+
 
             // Зачетные единицы
             SmartSyllabusTag сreditUnitsTag =
@@ -202,31 +212,35 @@ namespace ExcelToWordProject.Syllabus
             }
 
 
-            // Количество часов на лекции
+            // Количество часов на лекции (по семестрам)
             List<string> tempList = planList.GetCellValue(rowIndex, Parameters.planListHeaderNames["LecturesHoursHeaderName"]);
-            properties.LecturesHours = tempList.Sum(el => OtherUtils.StrToInt(el));
+            properties.LecturesHoursBySemesters = tempList.ConvertAll(el => OtherUtils.StrToInt(el));
 
-            // Количество часов на лабораторки
+            // Количество часов на лабораторки (по семестрам)
             tempList = planList.GetCellValue(rowIndex, Parameters.planListHeaderNames["LaboratoryLessonsHoursHeaderName"]);
-            properties.LaboratoryLessonsHours = tempList.Sum(el => OtherUtils.StrToInt(el));
+            properties.LaboratoryLessonsHoursBySemesters = tempList.ConvertAll(el => OtherUtils.StrToInt(el));
 
-            // Количество часов на практики
+            // Количество часов на практики (по семестрам)
             tempList = planList.GetCellValue(rowIndex, Parameters.planListHeaderNames["PracticalLessonsHoursHeaderName"]);
-            properties.PracticalLessonsHours = tempList.Sum(el => OtherUtils.StrToInt(el));
+            properties.PracticalLessonsHoursBySemesters = tempList.ConvertAll(el => OtherUtils.StrToInt(el));
 
-            // Количество часов на контроль
-            tempList = planList.GetCellValue(rowIndex, Parameters.planListHeaderNames["ControlHoursHeaderName"], true);
-            properties.ControlHours = tempList.Sum(el => OtherUtils.StrToInt(el));
+            // Количество часов на контроль (по семестрам)
+            tempList = planList.GetCellValue(rowIndex, Parameters.planListHeaderNames["ControlHoursHeaderName"]);
+            properties.ControlHoursBySemesters = tempList.ConvertAll(el => OtherUtils.StrToInt(el));
+            properties.ControlHoursBySemesters = 
+                properties.ControlHoursBySemesters.GetRange(1, properties.ControlHoursBySemesters.Count() - 1);
 
-            // Количество часов на самостоятельную работу
-            tempList = planList.GetCellValue(rowIndex, Parameters.planListHeaderNames["IndependentWorkHoursHeaderName"], true);
-            properties.IndependentWorkHours = tempList.Sum(el => OtherUtils.StrToInt(el));
+            // Количество часов на самостоятельную работу (по семестрам)
+            tempList = planList.GetCellValue(rowIndex, Parameters.planListHeaderNames["IndependentWorkHoursHeaderName"]);
+            properties.IndependentWorkHoursBySemesters = tempList.ConvertAll(el => OtherUtils.StrToInt(el));
+            properties.IndependentWorkHoursBySemesters =
+                properties.IndependentWorkHoursBySemesters.GetRange(1, properties.IndependentWorkHoursBySemesters.Count() - 1);
 
             // Общее количество часов по плану
             tempList = planList.GetCellValue(rowIndex, Parameters.planListHeaderNames["TotalHoursByPlanHeaderName"], true);
             properties.TotalHoursByPlan = tempList.Sum(el => OtherUtils.StrToInt(el));
 
-            // Количество семестров (тут придется плясать с бубном)
+            // Список семестров (тут придется плясать с бубном)
             // идея в том, что мы ищем все зачетные единицы по данном предмету
             tempList = planList.GetCellValue(rowIndex, Parameters.planListHeaderNames["SemesterCountingCreditUnitsPlanHeaderName"], false);
             for (int i = 0; i < tempList.Count; i++)

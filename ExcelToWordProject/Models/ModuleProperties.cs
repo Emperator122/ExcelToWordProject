@@ -9,7 +9,17 @@ namespace ExcelToWordProject.Models
 {
     public class ModuleProperties
     {
-        public int TotalLessonsHours { get => LecturesHours + PracticalLessonsHours + LaboratoryLessonsHours; } // Итого аудиторных занятий
+        public int TotalLessonsHours { get => TotalLecturesHours + TotalPracticalLessonsHours + TotalLaboratoryLessonsHours; } // Итого аудиторных занятий
+
+        public List<int> TotalLessonsHoursBySemesters
+        {
+            get {
+                List<int> result = new List<int>(LecturesHoursBySemesters);
+                for (int i = 0; i < LecturesHoursBySemesters.Count; i++)
+                    result[i] += PracticalLessonsHoursBySemesters[i] + LaboratoryLessonsHoursBySemesters[i];
+                return result;
+            }
+        }
         public List<int> Years // Курсы, на которых преподается модуль
         {
             get
@@ -26,20 +36,49 @@ namespace ExcelToWordProject.Models
             }
         }
 
+        public int TotalLecturesHours { get => LecturesHoursBySemesters.Sum(); }
+        public int TotalPracticalLessonsHours { get => PracticalLessonsHoursBySemesters.Sum(); }
+        public int TotalLaboratoryLessonsHours { get => LaboratoryLessonsHoursBySemesters.Sum(); }
+        public int TotalIndependentWorkHours { get => IndependentWorkHoursBySemesters.Sum(); }
+        public int TotalControlHours { get => ControlHoursBySemesters.Sum(); }
+
+        public List<ControlForm> Control
+        {
+            get
+            {
+                List<ControlForm> controls = new List<ControlForm>();
+                Array enumValues = Enum.GetValues(typeof(ControlForm));
+                for (int i = 0; i < enumValues.Length - 1; i++)
+                {
+                    ControlForm controlForm = (ControlForm)enumValues.GetValue(i);
+                    if (ControlFormsBySemesters.ContainsKey(controlForm) && ControlFormsBySemesters[controlForm]?.Count > 0)
+                        controls.Add(controlForm);
+                }
+                if (controls.Count == 0)
+                    controls.Add(ControlForm.Error);
+                return controls;
+            }
+        }
+
         public int BlockNumber = -1;
         public string BlockName = "";
         public string PartName = "";
-        public List<ControlForm> Control = new List<ControlForm>();
         public int CreditUnits = -1;
 
+        public List<int> LecturesHoursBySemesters = new List<int>();
+        public List<int> PracticalLessonsHoursBySemesters = new List<int>();
+        public List<int> LaboratoryLessonsHoursBySemesters = new List<int>();
+        public List<int> IndependentWorkHoursBySemesters = new List<int>();
+        public List<int> ControlHoursBySemesters = new List<int>();
         public List<int> Semesters = new List<int>();
-        public int LecturesHours = 0;
-        public int PracticalLessonsHours = 0;
-        public int LaboratoryLessonsHours = 0;
-        public int IndependentWorkHours = 0;
-        public int ControlHours = 0;
+
+        public Dictionary<ControlForm, List<int>> ControlFormsBySemesters 
+                                    = new Dictionary<ControlForm, List<int>>();
+
         public int TotalHoursByPlan = 0;
-        
+        public bool isCourseWork = false;
+
+
 
 
 
@@ -51,7 +90,6 @@ namespace ExcelToWordProject.Models
             BlockName = blockName;
             BlockNumber = blockNumber;
             PartName = partName;
-            Control = controlForm;
             CreditUnits = creditUnits;
         }
     }

@@ -36,7 +36,7 @@
             // descriptionTextBox
             // 
             this.descriptionTextBox.Location = new System.Drawing.Point(18, 16);
-            this.descriptionTextBox.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.descriptionTextBox.Margin = new System.Windows.Forms.Padding(4);
             this.descriptionTextBox.Multiline = true;
             this.descriptionTextBox.Name = "descriptionTextBox";
             this.descriptionTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
@@ -46,7 +46,7 @@
             // SaveButton
             // 
             this.SaveButton.Location = new System.Drawing.Point(18, 328);
-            this.SaveButton.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.SaveButton.Margin = new System.Windows.Forms.Padding(4);
             this.SaveButton.Name = "SaveButton";
             this.SaveButton.Size = new System.Drawing.Size(217, 31);
             this.SaveButton.TabIndex = 1;
@@ -57,7 +57,7 @@
             // CancelButton1
             // 
             this.CancelButton1.Location = new System.Drawing.Point(288, 328);
-            this.CancelButton1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.CancelButton1.Margin = new System.Windows.Forms.Padding(4);
             this.CancelButton1.Name = "CancelButton1";
             this.CancelButton1.Size = new System.Drawing.Size(217, 31);
             this.CancelButton1.TabIndex = 2;
@@ -75,8 +75,9 @@
             this.Controls.Add(this.descriptionTextBox);
             this.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "DescriptionEditForm";
+            this.ShowIcon = false;
             this.Text = "Редактирование описания";
             this.ResumeLayout(false);
             this.PerformLayout();

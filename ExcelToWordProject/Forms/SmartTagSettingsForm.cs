@@ -165,7 +165,7 @@ namespace ExcelToWordProject
             label.Left = (titles.Length - 3) * (label.Width + defaultMargin) + defaultMargin;
             label.Text = tag.Type.ToString();
             label.Font = new Font(FontFamily.GenericSansSerif, 10, FontStyle.Italic);
-            label.AutoSize = true;
+            label.AutoEllipsis = true;
             panel.Tag = tag;
             panel.Controls.Add(label);
 

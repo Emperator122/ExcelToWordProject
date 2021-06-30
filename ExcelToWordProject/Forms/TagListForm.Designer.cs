@@ -44,7 +44,7 @@
             this.tagsPanel.Location = new System.Drawing.Point(13, 45);
             this.tagsPanel.Margin = new System.Windows.Forms.Padding(4);
             this.tagsPanel.Name = "tagsPanel";
-            this.tagsPanel.Size = new System.Drawing.Size(383, 448);
+            this.tagsPanel.Size = new System.Drawing.Size(541, 448);
             this.tagsPanel.TabIndex = 1;
             // 
             // label1
@@ -55,7 +55,7 @@
             this.label1.Location = new System.Drawing.Point(13, 9);
             this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(383, 32);
+            this.label1.Size = new System.Drawing.Size(541, 32);
             this.label1.TabIndex = 2;
             this.label1.Text = "Общий список тегов";
             this.label1.TextAlign = System.Drawing.ContentAlignment.TopCenter;
@@ -75,7 +75,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 18F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(409, 527);
+            this.ClientSize = new System.Drawing.Size(567, 527);
             this.Controls.Add(this.topMostCheckBox);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.tagsPanel);
@@ -85,6 +85,7 @@
             this.Margin = new System.Windows.Forms.Padding(4);
             this.MaximizeBox = false;
             this.Name = "TagListForm";
+            this.ShowIcon = false;
             this.Text = "Список тегов";
             this.TopMost = true;
             this.ResumeLayout(false);

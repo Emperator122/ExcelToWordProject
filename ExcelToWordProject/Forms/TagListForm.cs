@@ -16,7 +16,7 @@ namespace ExcelToWordProject
     {
         // Настройки для генерации таблички с параметрами тегов
         string[] titles = new string[] { "Тег", "Описание", "Копировать"};
-        int defaultTextBoxWidth = 110;
+        int[] defaultWidths = { 300, 100, 110 };
         int defaultMargin = 5;
         Bitmap infoIcon = Properties.Resources.information;
         Bitmap clipboardIcon = Properties.Resources.clipboards;
@@ -30,6 +30,17 @@ namespace ExcelToWordProject
             Tags.Sort((el1, el2) => el1.Key.CompareTo(el2.Key));
             tagsPanel.Controls.AddRange(GenerateSmartTagsSettingsElements(tagsPanel));
             topMostCheckBox.Checked = TopMost;
+        }
+
+        protected int GetLeft(int i)
+        {
+            if (i == 0)
+                return defaultMargin;
+
+            int l = 0;
+            for (int j = 0; j < i; j++)
+                l += defaultWidths[j];
+            return l + defaultMargin;
         }
 
         protected Control[] GenerateSmartTagsSettingsElements(Control parent)
@@ -47,9 +58,9 @@ namespace ExcelToWordProject
                 Label label = new Label();
                 label.Text = titles[i];
                 label.Top = 0;
-                label.Left = i * (defaultTextBoxWidth + defaultMargin) + defaultMargin;
+                label.Left = GetLeft(i);
                 label.Font = new Font(FontFamily.GenericSansSerif, 12, FontStyle.Bold);
-                label.Width = defaultTextBoxWidth;
+                label.Width = defaultWidths[i];
                 label.AutoEllipsis = true;
                 headerPanel.Controls.Add(label);
             }
@@ -69,6 +80,8 @@ namespace ExcelToWordProject
             return result.ToArray();
         }
 
+       
+
         protected Panel GenerateSmartTagRow(int i, BaseSyllabusTag tag, Control parent)
         {
             Panel panel = new Panel();
@@ -80,10 +93,10 @@ namespace ExcelToWordProject
 
             // Инфу о типе тега
             Label label = new Label();
-            label.Width = defaultTextBoxWidth;
+            label.Width = defaultWidths[0];
             label.Top = 0;
             label.AutoEllipsis = true;
-            label.Left = (titles.Length - 3) * (label.Width + defaultMargin) + defaultMargin;
+            label.Left = GetLeft(0);
             label.Text = tag.Key;
             label.Font = new Font("Arial", 12, FontStyle.Bold);
             panel.Tag = tag;
@@ -95,7 +108,7 @@ namespace ExcelToWordProject
                 Width = 26,
                 Height = 26,
                 Top = 0,
-                Left = (titles.Length - 2) * (defaultTextBoxWidth + defaultMargin) + defaultMargin + 20,
+                Left = GetLeft(1)+20,
                 Image = infoIcon,
                 Cursor = Cursors.Hand,
                 SizeMode = PictureBoxSizeMode.StretchImage,
@@ -113,7 +126,7 @@ namespace ExcelToWordProject
                 Width = 26,
                 Height = 26,
                 Top = 0,
-                Left = (titles.Length - 1) * (defaultTextBoxWidth + defaultMargin) + defaultMargin + 20,
+                Left = GetLeft(2)+20,
                 Image = clipboardIcon,
                 Cursor = Cursors.Hand,
                 SizeMode = PictureBoxSizeMode.StretchImage,

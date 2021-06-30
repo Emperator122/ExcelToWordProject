@@ -1,4 +1,5 @@
-﻿using ExcelToWordProject.Models;
+﻿using ExcelToWordProject.Forms;
+using ExcelToWordProject.Models;
 using ExcelToWordProject.Syllabus;
 using ExcelToWordProject.Utils;
 using System;
@@ -20,6 +21,7 @@ namespace ExcelToWordProject
         DefaultTagSettingsForm DefaultTagSettingsForm;
         SmartTagSettingsForm SmartTagSettingsForm;
         TagListForm TagListForm;
+        AboutProgramForm aboutProgramForm;
         SyllabusParameters syllabusParameters;
         public MainForm()
         {
@@ -27,6 +29,7 @@ namespace ExcelToWordProject
 
             syllabusParameters = ConfigManager.GetConfigData();
 
+            SetToolTips();
 
         }
 
@@ -36,6 +39,15 @@ namespace ExcelToWordProject
             Type moduleType = module.GetType();
             moduleType.GetField("Name");
 
+        }
+
+        private void SetToolTips()
+        {
+            ToolTip toolTip = new ToolTip();
+            toolTip.SetToolTip(convertButton, "Конвертировать");
+            toolTip.SetToolTip(filePathButton, "Выберите файл");
+            toolTip.SetToolTip(templateFilePathButton, "Выберите файл");
+            toolTip.SetToolTip(folderPathButton, "Выберите папку");
         }
 
         private async void ConvertButton_Click(object sender, EventArgs e)
@@ -88,6 +100,7 @@ namespace ExcelToWordProject
         private void FolderPathButton_Click(object sender, EventArgs e)
         {
             FolderBrowserDialog folderDialog = new FolderBrowserDialog();
+            folderDialog.SelectedPath = Application.StartupPath;
             if (folderDialog.ShowDialog() == DialogResult.OK)
             {
                 resultFolderPathTextBox.Text = folderDialog.SelectedPath;
@@ -135,6 +148,17 @@ namespace ExcelToWordProject
             }
             else
                 TagListForm.Focus();
+        }
+
+        private void ОПрограммеToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (TagListForm == null || TagListForm.IsDisposed)
+            {
+                aboutProgramForm = new AboutProgramForm();
+                aboutProgramForm.ShowDialog();
+            }
+            else
+                aboutProgramForm.Focus();
         }
     }
 }

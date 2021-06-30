@@ -16,6 +16,14 @@ namespace ExcelToWordProject.Utils
             return result;
         }
 
+        public static List<int> StrToListInt(string str)
+        {
+            List<int> result = new List<int>();
+            for (int i = 0; i < str.Length; i++)
+                result.Add(StrToInt(str[i].ToString()));
+            return result;
+        }
+
         public static string ListToDelimiteredString(string delimiter, string endDelimiter, List<string> list)
         {
             string result = "";

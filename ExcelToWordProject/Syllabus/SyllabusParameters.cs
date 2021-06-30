@@ -105,26 +105,59 @@ namespace ExcelToWordProject.Syllabus
                 new SmartSyllabusTag(-1, "Semesters", PlanListName, SmartTagType.Semesters, "Семестры, на которых преподается дисциплина.\r\n" +
                 "Напр.: 1, 2, 3"),
 
-                new SmartSyllabusTag(-1, "LecturesHours", PlanListName, SmartTagType.LecturesHours, "Общее количество акад. часов на лекции.\r\n" +
+                new SmartSyllabusTag(-1, "TotalLecturesHours", PlanListName, SmartTagType.TotalLecturesHours, "Общее количество акад. часов на лекции.\r\n" +
                 "Напр.: 200"),
 
-                new SmartSyllabusTag(-1, "PracticalLessonsHours", PlanListName, SmartTagType.PracticalLessonsHours, "Общее количество акад. часов на практики.\r\n" +
+                new SmartSyllabusTag(-1, "TotalPracticalLessonsHours", PlanListName, SmartTagType.TotalPracticalLessonsHours, "Общее количество акад. часов на практики.\r\n" +
                 "Напр.: 150"),
 
-                new SmartSyllabusTag(-1, "LaboratoryLessonsHours", PlanListName, SmartTagType.LaboratoryLessonsHours, "Общее количество акад. часов на лабораторные.\r\n" +
+                new SmartSyllabusTag(-1, "TotalLaboratoryLessonsHours", PlanListName, SmartTagType.TotalLaboratoryLessonsHours, "Общее количество акад. часов на лабораторные.\r\n" +
                 "Напр.: 140"),
 
-                new SmartSyllabusTag(-1, "IndependentWorkHours", PlanListName, SmartTagType.IndependentWorkHours, "Общее количество акад. часов на самостоятельную работу.\r\n" +
+                new SmartSyllabusTag(-1, "TotalIndependentWorkHours", PlanListName, SmartTagType.TotalIndependentWorkHours, "Общее количество акад. часов на самостоятельную работу.\r\n" +
                 "Напр.: 100"),
 
-                new SmartSyllabusTag(-1, "ControlHours", PlanListName, SmartTagType.ControlHours, "Общее количество акад. часов контроль\r\n" +
+                new SmartSyllabusTag(-1, "TotalControlHours", PlanListName, SmartTagType.TotalControlHours, "Общее количество акад. часов на экзамен\r\n" +
                 "Напр.: 200"),
 
                 new SmartSyllabusTag(-1, "TotalHoursByPlan", PlanListName, SmartTagType.TotalHoursByPlan, "Общее количество акад. часов.\r\n" +
                 "Напр.: 700"),
 
-                new SmartSyllabusTag(-1, "TotalLessons", PlanListName, SmartTagType.TotalLessons, "Итого аудиторных занятий. Сумма лаб, лекций и практик.\r\n" +
+                new SmartSyllabusTag(-1, "TotalLessons", PlanListName, SmartTagType.TotalLessons,
+                "Итого аудиторных занятий. Сумма лаб, лекций и практик.\r\n" +
                 "Напр.: 200"),
+
+
+                new SmartSyllabusTag(-1, "LecturesHoursBySemesters", PlanListName, SmartTagType.LecturesHoursBySemesters,
+                "Количество акад. часов на лекции по семестрам.\r\n" +
+                "Напр.: 50/60/17"),
+
+                new SmartSyllabusTag(-1, "PracticalLessonsHoursBySemesters", PlanListName, SmartTagType.PracticalLessonsHoursBySemesters,
+                "Количество акад. часов на практики по семестрам.\r\n" +
+                "Напр.: 14/25/30"),
+
+                new SmartSyllabusTag(-1, "LaboratoryLessonsHoursBySemesters", PlanListName, SmartTagType.LaboratoryLessonsHoursBySemesters,
+                "Количество акад. часов на лабораторные по семестрам.\r\n" +
+                "Напр.: 60/80/40"),
+
+                new SmartSyllabusTag(-1, "IndependentWorkHoursBySemesters", PlanListName, SmartTagType.IndependentWorkHoursBySemesters,
+                "Количество акад. часов на самостоятельную работу по семестрам.\r\n" +
+                "Напр.: 40/70/0"),
+
+                new SmartSyllabusTag(-1, "ControlHoursBySemesters", PlanListName, SmartTagType.ControlHoursBySemesters,
+                "Количество акад. часов контроль по семестрам.\r\n" +
+                "Напр.: 20/0/60"),
+
+                new SmartSyllabusTag(-1, "TotalLessonsBySemesters", PlanListName, SmartTagType.TotalLessonsBySemesters, "Итого аудиторных занятий по семестрам. " +
+                "Сумма лаб, лекций и практик по семестрам.\r\n" +
+                "Напр.: 100/110/120"),
+
+                new SmartSyllabusTag(-1, "isCreditBySemesters", PlanListName, SmartTagType.isCreditBySemesters, "Перечисление значений: будет ли в данном семестре " +
+                "зачет. Семестры берутся из списка семестров, в которые ведется предмет.\r\nНапр.:+/+/-/+"),
+
+                new SmartSyllabusTag(6, "isCourseWork", PlanListName, SmartTagType.isCourseWork, "+ если по предмету есть курсова, иначе -"),
+
+
 
                 // Обычные теги
                 new DefaultSyllabusTag(15, 1, "DirectionCode", "Титул", "Номер направления.\r\nНапр.:09.03.01"),
@@ -167,6 +200,7 @@ namespace ExcelToWordProject.Syllabus
 
         public static string ExtractDataFromModule(SmartSyllabusTag tag, Module module, List<Content> contentList = null, ModuleProperties properties = null)
         {
+            List<int> tempList;
             switch (tag.Type)
             {
                 case SmartTagType.ModuleName:
@@ -226,32 +260,110 @@ namespace ExcelToWordProject.Syllabus
                 case SmartTagType.CreditUnits:
                     return properties.CreditUnits.ToString();
 
-                case SmartTagType.LecturesHours:
-                    return properties.LecturesHours.ToString();
+                case SmartTagType.TotalLecturesHours:
+                    return properties.TotalLecturesHours.ToString();
 
-                case SmartTagType.PracticalLessonsHours:
-                    return properties.PracticalLessonsHours.ToString();
+                case SmartTagType.TotalPracticalLessonsHours:
+                    return properties.TotalPracticalLessonsHours.ToString();
 
-                case SmartTagType.LaboratoryLessonsHours:
-                    return properties.LaboratoryLessonsHours.ToString();
+                case SmartTagType.TotalLaboratoryLessonsHours:
+                    return properties.TotalLaboratoryLessonsHours.ToString();
 
                 case SmartTagType.TotalHoursByPlan:
                     return properties.TotalHoursByPlan.ToString();
 
-                case SmartTagType.ControlHours:
-                    return properties.ControlHours.ToString();
+                case SmartTagType.TotalControlHours:
+                    return properties.TotalControlHours.ToString();
 
-                case SmartTagType.IndependentWorkHours:
-                    return properties.IndependentWorkHours.ToString();
+                case SmartTagType.TotalIndependentWorkHours:
+                    return properties.TotalIndependentWorkHours.ToString();
 
                 case SmartTagType.Years:
-                    return OtherUtils.ListToDelimiteredString(", ", "", properties.Years);
+                    return OtherUtils.ListToDelimiteredString("/", "", properties.Years);
 
                 case SmartTagType.Semesters:
-                    return OtherUtils.ListToDelimiteredString(", ", "", properties.Semesters);
+                    return OtherUtils.ListToDelimiteredString("/", "", properties.Semesters);
 
                 case SmartTagType.TotalLessons:
                     return properties.TotalLessonsHours.ToString();
+
+                case SmartTagType.LecturesHoursBySemesters:
+                    if (properties.LecturesHoursBySemesters.Count(el => el == 0) == properties.LecturesHoursBySemesters.Count)
+                        return "-";
+
+                    tempList = new List<int>();
+                    properties.Semesters.ForEach(semesterNumber => {
+                        tempList.Add(properties.LecturesHoursBySemesters[semesterNumber - 1]);
+                    });
+                    return OtherUtils.ListToDelimiteredString("/", "", tempList);
+
+                case SmartTagType.PracticalLessonsHoursBySemesters:
+                    if (properties.PracticalLessonsHoursBySemesters.Count(el => el == 0) == properties.PracticalLessonsHoursBySemesters.Count)
+                        return "-";
+
+                    tempList = new List<int>();
+                    properties.Semesters.ForEach(semesterNumber => {
+                        tempList.Add(properties.PracticalLessonsHoursBySemesters[semesterNumber - 1]);
+                    });
+                    return OtherUtils.ListToDelimiteredString("/", "", tempList);
+
+                case SmartTagType.LaboratoryLessonsHoursBySemesters:
+                    if (properties.LaboratoryLessonsHoursBySemesters.Count(el => el == 0) == properties.LaboratoryLessonsHoursBySemesters.Count)
+                        return "-";
+
+                    tempList = new List<int>();
+                    properties.Semesters.ForEach(semesterNumber => {
+                        tempList.Add(properties.LaboratoryLessonsHoursBySemesters[semesterNumber - 1]);
+                    });
+                    return OtherUtils.ListToDelimiteredString("/", "", tempList);
+
+                case SmartTagType.IndependentWorkHoursBySemesters:
+                    if (properties.IndependentWorkHoursBySemesters.Count(el => el == 0) == properties.IndependentWorkHoursBySemesters.Count)
+                        return "-";
+
+                    tempList = new List<int>();
+                    properties.Semesters.ForEach(semesterNumber => {
+                        tempList.Add(properties.IndependentWorkHoursBySemesters[semesterNumber - 1]);
+                    });
+                    return OtherUtils.ListToDelimiteredString("/", "", tempList);
+
+                case SmartTagType.ControlHoursBySemesters:
+                    if (properties.ControlHoursBySemesters.Count(el => el == 0) == properties.ControlHoursBySemesters.Count)
+                        return "-";
+
+                    tempList = new List<int>();
+                    properties.Semesters.ForEach(semesterNumber => {
+                        tempList.Add(properties.ControlHoursBySemesters[semesterNumber - 1]);
+                    });
+                    return OtherUtils.ListToDelimiteredString("/", "", tempList);
+
+                case SmartTagType.TotalLessonsBySemesters:
+                    if (properties.TotalLessonsHoursBySemesters.Count(el => el == 0) == properties.TotalLessonsHoursBySemesters.Count)
+                        return "-";
+
+                    tempList = new List<int>();
+                    properties.Semesters.ForEach(semesterNumber => {
+                        tempList.Add(properties.TotalLessonsHoursBySemesters[semesterNumber - 1]);
+                    });
+                    return OtherUtils.ListToDelimiteredString("/", "", tempList);
+
+
+                case SmartTagType.isCreditBySemesters:
+                    if ((properties.ControlFormsBySemesters[ControlForm.Credit]?.Count ?? 0) == 0)
+                        return "-";
+
+                    List<string> isCreditBySemesters = new List<string>();
+                    properties.Semesters.ForEach(semesterNumber => {
+                        if (properties.ControlFormsBySemesters[ControlForm.Credit]?.Contains(semesterNumber) == true)
+                            isCreditBySemesters.Add("+");
+                        else
+                            isCreditBySemesters.Add("-");
+                    });
+                    return OtherUtils.ListToDelimiteredString("/", "", isCreditBySemesters);
+
+                case SmartTagType.isCourseWork:
+                    return properties.isCourseWork ? "+" : "-";
+
             }
             return "";
         }
@@ -351,12 +463,23 @@ namespace ExcelToWordProject.Syllabus
 
         Years,
         Semesters,
-        LecturesHours,
-        PracticalLessonsHours,
-        LaboratoryLessonsHours,
-        IndependentWorkHours,
-        ControlHours,
+
+        TotalLecturesHours,
+        TotalPracticalLessonsHours,
+        TotalLaboratoryLessonsHours,
+        TotalIndependentWorkHours,
+        TotalControlHours,
+
+        LecturesHoursBySemesters,
+        PracticalLessonsHoursBySemesters,
+        LaboratoryLessonsHoursBySemesters,
+        IndependentWorkHoursBySemesters,
+        ControlHoursBySemesters,
+        TotalLessonsBySemesters,
+        isCreditBySemesters,
+
         TotalHoursByPlan,
-        TotalLessons
+        TotalLessons,
+        isCourseWork
     }
 }

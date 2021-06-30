@@ -83,6 +83,7 @@
             this.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "DefaultTagSettingsForm";
+            this.ShowIcon = false;
             this.Text = "Настройка обычных тегов";
             this.Resize += new System.EventHandler(this.DefaultTagSettingsForm_Resize);
             ((System.ComponentModel.ISupportInitialize)(this.addButton)).EndInit();

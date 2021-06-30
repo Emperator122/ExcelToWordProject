@@ -30,16 +30,16 @@
         {
             this.regExpTextBox = new System.Windows.Forms.TextBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.regexSettings = new System.Windows.Forms.CheckedListBox();
+            this.label2 = new System.Windows.Forms.Label();
             this.regexGroupIndexTextBox = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.groupsCountLabel = new System.Windows.Forms.Label();
             this.testRegExpButton = new System.Windows.Forms.Button();
             this.testRegExpTextBox = new System.Windows.Forms.TextBox();
             this.CancelButton1 = new System.Windows.Forms.Button();
             this.SaveButton = new System.Windows.Forms.Button();
-            this.label2 = new System.Windows.Forms.Label();
-            this.regexSettings = new System.Windows.Forms.CheckedListBox();
-            this.groupsCountLabel = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.SuspendLayout();
@@ -69,6 +69,23 @@
             this.groupBox1.TabIndex = 1;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Регулярное выражение";
+            // 
+            // regexSettings
+            // 
+            this.regexSettings.FormattingEnabled = true;
+            this.regexSettings.Location = new System.Drawing.Point(303, 89);
+            this.regexSettings.Name = "regexSettings";
+            this.regexSettings.Size = new System.Drawing.Size(236, 88);
+            this.regexSettings.TabIndex = 4;
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(300, 67);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(93, 18);
+            this.label2.TabIndex = 3;
+            this.label2.Text = "Параметры";
             // 
             // regexGroupIndexTextBox
             // 
@@ -102,6 +119,15 @@
             this.groupBox2.TabIndex = 2;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Тестовый текст (для проверки)";
+            // 
+            // groupsCountLabel
+            // 
+            this.groupsCountLabel.AutoSize = true;
+            this.groupsCountLabel.Location = new System.Drawing.Point(6, 163);
+            this.groupsCountLabel.Name = "groupsCountLabel";
+            this.groupsCountLabel.Size = new System.Drawing.Size(141, 18);
+            this.groupsCountLabel.TabIndex = 6;
+            this.groupsCountLabel.Text = "Количетсво групп: ";
             // 
             // testRegExpButton
             // 
@@ -152,32 +178,6 @@
             this.SaveButton.UseVisualStyleBackColor = true;
             this.SaveButton.Click += new System.EventHandler(this.SaveButton_Click);
             // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(300, 67);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(93, 18);
-            this.label2.TabIndex = 3;
-            this.label2.Text = "Параметры";
-            // 
-            // regexSettings
-            // 
-            this.regexSettings.FormattingEnabled = true;
-            this.regexSettings.Location = new System.Drawing.Point(303, 89);
-            this.regexSettings.Name = "regexSettings";
-            this.regexSettings.Size = new System.Drawing.Size(236, 88);
-            this.regexSettings.TabIndex = 4;
-            // 
-            // groupsCountLabel
-            // 
-            this.groupsCountLabel.AutoSize = true;
-            this.groupsCountLabel.Location = new System.Drawing.Point(6, 163);
-            this.groupsCountLabel.Name = "groupsCountLabel";
-            this.groupsCountLabel.Size = new System.Drawing.Size(141, 18);
-            this.groupsCountLabel.TabIndex = 6;
-            this.groupsCountLabel.Text = "Количетсво групп: ";
-            // 
             // RegularExpressionEditForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 18F);
@@ -191,6 +191,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "RegularExpressionEditForm";
+            this.ShowIcon = false;
             this.Text = "Редактирование регулярного выражения";
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
