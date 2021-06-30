@@ -32,6 +32,7 @@ namespace ExcelToWordProject
         public DefaultTagSettingsForm(SyllabusParameters syllabusParameters)
         {
             InitializeComponent();
+
             this.syllabusParameters = syllabusParameters;
             Control[] controls = GenerateSmartTagsSettingsElements(defaultTagsPanel);
             
