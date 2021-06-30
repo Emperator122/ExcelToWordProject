@@ -10,6 +10,7 @@ using System.Media;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Linq;
 
 namespace ExcelToWordProject
 {
@@ -39,7 +40,11 @@ namespace ExcelToWordProject
 
             this.syllabusParameters = syllabusParameters;
             smartTagsPanel.Controls.AddRange(GenerateSmartTagsSettingsElements(smartTagsPanel, smartSyllabusTags));
+
+
             tagActivator.Nodes.AddRange(GenerateTreeNodes(smartSyllabusTags));
+            foreach (TreeNode node in tagActivator.Nodes)
+                node.ExpandAll();
 
         }
 
