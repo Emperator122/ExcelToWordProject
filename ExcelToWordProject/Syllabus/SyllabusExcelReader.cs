@@ -265,7 +265,12 @@ namespace ExcelToWordProject.Syllabus
                 if (tempList[i] != null)
                     properties.Semesters.Add(i + 1);
 
-
+            // Имя кафедры
+            // последний столбец с хедером Наименование
+            // первый столбец - имя дисциплины
+            tempList = planList.GetCellValue(rowIndex, Parameters.planListHeaderNames["DepartmentName"], false);
+            if (tempList.Count >= 2)
+                properties.DepartmentName = tempList[tempList.Count - 1] ?? "";
 
 
             return properties;

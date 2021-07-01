@@ -61,6 +61,7 @@ namespace ExcelToWordProject.Syllabus
             planListHeaderNames["IndependentWorkHoursHeaderName"] = "СР";
             planListHeaderNames["TotalHoursByPlanHeaderName"] = "По плану";
             planListHeaderNames["SemesterCountingCreditUnitsPlanHeaderName"] = "з.е.";
+            planListHeaderNames["DepartmentName"] = "Наименование";
             // заполняем временный массив для сериализации
             tempPlanListHeaderNames = new List<TempDictionaryItem>(planListHeaderNames.Select(kv 
                 => new TempDictionaryItem() { Name = kv.Key, Value = kv.Value }).ToArray());
@@ -163,6 +164,8 @@ namespace ExcelToWordProject.Syllabus
 
                 new SmartSyllabusTag(6, "isCourseWork", PlanListName, SmartTagType.isCourseWork, "+ если по предмету есть курсова, иначе -"),
 
+                new SmartSyllabusTag(-1, "DepartmentName", PlanListName, SmartTagType.DepartmentName, "Имя кафедры.\r\nНапр.: Экономики"),
+
 
 
                 // Обычные теги
@@ -181,6 +184,10 @@ namespace ExcelToWordProject.Syllabus
                 new DefaultSyllabusTag(30, 0, "StudyForm", "Титул", "Форма обучения.\r\nНапр.: Очная", true,
                             new RegExpData(){ Expression = @".*: (.*)",
                                 GroupIndex = 1, RegexOptions = RegexOptions.Singleline }),
+
+                new DefaultSyllabusTag(28, 0, "Qualification", "Титул", "Квалификация.\r\nНапр.: Бакалавр", true,
+                            new RegExpData(){ Expression = @"Квалификация: (.*)",
+                                GroupIndex = 1, RegexOptions = RegexOptions.Singleline | RegexOptions.IgnoreCase }),
             };
         }
 
@@ -382,6 +389,9 @@ namespace ExcelToWordProject.Syllabus
                 case SmartTagType.isCourseWork:
                     return properties.isCourseWork ? "+" : "-";
 
+                case SmartTagType.DepartmentName:
+                    return properties.DepartmentName;
+
             }
             return "";
         }
@@ -498,6 +508,7 @@ namespace ExcelToWordProject.Syllabus
 
         TotalHoursByPlan,
         TotalLessons,
-        isCourseWork
+        isCourseWork,
+        DepartmentName
     }
 }

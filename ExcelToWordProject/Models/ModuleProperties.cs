@@ -64,6 +64,7 @@ namespace ExcelToWordProject.Models
         public string BlockName = "";
         public string PartName = "";
         public int CreditUnits = -1;
+        public string DepartmentName = "";
 
         public List<int> LecturesHoursBySemesters = new List<int>();
         public List<int> PracticalLessonsHoursBySemesters = new List<int>();
