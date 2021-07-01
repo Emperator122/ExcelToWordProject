@@ -29,11 +29,15 @@ namespace ExcelToWordProject
 
 
         public SyllabusParameters syllabusParameters;
+        public List<BaseSyllabusTag> Tags;
         public DefaultTagSettingsForm(SyllabusParameters syllabusParameters)
         {
             InitializeComponent();
 
             this.syllabusParameters = syllabusParameters;
+
+            Tags = new List<BaseSyllabusTag>(syllabusParameters.Tags);
+
             Control[] controls = GenerateSmartTagsSettingsElements(defaultTagsPanel);
             
             defaultTagsPanel.Controls.AddRange(controls);
@@ -48,7 +52,7 @@ namespace ExcelToWordProject
 
             // получим все смарт теги
             List<DefaultSyllabusTag> defaultSyllabusTags = new List<DefaultSyllabusTag>();
-            syllabusParameters.Tags.ForEach(tag => {
+            Tags.ForEach(tag => {
                 if (tag is DefaultSyllabusTag)
                     defaultSyllabusTags.Add(tag as DefaultSyllabusTag);
             });
@@ -189,7 +193,7 @@ namespace ExcelToWordProject
                     "данный тег?", "Внимание", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                 if (dialogResult == DialogResult.Yes)
                 {
-                    syllabusParameters.Tags.Remove(tag);
+                    Tags.Remove(tag);
                     panel.Dispose();
                     parent.Controls.Remove(panel);
                 }
@@ -209,11 +213,11 @@ namespace ExcelToWordProject
         {
             // получим все обычные теги
             List<DefaultSyllabusTag> defaultSyllabusTags = new List<DefaultSyllabusTag>();
-            syllabusParameters.Tags.ForEach(tag => {
+            Tags.ForEach(tag => {
                 if (tag is DefaultSyllabusTag)
                     defaultSyllabusTags.Add(tag as DefaultSyllabusTag);
             });
-            defaultSyllabusTags.Reverse();
+            defaultSyllabusTags.Reverse(); // из-за Dock'a приходится инвертировать
 
             // Загоним информацию из филдов в теги
             int i = 0;
@@ -229,6 +233,9 @@ namespace ExcelToWordProject
                     i++;
                 }
             }
+
+            syllabusParameters.Tags = Tags;
+
             ConfigManager.SaveConfigData(syllabusParameters);
 
             Close();
@@ -238,7 +245,7 @@ namespace ExcelToWordProject
         private void AddButton_Click(object sender, EventArgs e)
         {
             DefaultSyllabusTag tag = new DefaultSyllabusTag(0, 0, "", "");
-            syllabusParameters.Tags.Add(tag);
+            Tags.Add(tag);
             Panel row = GenerateSmartTagRow(defaultTagsPanel.Controls.Count, tag, defaultTagsPanel);
             row.Visible = false;
             defaultTagsPanel.Controls.Add(row);
