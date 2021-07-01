@@ -28,8 +28,17 @@ namespace ExcelToWordProject
             Tags = new List<BaseSyllabusTag>();
             Tags.AddRange(tags);
             Tags.Sort((el1, el2) => el1.Key.CompareTo(el2.Key));
-            tagsPanel.Controls.AddRange(GenerateSmartTagsSettingsElements(tagsPanel));
+            tagsPanel.Controls.AddRange(GenerateSmartTagsSettingsElements(false));
             topMostCheckBox.Checked = TopMost;
+        }
+
+
+        public void ChangeActiveTagsVisibility(bool hide)
+        {
+            foreach (Control item in tagsPanel.Controls)
+                item.Dispose();
+            tagsPanel.Controls.Clear();
+            tagsPanel.Controls.AddRange(GenerateSmartTagsSettingsElements(hide));
         }
 
         protected int GetLeft(int i)
@@ -43,7 +52,7 @@ namespace ExcelToWordProject
             return l + defaultMargin;
         }
 
-        protected Control[] GenerateSmartTagsSettingsElements(Control parent)
+        protected Control[] GenerateSmartTagsSettingsElements(bool hide)
         {
             List<Control> result = new List<Control>();
 
@@ -67,22 +76,22 @@ namespace ExcelToWordProject
             result.Add(headerPanel);
 
 
-
-            for (int i = 0; i < Tags.Count(); i++)
+            int rowNumber = 0;
+            foreach (BaseSyllabusTag tag in Tags)
             {
-                // текущий тег
-                BaseSyllabusTag tag = Tags[i];
-
-                Panel panel = GenerateSmartTagRow(i, tag, parent);
+                if (hide && !tag.Active)
+                    continue;
+                Panel panel = GenerateSmartTagRow(rowNumber, tag);
 
                 result.Add(panel);
+                rowNumber++;
             }
             return result.ToArray();
         }
 
        
 
-        protected Panel GenerateSmartTagRow(int i, BaseSyllabusTag tag, Control parent)
+        protected Panel GenerateSmartTagRow(int i, BaseSyllabusTag tag)
         {
             Panel panel = new Panel();
             panel.Height = 26;
@@ -149,6 +158,11 @@ namespace ExcelToWordProject
         private void TopMostCheckBox_CheckedChanged(object sender, EventArgs e)
         {
             TopMost = topMostCheckBox.Checked;
+        }
+
+        private void HideInactiveCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            ChangeActiveTagsVisibility(hideInactiveCheckBox.Checked);
         }
     }
 }

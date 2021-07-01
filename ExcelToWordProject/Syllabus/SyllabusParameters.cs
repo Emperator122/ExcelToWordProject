@@ -97,7 +97,7 @@ namespace ExcelToWordProject.Syllabus
                 new SmartSyllabusTag(2, "ContentIndex", ModulesContentListName, SmartTagType.ContentIndex, "Идентификатор компетенции. \r\nПример: ОК-2"),
 
                 new SmartSyllabusTag(3, "Control", PlanListName, SmartTagType.Control,
-                "Форма контроля. \r\nНапр.: Экзамен; Зачет; Зачет с оценкой; Экзамент, зачет; ...\r\nТочки в конце нет!"),
+                "Форма контроля. \r\nНапр.: Экзамен; Зачет; Зачет с оценкой; Экзамен, зачет; ...\r\nТочки в конце нет!"),
 
                 new SmartSyllabusTag(4, "ModuleName", ModulesListName, SmartTagType.ModuleName,
                 "Имя дисциплины. \r\nНапр.: Математика"),
@@ -169,18 +169,18 @@ namespace ExcelToWordProject.Syllabus
                 new DefaultSyllabusTag(15, 1, "DirectionCode", "Титул", "Номер направления.\r\nНапр.:09.03.01"),
 
                 new DefaultSyllabusTag(17, 1, "DirectionName", "Титул", "Имя направления. \r\nНапр.: Прикладная математика и информатика", true, 
-                            new RegExpData(){ Expression = @"\d ((.*)(?= Программа)|(.*))",
-                                GroupIndex = 1, RegexOptions = System.Text.RegularExpressions.RegexOptions.Multiline }),
+                            new RegExpData(){ Expression = @"\d ((.*)(?=[ \n]Программа)|(.*))",
+                                GroupIndex = 1, RegexOptions = RegexOptions.Singleline }),
 
                 new DefaultSyllabusTag(12, 0, "ProtocolInfo", "Титул", "План одобрен Ученым советом вуза. Протокол №... \r\nНапр.: № 12 от 29.02.2020", true,
                             new RegExpData(){ Expression = @"Протокол (.*)",
-                                GroupIndex = 1, RegexOptions = System.Text.RegularExpressions.RegexOptions.Multiline }),
+                                GroupIndex = 1, RegexOptions = RegexOptions.Singleline }),
 
                 new DefaultSyllabusTag(30, 19, "EducationalStandard", "Титул", "Образовательный стандарт (ФГОС). \r\nНапр.:  № 12 от 10.01.2018"),
 
                 new DefaultSyllabusTag(30, 0, "StudyForm", "Титул", "Форма обучения.\r\nНапр.: Очная", true,
                             new RegExpData(){ Expression = @".*: (.*)",
-                                GroupIndex = 1, RegexOptions = System.Text.RegularExpressions.RegexOptions.Multiline }),
+                                GroupIndex = 1, RegexOptions = RegexOptions.Singleline }),
             };
         }
 

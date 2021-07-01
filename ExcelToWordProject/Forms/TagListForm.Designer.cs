@@ -31,6 +31,7 @@
             this.tagsPanel = new System.Windows.Forms.Panel();
             this.label1 = new System.Windows.Forms.Label();
             this.topMostCheckBox = new System.Windows.Forms.CheckBox();
+            this.hideInactiveCheckBox = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // tagsPanel
@@ -71,11 +72,23 @@
             this.topMostCheckBox.UseVisualStyleBackColor = true;
             this.topMostCheckBox.CheckedChanged += new System.EventHandler(this.TopMostCheckBox_CheckedChanged);
             // 
+            // hideInactiveCheckBox
+            // 
+            this.hideInactiveCheckBox.AutoSize = true;
+            this.hideInactiveCheckBox.Location = new System.Drawing.Point(367, 500);
+            this.hideInactiveCheckBox.Name = "hideInactiveCheckBox";
+            this.hideInactiveCheckBox.Size = new System.Drawing.Size(187, 22);
+            this.hideInactiveCheckBox.TabIndex = 4;
+            this.hideInactiveCheckBox.Text = "Спрятать неактивные";
+            this.hideInactiveCheckBox.UseVisualStyleBackColor = true;
+            this.hideInactiveCheckBox.CheckedChanged += new System.EventHandler(this.HideInactiveCheckBox_CheckedChanged);
+            // 
             // TagListForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 18F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(567, 527);
+            this.Controls.Add(this.hideInactiveCheckBox);
             this.Controls.Add(this.topMostCheckBox);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.tagsPanel);
@@ -98,5 +111,6 @@
         private System.Windows.Forms.Panel tagsPanel;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.CheckBox topMostCheckBox;
+        private System.Windows.Forms.CheckBox hideInactiveCheckBox;
     }
 }
