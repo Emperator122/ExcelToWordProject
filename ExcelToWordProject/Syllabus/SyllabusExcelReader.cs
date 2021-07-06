@@ -21,9 +21,7 @@ namespace ExcelToWordProject.Syllabus
                 try
                 {
                     string flagValue = ExcelData.Tables[0].Rows[11][8] as string ?? "";
-                    if (flagValue.ToLower() != "учебный план")
-                        return false;
-                    return true;
+                    return flagValue.ToLower().Contains("учебный план");
                 }
                 catch
                 {
@@ -67,6 +65,31 @@ namespace ExcelToWordProject.Syllabus
             CloseStreams();
         }
 
+        /// <summary>
+        /// Парсинг всех дисциплин в Excel файле, а затем фильтрация их по переданным курсам.
+        /// </summary>
+        /// <param name="years">курсы, за которые необходимо получить модули</param>
+        /// <returns></returns>
+        public List<Module> GetAllModules(int[] years)
+        {
+            List<Module> allModules = GetAllModules();
+            if (years.Length == 0)
+                return allModules;
+
+            List<Module> result = allModules.FindAll(module => {
+                bool contains = false;
+                foreach (int year in module.Properties.Years)
+                {
+                    contains = years.Contains(year);
+                    if (contains)
+                        return contains;
+                }
+
+                return contains;
+            });
+
+            return result ?? new List<Module>();
+        }
 
         /// <summary>
         /// Парсинг всех дисциплин в Excel файле
@@ -74,50 +97,45 @@ namespace ExcelToWordProject.Syllabus
         /// <returns>Список дисциплин</returns>
         public List<Module> GetAllModules()
         {
-            SmartSyllabusTag tag =
+            // Получим все необходимые теги
+            SmartSyllabusTag moduleNameTag =
                 Parameters.Tags.Find(
                     tag_ => tag_ is SmartSyllabusTag && (tag_ as SmartSyllabusTag).Type == SmartTagType.ModuleName) as SmartSyllabusTag;
+
+            SmartSyllabusTag moduleIndexTag =
+                Parameters.Tags.Find(
+                    tag_ => tag_ is SmartSyllabusTag && (tag_ as SmartSyllabusTag).Type == SmartTagType.ModuleIndex) as SmartSyllabusTag;
+
+            SmartSyllabusTag moduleContentIndexesTag =
+                Parameters.Tags.Find(
+                    tag_ => tag_ is SmartSyllabusTag && (tag_ as SmartSyllabusTag).Type == SmartTagType.ModuleContentIndexes) as SmartSyllabusTag;
+
+            // Список модулей
             List<Module> modules = new List<Module>();
 
-            var rows = ExcelData.Tables[tag.ListName].Rows;
+            // Поиск
+            ExcelTableList list = new ExcelTableList(Parameters.PlanListName, ExcelData, Parameters.PlanListHeaderRowIndex);
 
-            for (int i = 0; i < rows.Count; i++)
+            for (int i = Parameters.PlanListHeaderRowIndex+1; i < list.RowsCount; i++)
             {
                 // Имя модуля
-                string moduleName = (rows[i][tag.ColumnIndex] as string) ?? "";
+                string moduleName = list.GetCellValue(i, moduleNameTag.ColumnIndex);
 
-                if (moduleName.Trim() == "")
+                if (moduleName.Trim() == "") // если пусто, то пропускаем
                     continue;
+                
+                // Индекс модуля 
+                string moduleIndex = list.GetCellValue(i, moduleIndexTag.ColumnIndex);
 
-                // Проверка имени на стоп-слова
-                bool containsStopWord = false;
-                foreach (string stopWord in Parameters.ModuleNameStopWords)
-                {
-                    containsStopWord = moduleName.ToLower().Contains(stopWord);
-                    if (containsStopWord)
-                        break;
-                }
-                if (containsStopWord)
-                    continue;
-
-                // Получим индекс модуля
-                // т.к. он может быть смещен на несколько ячеек
-                // то придется костылить
-                string moduleIndex = "";
-                for (int j = tag.ColumnIndex - 1; j >= 0; j--)
-                {
-                    string val = (rows[i][j] as string) ?? "";
-                    if (val.Trim() != "")
-                    {
-                        moduleIndex = val;
-                        break;
-                    }
-                }
 
                 // Строка, содержащая индексы компетенций
-                string contentIndexesStr = rows[i][tag.ColumnIndex + 1] as string ?? "";
+                string contentIndexesStr = list.GetFirstCellValue(i, Parameters.planListHeaderNames["Competitions"]);
 
+                // Добавим модуль
                 modules.Add(new Module(moduleIndex, moduleName, contentIndexesStr));
+
+                // и получим его свойства
+                modules.Last().Properties = ParseModuleProperties(modules.Last());
             }
 
             return modules;

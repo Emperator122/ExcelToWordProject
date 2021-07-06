@@ -73,8 +73,13 @@ namespace ExcelToWordProject.Models
         public List<int> ControlHoursBySemesters = new List<int>();
         public List<int> Semesters = new List<int>();
 
+        // Соответсвие между формой контроля и перечислением семестров
         public Dictionary<ControlForm, List<int>> ControlFormsBySemesters 
-                                    = new Dictionary<ControlForm, List<int>>();
+                                    = new Dictionary<ControlForm, List<int>>() {
+                                        { ControlForm.Credit, new List<int>() },
+                                        { ControlForm.Exam, new List<int>() },
+                                        { ControlForm.GradedCredit, new List<int>() },
+                                    };
 
         public int TotalHoursByPlan = 0;
         public bool isCourseWork = false;

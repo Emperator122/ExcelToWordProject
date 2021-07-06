@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace ExcelToWordProject.Syllabus
 {
-    public class SyllabusParameters
+    public class SyllabusParameters 
     {
         [System.Xml.Serialization.XmlIgnore]
         public bool HasActiveSmartTags
@@ -20,15 +20,13 @@ namespace ExcelToWordProject.Syllabus
 
         public string ModulesContentListName;
         public string PlanListName;
-        public string ModulesListName;
         public int PlanListHeaderRowIndex;
 
         [System.Xml.Serialization.XmlIgnore]
         public Dictionary<string, string> planListHeaderNames;
         public List<TempDictionaryItem> tempPlanListHeaderNames; // для сериализации словаря
 
-
-        public string[] ModuleNameStopWords;
+        public int[] ModulesYears;
 
         [System.Xml.Serialization.XmlElementAttribute("SmartSyllabusTag", typeof(SmartSyllabusTag))]
         [System.Xml.Serialization.XmlElementAttribute("DefaultSyllabusTag", typeof(DefaultSyllabusTag))]
@@ -39,15 +37,11 @@ namespace ExcelToWordProject.Syllabus
         public SyllabusParameters(bool fillWithValues) {
             if (!fillWithValues) return;
 
+            ModulesYears = new int[0];
+
             // Инициализация базового набора параметров
-            ModulesContentListName = "Компетенции";
             PlanListName = "План";
-            ModulesListName = "Компетенции(2)";
-
-            // Стоп слова при парсинге имен дисциплин
-            ModuleNameStopWords = new string[] { "дисциплины ", " часть", "факультативы", "наименование", "практики", "практика", "часть,",
-                "государственная итоговая аттестация"};
-
+            ModulesContentListName = "Компетенции";
 
             // Индекс строки с хедером на листе "План"
             PlanListHeaderRowIndex = 2;
@@ -62,6 +56,7 @@ namespace ExcelToWordProject.Syllabus
             planListHeaderNames["TotalHoursByPlanHeaderName"] = "По плану";
             planListHeaderNames["SemesterCountingCreditUnitsPlanHeaderName"] = "з.е.";
             planListHeaderNames["DepartmentName"] = "Наименование";
+            planListHeaderNames["Competitions"] = "Компетенции";
             // заполняем временный массив для сериализации
             tempPlanListHeaderNames = new List<TempDictionaryItem>(planListHeaderNames.Select(kv 
                 => new TempDictionaryItem() { Name = kv.Key, Value = kv.Value }).ToArray());
@@ -71,6 +66,7 @@ namespace ExcelToWordProject.Syllabus
             Tags = new List<BaseSyllabusTag>()
             {
                 // Умные теги
+                
                 new SmartSyllabusTag(0, "BlockName", PlanListName, SmartTagType.BlockName,
                 "Полное наименование блока, в который входит дисциплина. \r\nНапр.: Блок 1.Дисциплины (модули)."),
 
@@ -97,13 +93,15 @@ namespace ExcelToWordProject.Syllabus
 
                 new SmartSyllabusTag(2, "ContentIndex", ModulesContentListName, SmartTagType.ContentIndex, "Идентификатор компетенции. \r\nПример: ОК-2"),
 
+                new SmartSyllabusTag(-1, "ModuleContentIndexes", PlanListName, SmartTagType.ModuleContentIndexes, "Совпадает с ContentIndex. Играет служебную роль."),
+
                 new SmartSyllabusTag(3, "Control", PlanListName, SmartTagType.Control,
                 "Форма контроля. \r\nНапр.: Экзамен; Зачет; Зачет с оценкой; Экзамен, зачет; ...\r\nТочки в конце нет!"),
 
-                new SmartSyllabusTag(4, "ModuleName", ModulesListName, SmartTagType.ModuleName,
+                new SmartSyllabusTag(2, "ModuleName", PlanListName, SmartTagType.ModuleName,
                 "Имя дисциплины. \r\nНапр.: Математика"),
 
-                new SmartSyllabusTag(3, "ModuleIndex", ModulesListName, SmartTagType.ModuleIndex,
+                new SmartSyllabusTag(1, "ModuleIndex", PlanListName, SmartTagType.ModuleIndex,
                 "Индекс дисциплины. \r\nНапр.: Б1.Б.05"),
 
                 new SmartSyllabusTag(-1, "Years", PlanListName, SmartTagType.Years, "Курсы, на которых преподается дисциплина.\r\n" +
@@ -172,8 +170,12 @@ namespace ExcelToWordProject.Syllabus
                 new DefaultSyllabusTag(15, 1, "DirectionCode", "Титул", "Номер направления.\r\nНапр.:09.03.01"),
 
                 new DefaultSyllabusTag(17, 1, "DirectionName", "Титул", "Имя направления. \r\nНапр.: Прикладная математика и информатика", true, 
-                            new RegExpData(){ Expression = @"\d ((.*)(?=[ \n]Программа)|(.*))",
+                            new RegExpData(){ Expression = @"\d ((.*)(?=[ \n](?=Программа|Профиль))|(.*))",
                                 GroupIndex = 1, RegexOptions = RegexOptions.Singleline }),
+
+                new DefaultSyllabusTag(17, 1, "ProgramValue", "Титул", "Название программы/профиля.", true, 
+                            new RegExpData(){ Expression = @"((Программа|Профиль).*)",
+                                GroupIndex = 1, RegexOptions = RegexOptions.Singleline | RegexOptions.IgnoreCase }),
 
                 new DefaultSyllabusTag(12, 0, "ProtocolInfo", "Титул", "План одобрен Ученым советом вуза. Протокол №... \r\nНапр.: № 12 от 29.02.2020", true,
                             new RegExpData(){ Expression = @"Протокол (.*)",
@@ -218,9 +220,9 @@ namespace ExcelToWordProject.Syllabus
             Type = type;
         }
 
-        public override string GetValue(Module module = null, List<Content> contentList = null, ModuleProperties properties = null, DataSet excelData = null)
+        public override string GetValue(Module module = null, List<Content> contentList = null, DataSet excelData = null)
         {
-            return ExtractDataFromModule(this, module, contentList, properties);
+            return ExtractDataFromModule(this, module, contentList, module.Properties);
         }
 
         public static string ExtractDataFromModule(SmartSyllabusTag tag, Module module, List<Content> contentList = null, ModuleProperties properties = null)
@@ -230,8 +232,10 @@ namespace ExcelToWordProject.Syllabus
             {
                 case SmartTagType.ModuleName:
                     return module.Name;
+
                 case SmartTagType.ModuleIndex:
                     return module.Index;
+
                 case SmartTagType.Content:
                     string contentStr = "";
                     for (int i = 0; i < contentList.Count(); i++)
@@ -240,6 +244,8 @@ namespace ExcelToWordProject.Syllabus
                         contentStr += (i == contentList.Count() - 1) ? content.Value + "" : content.Value + "\n";
                     }
                     return contentStr;
+
+                case SmartTagType.ModuleContentIndexes:
                 case SmartTagType.ContentIndex:
                     string contentIndexesStr = "";
                     for (int i = 0; i < contentList.Count(); i++)
@@ -248,6 +254,7 @@ namespace ExcelToWordProject.Syllabus
                         contentIndexesStr += (i == contentList.Count() - 1) ? content.Index + "" : content.Index + "\n";
                     }
                     return contentIndexesStr;
+
                 case SmartTagType.ExtendedContent:
                     string extContentStr = "";
                     for (int i = 0; i < contentList.Count(); i++)
@@ -257,14 +264,17 @@ namespace ExcelToWordProject.Syllabus
                             (i == contentList.Count() - 1) ? content.Value + " (" + content.Index + ")" : content.Value + " (" + content.Index + ")\n";
                     }
                     return extContentStr;
+
                 case SmartTagType.BlockName:
                     return properties.BlockName;
+
                 case SmartTagType.BlockNumber:
                     return properties.BlockNumber.ToString();
+
                 case SmartTagType.PartName:
                     return properties.PartName;
-                case SmartTagType.Control:
 
+                case SmartTagType.Control:
                     if (properties.Control.Count == 0)
                         return "-";
                     string controlString = "";
@@ -282,6 +292,7 @@ namespace ExcelToWordProject.Syllabus
                             controlString += ", ";
                     }
                     return controlString;
+
                 case SmartTagType.CreditUnits:
                     return properties.CreditUnits.ToString();
 
@@ -363,9 +374,12 @@ namespace ExcelToWordProject.Syllabus
                     return OtherUtils.ListToDelimiteredString("/", "", tempList);
 
                 case SmartTagType.TotalLessonsBySemesters:
+                    // Если за семестр не было аудиторных занятий
+                    // то пропуск
                     if (properties.TotalLessonsHoursBySemesters.Count(el => el == 0) == properties.TotalLessonsHoursBySemesters.Count)
                         return "-";
 
+                    // Иначе выводим инфу
                     tempList = new List<int>();
                     properties.Semesters.ForEach(semesterNumber => {
                         tempList.Add(properties.TotalLessonsHoursBySemesters[semesterNumber - 1]);
@@ -410,7 +424,7 @@ namespace ExcelToWordProject.Syllabus
         }
 
 
-        public override string GetValue(Module module = null, List<Content> contentList = null, ModuleProperties properties = null, DataSet excelData = null)
+        public override string GetValue(Module module = null, List<Content> contentList = null, DataSet excelData = null)
         {
             try
             {
@@ -468,7 +482,7 @@ namespace ExcelToWordProject.Syllabus
         /// <param name="properties">Для smart</param>
         /// <param name="excelData">Для Default</param>
         /// <returns></returns>
-        public abstract string GetValue(Module module = null, List<Content> contentList = null, ModuleProperties properties = null, DataSet excelData = null);
+        public abstract string GetValue(Module module = null, List<Content> contentList = null, DataSet excelData = null);
 
 
 
@@ -478,6 +492,7 @@ namespace ExcelToWordProject.Syllabus
     // Зачетные единицы, Номер блока, Имя блока, Имя модуля, Компетенции, Форма контроля, Индекс модуля...
     public enum SmartTagType
     {
+        None,
         CreditUnits,
         BlockNumber,
         BlockName,
@@ -509,6 +524,7 @@ namespace ExcelToWordProject.Syllabus
         TotalHoursByPlan,
         TotalLessons,
         isCourseWork,
-        DepartmentName
+        DepartmentName,
+        ModuleContentIndexes
     }
 }

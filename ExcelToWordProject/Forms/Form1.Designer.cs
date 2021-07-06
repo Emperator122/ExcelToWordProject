@@ -35,8 +35,11 @@
             this.smartTagsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.constantsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.списокТеговToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.оПрограммеToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.bodyPanel = new System.Windows.Forms.Panel();
             this.bodyGroupBox = new System.Windows.Forms.GroupBox();
+            this.excelFilesLabelClear = new System.Windows.Forms.LinkLabel();
+            this.excelFilesLabel = new System.Windows.Forms.Label();
             this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.resultFilePrefixLabel = new System.Windows.Forms.Label();
             this.templateFilePathButton = new System.Windows.Forms.PictureBox();
@@ -52,7 +55,6 @@
             this.filePathTextBox = new System.Windows.Forms.TextBox();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.status = new System.Windows.Forms.ToolStripStatusLabel();
-            this.оПрограммеToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.bodyPanel.SuspendLayout();
             this.bodyGroupBox.SuspendLayout();
@@ -89,23 +91,23 @@
             // defaultТегиToolStripMenuItem
             // 
             this.defaultТегиToolStripMenuItem.Name = "defaultТегиToolStripMenuItem";
-            this.defaultТегиToolStripMenuItem.Size = new System.Drawing.Size(154, 22);
+            this.defaultТегиToolStripMenuItem.Size = new System.Drawing.Size(245, 22);
             this.defaultТегиToolStripMenuItem.Text = "Обычные теги";
             this.defaultТегиToolStripMenuItem.Click += new System.EventHandler(this.DefaultТегиToolStripMenuItem_Click);
             // 
             // smartTagsToolStripMenuItem
             // 
             this.smartTagsToolStripMenuItem.Name = "smartTagsToolStripMenuItem";
-            this.smartTagsToolStripMenuItem.Size = new System.Drawing.Size(154, 22);
+            this.smartTagsToolStripMenuItem.Size = new System.Drawing.Size(245, 22);
             this.smartTagsToolStripMenuItem.Text = "\"Умные\" теги";
             this.smartTagsToolStripMenuItem.Click += new System.EventHandler(this.SmartTagsToolStripMenuItem_Click);
             // 
             // constantsToolStripMenuItem
             // 
             this.constantsToolStripMenuItem.Name = "constantsToolStripMenuItem";
-            this.constantsToolStripMenuItem.Size = new System.Drawing.Size(154, 22);
-            this.constantsToolStripMenuItem.Text = "Константы";
-            this.constantsToolStripMenuItem.Visible = false;
+            this.constantsToolStripMenuItem.Size = new System.Drawing.Size(245, 22);
+            this.constantsToolStripMenuItem.Text = "Параметры получения данных";
+            this.constantsToolStripMenuItem.Click += new System.EventHandler(this.ConstantsToolStripMenuItem_Click);
             // 
             // списокТеговToolStripMenuItem
             // 
@@ -113,6 +115,13 @@
             this.списокТеговToolStripMenuItem.Size = new System.Drawing.Size(92, 20);
             this.списокТеговToolStripMenuItem.Text = "Список тегов";
             this.списокТеговToolStripMenuItem.Click += new System.EventHandler(this.СписокТеговToolStripMenuItem_Click);
+            // 
+            // оПрограммеToolStripMenuItem
+            // 
+            this.оПрограммеToolStripMenuItem.Name = "оПрограммеToolStripMenuItem";
+            this.оПрограммеToolStripMenuItem.Size = new System.Drawing.Size(94, 20);
+            this.оПрограммеToolStripMenuItem.Text = "О программе";
+            this.оПрограммеToolStripMenuItem.Click += new System.EventHandler(this.ОПрограммеToolStripMenuItem_Click);
             // 
             // bodyPanel
             // 
@@ -124,11 +133,13 @@
             this.bodyPanel.Margin = new System.Windows.Forms.Padding(4);
             this.bodyPanel.Name = "bodyPanel";
             this.bodyPanel.Padding = new System.Windows.Forms.Padding(15, 7, 15, 14);
-            this.bodyPanel.Size = new System.Drawing.Size(626, 377);
+            this.bodyPanel.Size = new System.Drawing.Size(626, 352);
             this.bodyPanel.TabIndex = 2;
             // 
             // bodyGroupBox
             // 
+            this.bodyGroupBox.Controls.Add(this.excelFilesLabelClear);
+            this.bodyGroupBox.Controls.Add(this.excelFilesLabel);
             this.bodyGroupBox.Controls.Add(this.progressBar1);
             this.bodyGroupBox.Controls.Add(this.resultFilePrefixLabel);
             this.bodyGroupBox.Controls.Add(this.templateFilePathButton);
@@ -147,15 +158,40 @@
             this.bodyGroupBox.Margin = new System.Windows.Forms.Padding(4);
             this.bodyGroupBox.Name = "bodyGroupBox";
             this.bodyGroupBox.Padding = new System.Windows.Forms.Padding(4);
-            this.bodyGroupBox.Size = new System.Drawing.Size(596, 356);
+            this.bodyGroupBox.Size = new System.Drawing.Size(596, 331);
             this.bodyGroupBox.TabIndex = 1;
             this.bodyGroupBox.TabStop = false;
+            // 
+            // excelFilesLabelClear
+            // 
+            this.excelFilesLabelClear.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.excelFilesLabelClear.Location = new System.Drawing.Point(479, 45);
+            this.excelFilesLabelClear.Name = "excelFilesLabelClear";
+            this.excelFilesLabelClear.Size = new System.Drawing.Size(77, 26);
+            this.excelFilesLabelClear.TabIndex = 12;
+            this.excelFilesLabelClear.TabStop = true;
+            this.excelFilesLabelClear.Text = "Очистить";
+            this.excelFilesLabelClear.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.excelFilesLabelClear.Visible = false;
+            this.excelFilesLabelClear.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.ExcelFilesLabelClear_LinkClicked);
+            // 
+            // excelFilesLabel
+            // 
+            this.excelFilesLabel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.excelFilesLabel.Location = new System.Drawing.Point(10, 45);
+            this.excelFilesLabel.Name = "excelFilesLabel";
+            this.excelFilesLabel.Size = new System.Drawing.Size(471, 26);
+            this.excelFilesLabel.TabIndex = 11;
+            this.excelFilesLabel.Text = "Выбрано 0 файлов";
+            this.excelFilesLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.excelFilesLabel.Visible = false;
             // 
             // progressBar1
             // 
             this.progressBar1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.progressBar1.Location = new System.Drawing.Point(13, 320);
+            this.progressBar1.Location = new System.Drawing.Point(13, 295);
             this.progressBar1.Name = "progressBar1";
             this.progressBar1.Size = new System.Drawing.Size(468, 27);
             this.progressBar1.TabIndex = 10;
@@ -223,7 +259,7 @@
             this.convertButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.convertButton.Cursor = System.Windows.Forms.Cursors.Hand;
             this.convertButton.Image = global::ExcelToWordProject.Properties.Resources.convert;
-            this.convertButton.Location = new System.Drawing.Point(525, 283);
+            this.convertButton.Location = new System.Drawing.Point(525, 258);
             this.convertButton.Name = "convertButton";
             this.convertButton.Size = new System.Drawing.Size(64, 64);
             this.convertButton.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
@@ -305,7 +341,7 @@
             // 
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.status});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 405);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 380);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Size = new System.Drawing.Size(626, 22);
             this.statusStrip1.TabIndex = 3;
@@ -317,18 +353,11 @@
             this.status.Size = new System.Drawing.Size(73, 17);
             this.status.Text = "Ожидание...";
             // 
-            // оПрограммеToolStripMenuItem
-            // 
-            this.оПрограммеToolStripMenuItem.Name = "оПрограммеToolStripMenuItem";
-            this.оПрограммеToolStripMenuItem.Size = new System.Drawing.Size(94, 20);
-            this.оПрограммеToolStripMenuItem.Text = "О программе";
-            this.оПрограммеToolStripMenuItem.Click += new System.EventHandler(this.ОПрограммеToolStripMenuItem_Click);
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 18F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(626, 427);
+            this.ClientSize = new System.Drawing.Size(626, 402);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.bodyPanel);
             this.Controls.Add(this.menuStrip1);
@@ -336,7 +365,7 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuStrip1;
             this.Margin = new System.Windows.Forms.Padding(4);
-            this.MinimumSize = new System.Drawing.Size(642, 419);
+            this.MinimumSize = new System.Drawing.Size(642, 441);
             this.Name = "MainForm";
             this.Text = "Граббер данных из Excel";
             this.Load += new System.EventHandler(this.Form1_Load);
@@ -381,6 +410,8 @@
         private System.Windows.Forms.ToolStripStatusLabel status;
         private System.Windows.Forms.ToolStripMenuItem списокТеговToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem оПрограммеToolStripMenuItem;
+        private System.Windows.Forms.LinkLabel excelFilesLabelClear;
+        private System.Windows.Forms.Label excelFilesLabel;
     }
 }
 

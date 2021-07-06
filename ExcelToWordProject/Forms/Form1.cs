@@ -23,7 +23,12 @@ namespace ExcelToWordProject
         SmartTagSettingsForm SmartTagSettingsForm;
         TagListForm TagListForm;
         AboutProgramForm aboutProgramForm;
+        GetDataParametersForm getDataParametersForm;
+
+
         SyllabusParameters syllabusParameters;
+
+        string[] selectedExcels = new string[0];
         public MainForm()
         {
             InitializeComponent();
@@ -34,11 +39,28 @@ namespace ExcelToWordProject
 
         }
 
+        private void SwitchExcelLoadingMode(bool single)
+        {
+            if(single)
+            {
+                excelFilesLabel.Visible = false;
+                excelFilesLabelClear.Visible = false;
+                filePathTextBox.Visible = true;
+                selectedExcels = new string[0];
+            }
+            else
+            {
+                excelFilesLabel.Visible = true;
+                excelFilesLabelClear.Visible = true;
+                filePathTextBox.Visible = false;
+                filePathTextBox.Text = "";
+                excelFilesLabel.Text = "Выбрано " + selectedExcels.Length + " файлов";
+            }
+        }
+
         private void Form1_Load(object sender, EventArgs e)
         {
-            Module module = new Module("0", "ваыва", "фваываыва;ываыва");
-            Type moduleType = module.GetType();
-            moduleType.GetField("Name");
+
 
         }
 
@@ -51,6 +73,58 @@ namespace ExcelToWordProject
             toolTip.SetToolTip(folderPathButton, "Выберите папку");
         }
 
+        public async Task ConvertProcessing(string selectedFilePath, string templateFilePath, string resultFolderPath, string prefix)
+        {
+            SyllabusExcelReader syllabusExcelReader = null;
+            SyllabusDocWriter syllabusDocWriter = null;
+
+            try
+            {
+                syllabusExcelReader = new SyllabusExcelReader(selectedFilePath, syllabusParameters);
+                syllabusDocWriter = new SyllabusDocWriter(syllabusExcelReader, syllabusParameters);
+                // Проверка на активные смарт теги при неправильном файле
+                if (syllabusParameters.HasActiveSmartTags && !syllabusExcelReader.IsSyllabusFile)
+                {
+                    DialogResult dialogResult = MessageBox.Show("Возможно данный файл " +
+                        "("+selectedFilePath+") не является " +
+                        "файлом учебного плана, но у вас активны \"умные\" теги. Это может стать причиной " +
+                        "сбоя в работе программы.\r\nОтключить \"умные\" теги?", "Внимание!", MessageBoxButtons.YesNoCancel);
+                    switch (dialogResult)
+                    {
+                        case DialogResult.Yes:
+                            // Склонируем новые параметры
+                            SyllabusParameters tempParameters = ConfigManager.GetConfigData();
+
+                            // Закроем старые потоки чтения
+                            syllabusExcelReader.Dispose();
+                            syllabusDocWriter.Dispose();
+
+                            // Отключим умные теги
+                            tempParameters.DisableSmartTags();
+                            syllabusExcelReader = new SyllabusExcelReader(selectedFilePath, tempParameters);
+                            syllabusDocWriter = new SyllabusDocWriter(syllabusExcelReader, tempParameters);
+                            break;
+                        case DialogResult.Cancel:
+                            return;
+                    }
+                }
+
+                await Task.Run(() => syllabusDocWriter.ConvertToDocx(resultFolderPath, templateFilePath, prefix,
+                            new Progress<int>(percent => progressBar1.Value = percent)));
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Произошла ошибка:\r\n" + ex.Message+"" +
+                    "\r\nФайл:" + selectedFilePath, 
+                    "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                syllabusExcelReader?.CloseStreams();
+                
+            }
+        }
+
         private async void ConvertButton_Click(object sender, EventArgs e)
         {
             if (LockButtons)
@@ -59,60 +133,52 @@ namespace ExcelToWordProject
             string selectedFilePath = filePathTextBox.Text;
             string templateFilePath = templateFilePathTextBox.Text;
             string resultFolderPath = resultFolderPathTextBox.Text;
-            SyllabusExcelReader syllabusExcelReader = null;
-            SyllabusDocWriter syllabusDocWriter = null;
-            /*
-            syllabusExcelReader = new SyllabusExcelReader(selectedFilePath, syllabusParameters);
-            syllabusDocWriter = new SyllabusDocWriter(syllabusExcelReader, syllabusParameters);
-            status.Text = "Генерация файлов...";
-            syllabusDocWriter.ConvertToDocx(resultFolderPath, templateFilePath, resultFilePrefixTextBox.Text,
-                new Progress<int>(percent => progressBar1.Value = percent));
-            */
-            try
-            {
-                syllabusExcelReader = new SyllabusExcelReader(selectedFilePath, syllabusParameters);
-                syllabusDocWriter = new SyllabusDocWriter(syllabusExcelReader, syllabusParameters);
-
-                // Проверка на активные смарт теги при неправильном файле
-                if (syllabusParameters.HasActiveSmartTags && !syllabusExcelReader.IsSyllabusFile)
+            
+            
+            if(selectedExcels.Length <= 1)
+                 await ConvertProcessing(selectedFilePath, templateFilePath, resultFolderPath, resultFilePrefixTextBox.Text);
+            else if(selectedExcels.Length > 1)
+                for (int i = 0; i < selectedExcels.Length; i++)
                 {
-                    DialogResult dialogResult = MessageBox.Show("Возможно данный файл не является " +
-                        "файлом учебного плана, но у вас активны \"умные\" теги. Это может стать причиной " +
-                        "сбоя в работе программы.\r\nОтключить \"умные\" теги?", "Внимание!", MessageBoxButtons.YesNoCancel);
-                    switch (dialogResult)
+                    status.Text = "Файл " + (i + 1) + " из " + selectedExcels.Length + "...";
+
+                    string fileName = Path.GetFileNameWithoutExtension(selectedExcels[i]);
+                    string folderPath = Path.Combine(resultFolderPath, fileName);
+
+                    try
                     {
-                        case DialogResult.Yes:
-                            syllabusParameters.DisableSmartTags();
-                            break;
-                        case DialogResult.Cancel:
-                            return;
+                        Directory.CreateDirectory(folderPath);
+                        await ConvertProcessing(
+                            selectedExcels[i], 
+                            templateFilePath,
+                            folderPath, 
+                            resultFilePrefixTextBox.Text);
+                    }
+                    catch
+                    {
+                        string prefix = "[" + Path.GetFileNameWithoutExtension(selectedExcels[i]) + "] " + resultFilePrefixTextBox.Text;
+                        await ConvertProcessing(selectedExcels[i], templateFilePath, resultFolderPath, prefix);
                     }
                 }
 
-                
-                status.Text = "Генерация файлов...";
-                await Task.Run(()=> syllabusDocWriter.ConvertToDocx(resultFolderPath, templateFilePath, resultFilePrefixTextBox.Text,
-                    new Progress<int>(percent => progressBar1.Value = percent)));
-            }
-            catch(Exception ex)
-            {
-                MessageBox.Show("Произошла ошибка:\r\n" + ex.Message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            finally
-            {
-                syllabusExcelReader?.CloseStreams();
-                status.Text = "Ожидание...";
-                LockButtons = false;
-            }
+            LockButtons = false;
+            status.Text = "Ожидание...";
+
         }
 
         private void FilePathButton_Click(object sender, EventArgs e)
         {
             OpenFileDialog fileDialog = new OpenFileDialog();
             fileDialog.Filter = "Excel документы|*.xls;*.xlsx";
+            fileDialog.Multiselect = true;
             if(fileDialog.ShowDialog() == DialogResult.OK)
             {
                 filePathTextBox.Text = fileDialog.FileName;
+                selectedExcels = fileDialog.FileNames;
+                if(selectedExcels.Length > 1)
+                    SwitchExcelLoadingMode(false);
+                else
+                    SwitchExcelLoadingMode(true);
             }
         }
 
@@ -178,6 +244,22 @@ namespace ExcelToWordProject
             }
             else
                 aboutProgramForm.Focus();
+        }
+
+        private void ExcelFilesLabelClear_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            SwitchExcelLoadingMode(true);
+        }
+
+        private void ConstantsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (getDataParametersForm == null || getDataParametersForm.IsDisposed)
+            {
+                getDataParametersForm = new GetDataParametersForm(syllabusParameters);
+                getDataParametersForm.Show();
+            }
+            else
+                getDataParametersForm.Focus();
         }
     }
 }

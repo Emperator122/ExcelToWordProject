@@ -59,36 +59,32 @@ namespace ExcelToWordProject.Syllabus
                     Parameters.Tags.FindIndex(el => 
                     el is SmartSyllabusTag && el.ListName == Parameters.ModulesContentListName) != -1;
 
-                // Есть ли смарт-теги, работающие с планом
-                bool hasSmartPlanListTags =
-                    Parameters.Tags.FindIndex(el =>
-                    el is SmartSyllabusTag && el.ListName == Parameters.PlanListName) != -1;
-
                 // получаем все модули
-                List<Module> modules = SyllabusExcelReader.GetAllModules();
+                List<Module> modules = SyllabusExcelReader.GetAllModules(Parameters.ModulesYears);
                 int i = 0;
                 foreach(Module module in modules) 
                 {
-                    // Приготовим имя и путь к файлу
-                    string safeName = PathUtils.RemoveIllegalFileNameCharacters(fileNamePrefix + module.Index + " " + module.Name + ".docx");
-                    string resultFilePath = Path.Combine(resultFolderPath, safeName);
-
-                    // Создадим новый файл с результатом
-                    baseDocument = DocX.Load(baseDocumentPath);
-                    baseDocument.SaveAs(resultFilePath);
-                    DocX doc = DocX.Load(resultFilePath);
-
-                    // Обработаем данный модуль
-                    ModuleHandler(doc, module, hasSmartModulesContentTags, hasSmartModulesContentTags);
-                   
-                    // Сохраняем файл
-                    doc.Save();
-                    doc.Dispose();
-
                     // Репортим прогресс
                     i++;
                     if (progress != null)
                         progress.Report(i * 100 / modules.Count());
+
+                    // Приготовим имя и путь к файлу
+                    string safeName = PathUtils.RemoveIllegalFileNameCharacters(fileNamePrefix + module.Index + " " + module.Name + ".docx");
+                    safeName = PathUtils.FixFileNameLimit(safeName);
+                    string resultFilePath = Path.Combine(resultFolderPath, safeName);
+
+                    // Создадим новый файл с результатом
+                    DocX doc = PathUtils.CopyFile(baseDocumentPath, resultFilePath);
+                    if (doc == null)
+                        continue;
+
+                    // Обработаем данный модуль
+                    ModuleHandler(doc, module, hasSmartModulesContentTags);
+                   
+                    // Сохраняем файл
+                    doc.Save();
+                    doc.Dispose();
                 }
             }
             else // просто заменяем теги
@@ -122,19 +118,14 @@ namespace ExcelToWordProject.Syllabus
         /// <param name="module">Дисциплина</param>
         /// <param name="hasSmartModulesContentTags">Есть ли активные теги, работающие с контентом</param>
         /// <param name="hasSmartPlanListTags">Есть ли активные теги, работающие с листом "План"</param>
-        protected void ModuleHandler(DocX doc, Module module, bool hasSmartModulesContentTags, bool hasSmartPlanListTags)
+        protected void ModuleHandler(DocX doc, Module module, bool hasSmartModulesContentTags)
         {
             // получаем компентенции
             List<Content> contentList = null;
             if (hasSmartModulesContentTags)
                 contentList = SyllabusExcelReader.ParseContentList(module);
 
-            // получаем свойства с листа "план"
-            ModuleProperties properties = null;
-            if (hasSmartPlanListTags)
-                properties = SyllabusExcelReader.ParseModuleProperties(module);
-
-            TablesHandler(doc, module, contentList, properties);
+            TablesHandler(doc, module, contentList);
 
             // бежим по списку тегов
             foreach (var tag in Parameters.Tags)
@@ -144,7 +135,7 @@ namespace ExcelToWordProject.Syllabus
                 if (tag.Active)
                 {
                     // получаем значение тега
-                    tagValue = tag.GetValue(module, contentList, properties, SyllabusExcelReader.ExcelData);
+                    tagValue = tag.GetValue(module, contentList, SyllabusExcelReader.ExcelData);
 
                     if (tag is SmartSyllabusTag) // если у нас контент-тег, то заполняем параграфы
                     {
@@ -159,7 +150,6 @@ namespace ExcelToWordProject.Syllabus
             }
         }
         
-
         /// <summary>
         /// Поиск всех тегов, находящихся в последних строках таблиц.
         /// В результате будет заполнено поле класса tablesTags,
@@ -196,7 +186,7 @@ namespace ExcelToWordProject.Syllabus
         /// <param name="module">Информация о дисциплине</param>
         /// <param name="contentList">Компетенции дисциплины</param>
         /// <param name="properties">Другие свойства дисциплины</param>
-        protected void TablesHandler(DocX doc, Module module=null, List<Content> contentList=null, ModuleProperties properties=null)
+        protected void TablesHandler(DocX doc, Module module=null, List<Content> contentList=null)
         {
             // Находим все теги, содержащиеся в таблицах
             FindTablesTags(doc, false);
@@ -208,7 +198,7 @@ namespace ExcelToWordProject.Syllabus
                 // Заполняем массив значений тегов
                 string[][] tagsValues = new string[tags.Count][];
                 for (int i = 0; i < tags.Count; i++)
-                    tagsValues[i] = tags[i].GetValue(module, contentList, properties, SyllabusExcelReader.ExcelData).Split('\n');
+                    tagsValues[i] = tags[i].GetValue(module, contentList, SyllabusExcelReader.ExcelData).Split('\n');
 
                 // Заполняем таблицу
                 FillTable(table, tags, tagsValues);

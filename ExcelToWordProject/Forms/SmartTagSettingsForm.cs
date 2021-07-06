@@ -10,7 +10,6 @@ using System.Media;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Linq;
 
 namespace ExcelToWordProject
 {
@@ -69,30 +68,22 @@ namespace ExcelToWordProject
         {
             List<TreeNode> result = new List<TreeNode>();
 
-            SmartSyllabusTag tempTag = smartSyllabusTags.Find(tag => tag.ListName == syllabusParameters.ModulesListName);
+            SmartSyllabusTag tempTag = smartSyllabusTags.Find(tag => tag.ListName == syllabusParameters.PlanListName);
 
             // Сгенерируем корневую ноду
-            TreeNode rootNode = new TreeNode("Теги с листа " + syllabusParameters.ModulesListName) {
+            TreeNode rootNode = new TreeNode("Теги с листа " + syllabusParameters.PlanListName) {
                 Checked = tempTag.Active,
-                Name = "modulesCheckBox"
+                Name = "planCheckBox"
             };
 
             result.Add(rootNode);
 
-            // И две другие
+            // И дочернюю
             tempTag = smartSyllabusTags.Find(tag => tag.ListName == syllabusParameters.ModulesContentListName);
             TreeNode node = new TreeNode("Теги с листа " + syllabusParameters.ModulesContentListName)
             {
                 Checked = tempTag.Active,
                 Name = "contentCheckBox"
-            };
-            rootNode.Nodes.Add(node);
-
-            tempTag = smartSyllabusTags.Find(tag => tag.ListName == syllabusParameters.PlanListName);
-            node = new TreeNode("Теги с листа " + syllabusParameters.PlanListName)
-            {
-                Checked = tempTag.Active,
-                Name = "planCheckBox"
             };
             rootNode.Nodes.Add(node);
 
@@ -263,10 +254,6 @@ namespace ExcelToWordProject
 
             switch (e.Node.Name)
             {
-                case "modulesCheckBox":
-                    SetStatePanelsWithListNamed(syllabusParameters.ModulesListName, e.Node.Checked);
-                    break;
-
                 case "contentCheckBox":
                     SetStatePanelsWithListNamed(syllabusParameters.ModulesContentListName, e.Node.Checked);
                     break;

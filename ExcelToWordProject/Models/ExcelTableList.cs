@@ -9,6 +9,9 @@ namespace ExcelToWordProject.Models
 {
     class ExcelTableList
     {
+        public int RowsCount { get => ExcelData.Tables[ListName].Rows.Count; }
+        public int ColumnsCount { get => ExcelData.Tables[ListName].Columns.Count; }
+
         public string ListName;
         public DataSet ExcelData;
 
@@ -35,9 +38,10 @@ namespace ExcelToWordProject.Models
             ColumnHeaderIndex = columnHeaderIndex;
         }
 
-        public string GetCellValue(int rowIndex, int columnIndex)
+        public string GetCellValue(int rowIndex, int columnIndex, bool nullSafe = true)
         {
-            return ExcelData.Tables[ListName].Rows[rowIndex][columnIndex] as string;
+            string val = ExcelData.Tables[ListName].Rows[rowIndex][columnIndex] as string;
+            return nullSafe ? val ?? "" : val;
         }
 
         public List<string> GetCellValue(int rowIndex, string rowHeaderValue, bool first = false)
@@ -84,6 +88,13 @@ namespace ExcelToWordProject.Models
                 }
             }
             return result;
+        }
+
+        public string GetFirstCellValue(int rowIndex, string rowHeaderValue, bool nullSafe = true)
+        {
+            List<string> temp = GetCellValue(rowIndex, rowHeaderValue);
+            string val = temp.Count > 0 ? temp[0] : null;
+            return nullSafe ? val ?? "" : val;
         }
 
     }

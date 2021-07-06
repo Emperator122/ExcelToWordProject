@@ -1,4 +1,5 @@
-﻿using ExcelToWordProject.Syllabus;
+﻿using ExcelToWordProject.Models;
+using ExcelToWordProject.Syllabus;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -57,6 +58,12 @@ namespace ExcelToWordProject.Utils
         /// <param name="data">Файл с записанными настройками</param>
         public static void SaveConfigData(SyllabusParameters data)
         {
+            // Сериализуем словарь
+            List<TempDictionaryItem> tempDictionaryItems = new List<TempDictionaryItem>();
+            foreach (var kv in data.planListHeaderNames)
+                tempDictionaryItems.Add(new TempDictionaryItem() { Name = kv.Key, Value = kv.Value });
+            data.tempPlanListHeaderNames = tempDictionaryItems;
+
             using (Stream writer = new FileStream(ConfigPath, FileMode.Create))
             {
                 XmlSerializer serializer = new XmlSerializer(typeof(SyllabusParameters));

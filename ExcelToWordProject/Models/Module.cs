@@ -17,8 +17,11 @@ namespace ExcelToWordProject
         public string Name;
         public string[] ContentIndexes;
 
-        public Module(string index, string name, string сontentIndexesStr, char contentDelimiter = ';')
+        public ModuleProperties Properties;
+
+        public Module(string index, string name,string сontentIndexesStr, char contentDelimiter = ';', ModuleProperties moduleProperties = null)
         {
+            Properties = moduleProperties;
             Index = index;
             Name = name;
             ContentIndexes = сontentIndexesStr.Split(contentDelimiter);

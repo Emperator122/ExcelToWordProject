@@ -98,6 +98,12 @@
     <Compile Include="Forms\DescriptionEditForm.Designer.cs">
       <DependentUpon>DescriptionEditForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\GetDataParametersForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\GetDataParametersForm.Designer.cs">
+      <DependentUpon>GetDataParametersForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\RegularExpressionEditForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -148,6 +154,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\GetDataParametersForm.resx">
+      <DependentUpon>GetDataParametersForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\RegularExpressionEditForm.resx">
       <DependentUpon>RegularExpressionEditForm.cs</DependentUpon>
