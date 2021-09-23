@@ -294,7 +294,7 @@ namespace ExcelToWordProject.Syllabus
                     return controlString;
 
                 case SmartTagType.CreditUnits:
-                    return properties.CreditUnits.ToString();
+                    return properties.CreditUnits;
 
                 case SmartTagType.TotalLecturesHours:
                     return properties.TotalLecturesHours.ToString();

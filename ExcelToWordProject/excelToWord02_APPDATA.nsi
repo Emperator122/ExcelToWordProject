@@ -2,13 +2,13 @@
 
 ; Define your application name
 !define APPNAME "ExcelToWordGrabber"
-!define APPNAMEANDVERSION "ExcelToWordGrabber 0.2"
+!define APPNAMEANDVERSION "ExcelToWordGrabber 0.3"
 
 ; Main Install settings
 Name "${APPNAMEANDVERSION}"
 InstallDir "$APPDATA\ExcelToWordGrabber"
 InstallDirRegKey HKLM "Software\${APPNAME}" ""
-OutFile "ExcelToWord_0.2_Installer.exe"
+OutFile "ExcelToWord_0.3_Installer.exe"
 RequestExecutionLevel highest
 
 ; Modern interface settings

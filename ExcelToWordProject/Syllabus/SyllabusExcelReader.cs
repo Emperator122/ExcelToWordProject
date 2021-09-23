@@ -208,7 +208,7 @@ namespace ExcelToWordProject.Syllabus
 
             // если мы не нашли нужную строку
             if (rowIndex == rows.Count)
-                return new ModuleProperties("error", "error", new List<ControlForm>(), -1);
+                return new ModuleProperties("error", "error", new List<ControlForm>(), "-1");
 
             // Тянем доп данные
 
@@ -241,10 +241,10 @@ namespace ExcelToWordProject.Syllabus
             SmartSyllabusTag сreditUnitsTag =
                 Parameters.Tags.Find(
                     tag => tag is SmartSyllabusTag && (tag as SmartSyllabusTag).Type == SmartTagType.CreditUnits) as SmartSyllabusTag;
-            properties.CreditUnits = -1;
+            properties.CreditUnits = "-1";
             if (rows[rowIndex][сreditUnitsTag.ColumnIndex] as string != "")
             {
-                properties.CreditUnits = Convert.ToInt32(rows[rowIndex][сreditUnitsTag.ColumnIndex] as string ?? "-1");
+                properties.CreditUnits = rows[rowIndex][сreditUnitsTag.ColumnIndex] as string ?? "-1";
             }
 
 

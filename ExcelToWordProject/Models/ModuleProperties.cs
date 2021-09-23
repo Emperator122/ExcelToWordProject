@@ -63,7 +63,7 @@ namespace ExcelToWordProject.Models
         public int BlockNumber = -1;
         public string BlockName = "";
         public string PartName = "";
-        public int CreditUnits = -1;
+        public string CreditUnits = "-1";
         public string DepartmentName = "";
 
         public List<int> LecturesHoursBySemesters = new List<int>();
@@ -91,7 +91,7 @@ namespace ExcelToWordProject.Models
 
         public ModuleProperties() { }
 
-        public ModuleProperties(string blockName, string partName, List<ControlForm> controlForm, int creditUnits, int blockNumber = -1)
+        public ModuleProperties(string blockName, string partName, List<ControlForm> controlForm, string creditUnits, int blockNumber = -1)
         {
             BlockName = blockName;
             BlockNumber = blockNumber;

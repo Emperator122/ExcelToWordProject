@@ -109,6 +109,9 @@ namespace ExcelToWordProject
                     }
                 }
 
+                //syllabusDocWriter.ConvertToDocx(resultFolderPath, templateFilePath, prefix,
+                //            new Progress<int>(percent => progressBar1.Value = percent));
+
                 await Task.Run(() => syllabusDocWriter.ConvertToDocx(resultFolderPath, templateFilePath, prefix,
                             new Progress<int>(percent => progressBar1.Value = percent)));
             }
