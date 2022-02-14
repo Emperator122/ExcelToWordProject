@@ -1,6 +1,7 @@
 ﻿using ExcelToWordProject.Forms;
 using ExcelToWordProject.Models;
 using ExcelToWordProject.Syllabus;
+using ExcelToWordProject.Syllabus.Tags;
 using ExcelToWordProject.Utils;
 using System;
 using System.Collections.Generic;
@@ -60,8 +61,35 @@ namespace ExcelToWordProject
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            // для теста
+            TextBlockTag textBlockTag = new TextBlockTag(
+                    key: "testTag",
+                    listName: "testListName",
+                    description: "lalalalala",
+                    conditions: new TextBlockCondition[]
+                    {
+                        new TextBlockCondition(
+                                tag: syllabusParameters.Tags[0],
+                                condition: new string[] { syllabusParameters.Tags[0].Tag + ": value_1" }
+                            ),
+                        new TextBlockCondition(
+                                tag: syllabusParameters.Tags[4],
+                                condition: new string[] { syllabusParameters.Tags[4].Tag + ": value_1" }
+                            ),
+                        new TextBlockCondition(
+                                tag: syllabusParameters.Tags[0],
+                                condition: new string[] { syllabusParameters.Tags[0].Tag + ": value_1" }
+                            ),
+                        new TextBlockCondition(
+                                tag: syllabusParameters.Tags[syllabusParameters.Tags.Count-1],
+                                condition: new string[] { syllabusParameters.Tags[syllabusParameters.Tags.Count-1].Tag + ": value_1" }
+                            ),
+                    }
+                );
 
-
+            string serialized = textBlockTag.ToXml();
+            TextBlockTag deserializedTextBlockTag = TextBlockTag.FromXml(serialized);
+            Console.WriteLine("lala");
         }
 
         private void SetToolTips()

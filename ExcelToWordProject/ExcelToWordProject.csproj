@@ -162,6 +162,7 @@
     <Compile Include="Syllabus\Tags\BaseSyllabusTag.cs" />
     <Compile Include="Syllabus\Tags\DefaultSyllabusTag.cs" />
     <Compile Include="Syllabus\Tags\SmartSyllabusTag.cs" />
+    <Compile Include="Syllabus\Tags\TextBlockTag.cs" />
     <Compile Include="Utils\ConfigManager.cs" />
     <Compile Include="Utils\ExcelUtils.cs" />
     <Compile Include="Utils\OtherUtils.cs" />

@@ -7,12 +7,12 @@ using System.Text.RegularExpressions;
 
 namespace ExcelToWordProject.Syllabus
 {
-    public class SyllabusParameters 
+    public class SyllabusParameters
     {
         [System.Xml.Serialization.XmlIgnore]
         public bool HasActiveSmartTags
         {
-            get { return Tags.FindIndex(el => el is SmartSyllabusTag && el.Active)  != -1; }
+            get { return Tags.FindIndex(el => el is SmartSyllabusTag && el.Active) != -1; }
         }
 
         public string ModulesContentListName;
@@ -27,10 +27,15 @@ namespace ExcelToWordProject.Syllabus
 
         [System.Xml.Serialization.XmlElementAttribute("SmartSyllabusTag", typeof(SmartSyllabusTag))]
         [System.Xml.Serialization.XmlElementAttribute("DefaultSyllabusTag", typeof(DefaultSyllabusTag))]
+        [System.Xml.Serialization.XmlElementAttribute("TextBlockTag", typeof(TextBlockTag))]
         public List<BaseSyllabusTag> Tags;
 
         public SyllabusParameters() { }
 
+        /// <summary>
+        /// Конструктор с набором стандартных параметров
+        /// </summary>
+        /// <param name="fillWithValues">Заполнить стандартными параметрами</param>
         public SyllabusParameters(bool fillWithValues) {
             if (!fillWithValues) return;
 
@@ -55,7 +60,7 @@ namespace ExcelToWordProject.Syllabus
             planListHeaderNames["DepartmentName"] = "Наименование";
             planListHeaderNames["Competitions"] = "Компетенции";
             // заполняем временный массив для сериализации
-            tempPlanListHeaderNames = new List<TempDictionaryItem>(planListHeaderNames.Select(kv 
+            tempPlanListHeaderNames = new List<TempDictionaryItem>(planListHeaderNames.Select(kv
                 => new TempDictionaryItem() { Name = kv.Key, Value = kv.Value }).ToArray());
 
 
@@ -166,11 +171,11 @@ namespace ExcelToWordProject.Syllabus
                 // Обычные теги
                 new DefaultSyllabusTag(15, 1, "DirectionCode", "Титул", "Номер направления.\r\nНапр.:09.03.01"),
 
-                new DefaultSyllabusTag(17, 1, "DirectionName", "Титул", "Имя направления. \r\nНапр.: Прикладная математика и информатика", true, 
+                new DefaultSyllabusTag(17, 1, "DirectionName", "Титул", "Имя направления. \r\nНапр.: Прикладная математика и информатика", true,
                             new RegExpData(){ Expression = @"\d ((.*)(?=[ \n](?=Программа|Профиль))|(.*))",
                                 GroupIndex = 1, RegexOptions = RegexOptions.Singleline }),
 
-                new DefaultSyllabusTag(17, 1, "ProgramValue", "Титул", "Название программы/профиля.", true, 
+                new DefaultSyllabusTag(17, 1, "ProgramValue", "Титул", "Название программы/профиля.", true,
                             new RegExpData(){ Expression = @"((Программа|Профиль).*)",
                                 GroupIndex = 1, RegexOptions = RegexOptions.Singleline | RegexOptions.IgnoreCase }),
 
@@ -201,44 +206,5 @@ namespace ExcelToWordProject.Syllabus
                     el.Active = false;
             });
         }
-    }
-
-    // Зачетные единицы, Номер блока, Имя блока, Имя модуля, Компетенции, Форма контроля, Индекс модуля...
-    public enum SmartTagType
-    {
-        None,
-        CreditUnits,
-        BlockNumber,
-        BlockName,
-        ModuleName,
-        Content,
-        Control,
-        ModuleIndex,
-        PartName,
-        ExtendedContent,
-        ContentIndex,
-
-        Years,
-        Semesters,
-
-        TotalLecturesHours,
-        TotalPracticalLessonsHours,
-        TotalLaboratoryLessonsHours,
-        TotalIndependentWorkHours,
-        TotalControlHours,
-
-        LecturesHoursBySemesters,
-        PracticalLessonsHoursBySemesters,
-        LaboratoryLessonsHoursBySemesters,
-        IndependentWorkHoursBySemesters,
-        ControlHoursBySemesters,
-        TotalLessonsBySemesters,
-        isCreditBySemesters,
-
-        TotalHoursByPlan,
-        TotalLessons,
-        isCourseWork,
-        DepartmentName,
-        ModuleContentIndexes
     }
 }

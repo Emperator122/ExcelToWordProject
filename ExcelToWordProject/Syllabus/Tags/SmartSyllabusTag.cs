@@ -209,4 +209,43 @@ namespace ExcelToWordProject.Syllabus.Tags
             return "";
         }
     }
+
+    // Зачетные единицы, Номер блока, Имя блока, Имя модуля, Компетенции, Форма контроля, Индекс модуля...
+    public enum SmartTagType
+    {
+        None,
+        CreditUnits,
+        BlockNumber,
+        BlockName,
+        ModuleName,
+        Content,
+        Control,
+        ModuleIndex,
+        PartName,
+        ExtendedContent,
+        ContentIndex,
+
+        Years,
+        Semesters,
+
+        TotalLecturesHours,
+        TotalPracticalLessonsHours,
+        TotalLaboratoryLessonsHours,
+        TotalIndependentWorkHours,
+        TotalControlHours,
+
+        LecturesHoursBySemesters,
+        PracticalLessonsHoursBySemesters,
+        LaboratoryLessonsHoursBySemesters,
+        IndependentWorkHoursBySemesters,
+        ControlHoursBySemesters,
+        TotalLessonsBySemesters,
+        isCreditBySemesters,
+
+        TotalHoursByPlan,
+        TotalLessons,
+        isCourseWork,
+        DepartmentName,
+        ModuleContentIndexes
+    }
 }
