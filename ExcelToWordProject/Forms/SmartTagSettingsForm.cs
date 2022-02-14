@@ -1,4 +1,5 @@
 ﻿using ExcelToWordProject.Syllabus;
+using ExcelToWordProject.Syllabus.Tags;
 using ExcelToWordProject.Utils;
 using System;
 using System.Collections.Generic;
@@ -63,7 +64,6 @@ namespace ExcelToWordProject
                 }
             }
         }
-
         protected TreeNode[] GenerateTreeNodes(List<SmartSyllabusTag> smartSyllabusTags)
         {
             List<TreeNode> result = new List<TreeNode>();

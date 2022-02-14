@@ -1,4 +1,5 @@
 ﻿using ExcelToWordProject.Syllabus;
+using ExcelToWordProject.Syllabus.Tags;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

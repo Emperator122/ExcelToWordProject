@@ -159,6 +159,9 @@
     <Compile Include="Forms\TagListForm.Designer.cs">
       <DependentUpon>TagListForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Syllabus\Tags\BaseSyllabusTag.cs" />
+    <Compile Include="Syllabus\Tags\DefaultSyllabusTag.cs" />
+    <Compile Include="Syllabus\Tags\SmartSyllabusTag.cs" />
     <Compile Include="Utils\ConfigManager.cs" />
     <Compile Include="Utils\ExcelUtils.cs" />
     <Compile Include="Utils\OtherUtils.cs" />

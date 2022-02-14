@@ -1,5 +1,6 @@
 ﻿using ExcelToWordProject.Forms;
 using ExcelToWordProject.Syllabus;
+using ExcelToWordProject.Syllabus.Tags;
 using ExcelToWordProject.Utils;
 using System;
 using System.Collections.Generic;

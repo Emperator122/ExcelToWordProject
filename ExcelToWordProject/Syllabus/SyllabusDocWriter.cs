@@ -1,6 +1,7 @@
 ﻿using ExcelDataReader;
 using ExcelToWordProject.Models;
 using ExcelToWordProject.Syllabus;
+using ExcelToWordProject.Syllabus.Tags;
 using ExcelToWordProject.Utils;
 using System;
 using System.Collections.Generic;
