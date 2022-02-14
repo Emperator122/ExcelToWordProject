@@ -69,19 +69,19 @@ namespace ExcelToWordProject
                     conditions: new TextBlockCondition[]
                     {
                         new TextBlockCondition(
-                                tag: syllabusParameters.Tags[0],
+                                tagName: syllabusParameters.Tags[0].Key,
                                 condition: new string[] { syllabusParameters.Tags[0].Tag + ": value_1" }
                             ),
                         new TextBlockCondition(
-                                tag: syllabusParameters.Tags[4],
+                                tagName: syllabusParameters.Tags[4].Key,
                                 condition: new string[] { syllabusParameters.Tags[4].Tag + ": value_1" }
                             ),
                         new TextBlockCondition(
-                                tag: syllabusParameters.Tags[0],
-                                condition: new string[] { syllabusParameters.Tags[0].Tag + ": value_1" }
+                                tagName: syllabusParameters.Tags[0].Key,
+                                condition: new string[] { syllabusParameters.Tags[8].Tag + ": value_1" }
                             ),
                         new TextBlockCondition(
-                                tag: syllabusParameters.Tags[syllabusParameters.Tags.Count-1],
+                                tagName: syllabusParameters.Tags[syllabusParameters.Tags.Count-1].Key,
                                 condition: new string[] { syllabusParameters.Tags[syllabusParameters.Tags.Count-1].Tag + ": value_1" }
                             ),
                     }

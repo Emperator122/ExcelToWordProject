@@ -1,4 +1,5 @@
 ﻿using ExcelToWordProject.Models;
+using Microsoft.Data.Sqlite;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -24,14 +25,42 @@ namespace ExcelToWordProject.Syllabus.Tags
             description: description
         )
         {
-            Conditions = conditions.OrderBy(condition => condition.Tag.Key).ToArray();
+            Conditions = conditions.OrderBy(condition => condition.TagName).ToArray();
         }
 
         public TextBlockTag() { } // для сериализации
 
         public override string GetValue(Module module = null, List<Content> contentList = null, DataSet excelData = null)
         {
-            throw new NotImplementedException();
+            string sqlExpression =
+                $"SELECT * FROM {DatabaseStrings.TextBlockValueColumnName} "
+                + $"WHERE {DatabaseStrings.TextBlockKeyColumnName} = \'{Key}\' "
+                + $"AND {DatabaseStrings.TextBlockConditionColumnName} = \'{ToXml()}\'";
+            using (var connection = new SqliteConnection(DatabaseStrings.DatabasePath))
+            {
+                connection.Open();
+                SqliteCommand command = new SqliteCommand(sqlExpression, connection);
+                using (SqliteDataReader reader = command.ExecuteReader())
+                {
+                    if (reader.HasRows) // если есть данные
+                    {
+                        while (reader.Read())   // построчно считываем данные
+                        {
+                            var id = reader.GetValue(0);
+                            var name = reader.GetValue(1);
+                            var age = reader.GetValue(2);
+
+                            Console.WriteLine($"{id} \t {name} \t {age}");
+                        }
+                    }
+                }
+            }
+            return "";
+        }
+
+        public void SaveToDatabase(string value) 
+        {
+            
         }
 
         public string ToXml()
@@ -56,16 +85,13 @@ namespace ExcelToWordProject.Syllabus.Tags
 
     public class TextBlockCondition
     {
-        [System.Xml.Serialization.XmlElementAttribute("SmartSyllabusTag", typeof(SmartSyllabusTag))]
-        [System.Xml.Serialization.XmlElementAttribute("DefaultSyllabusTag", typeof(DefaultSyllabusTag))]
-        [System.Xml.Serialization.XmlElementAttribute("TextBlockTag", typeof(TextBlockTag))]
-        public BaseSyllabusTag Tag { get; set; }
+        public string TagName { get; set; }
         public string[] Condition { get; set; } // для тега, содержащего несколько значений, имеем массив
         public string Delimiter { get; set; }
 
-        public TextBlockCondition(BaseSyllabusTag tag, string[] condition, string delimiter = null)
+        public TextBlockCondition(string tagName, string[] condition, string delimiter = null)
         {
-            Tag = tag;
+            TagName = tagName;
             Condition = condition;
             Delimiter = delimiter;
         }
