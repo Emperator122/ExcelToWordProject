@@ -12,8 +12,8 @@ namespace ExcelToWordProject
         public static string ConnectionString { get => "Data Source=" + DatabasePath; }
 
         // Константы для TextBlockTag
-        public static readonly string TextBlockTagTableName = "text_block_conditions";
-        public static readonly string TextBlockKeyColumnName = "condition_key";
+        public static readonly string TextBlockTagTableName = "syllabus_text_blocks";
+        public static readonly string TextBlockKeyColumnName = "tag_key";
         public static readonly string TextBlockConditionColumnName = "condition_object";
         public static readonly string TextBlockValueColumnName = "value";
 

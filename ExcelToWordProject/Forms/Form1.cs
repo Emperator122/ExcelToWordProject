@@ -70,25 +70,27 @@ namespace ExcelToWordProject
                     {
                         new TextBlockCondition(
                                 tagName: syllabusParameters.Tags[0].Key,
-                                condition: new string[] { syllabusParameters.Tags[0].Tag + ": value_1" }
+                                condition: syllabusParameters.Tags[0].Tag + ": value_1"
                             ),
                         new TextBlockCondition(
                                 tagName: syllabusParameters.Tags[4].Key,
-                                condition: new string[] { syllabusParameters.Tags[4].Tag + ": value_1" }
+                                condition: syllabusParameters.Tags[4].Tag + ": value_1"
                             ),
                         new TextBlockCondition(
                                 tagName: syllabusParameters.Tags[0].Key,
-                                condition: new string[] { syllabusParameters.Tags[8].Tag + ": value_1" }
+                                condition: syllabusParameters.Tags[8].Tag + ": value_1"
                             ),
                         new TextBlockCondition(
                                 tagName: syllabusParameters.Tags[syllabusParameters.Tags.Count-1].Key,
-                                condition: new string[] { syllabusParameters.Tags[syllabusParameters.Tags.Count-1].Tag + ": value_1" }
+                                condition: syllabusParameters.Tags[syllabusParameters.Tags.Count-1].Tag + ": value_1"
                             ),
                     }
                 );
 
-            string serialized = textBlockTag.ToXml();
-            TextBlockTag deserializedTextBlockTag = TextBlockTag.FromXml(serialized);
+            //textBlockTag.SaveToDatabase("ara pere");
+
+            //string value = textBlockTag.GetValue();
+
             Console.WriteLine("lala");
         }
 
