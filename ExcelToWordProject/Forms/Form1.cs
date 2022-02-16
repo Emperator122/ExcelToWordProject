@@ -70,7 +70,8 @@ namespace ExcelToWordProject
                     {
                         new TextBlockCondition(
                                 tagName: syllabusParameters.Tags[0].Key,
-                                condition: syllabusParameters.Tags[0].Tag + ": value_1"
+                                condition: $"{syllabusParameters.Tags[0].Tag};value_2;value3",
+                                delimiter: ";"                                
                             ),
                         new TextBlockCondition(
                                 tagName: syllabusParameters.Tags[4].Key,
@@ -87,9 +88,9 @@ namespace ExcelToWordProject
                     }
                 );
 
-            //textBlockTag.SaveToDatabase("ara pere");
+            textBlockTag.SaveToDatabase(new string[] { "ara pere1", "lala2", "kk3" });
 
-            //string value = textBlockTag.GetValue();
+            string[] values = textBlockTag.GetValue2();
 
             Console.WriteLine("lala");
         }
