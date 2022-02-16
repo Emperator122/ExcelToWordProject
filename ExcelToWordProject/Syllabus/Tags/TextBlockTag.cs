@@ -194,7 +194,9 @@ namespace ExcelToWordProject.Syllabus.Tags
     {
         public string TagName { get; set; }
         public string Condition { get; set; }
-        public string Delimiter { get; set; }
+        public string Delimiter { get => delimiter; set => delimiter = value != "" ? value : "\n"; }
+
+        private string delimiter;
 
         public int Length { get => Subconditions.Length; }
 

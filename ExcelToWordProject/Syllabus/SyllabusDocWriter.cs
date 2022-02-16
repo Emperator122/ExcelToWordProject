@@ -25,6 +25,9 @@ namespace ExcelToWordProject.Syllabus
         // Список тегов в таблицах текущего шаблона
         Dictionary<int, List<BaseSyllabusTag>> tablesTags;
 
+        // Список TextBlock тегов в таблицах текущего шаблона
+        Dictionary<int, List<TextBlockTag>> tablesTextBlockTags;
+
         // Список смарт тегов, для которых будут пробегаться параграфы
         readonly SmartTagType[] smartTagParagraphJob = { SmartTagType.Content, SmartTagType.ExtendedContent };
 
@@ -126,19 +129,15 @@ namespace ExcelToWordProject.Syllabus
             if (hasSmartModulesContentTags)
                 contentList = SyllabusExcelReader.ParseContentList(module);
 
-            // обработка TextBlock
-            List<TextBlockTag> textBlockTags = Parameters.UniqueTextBlockTags;
-            foreach (TextBlockTag textBlockTag in textBlockTags)
-            {
-                if (!textBlockTag.Active) continue;
-                bool isValid = textBlockTag.CheckConditions(Parameters.Tags, module, contentList, SyllabusExcelReader.ExcelData);
-                if (!isValid) continue;
-                string tagValue = textBlockTag.GetValue2();
-                doc.ReplaceText(textBlockTag.Tag, tagValue);
-            }
-
             // обработка таблиц
             TablesHandler(doc, module, contentList);
+
+            // обработка TextBlock
+            TextBlocksHandler(
+                doc: doc,
+                module: module,
+                contentList: contentList
+            );
 
             // бежим по списку тегов
             foreach (var tag in Parameters.Tags)
@@ -162,34 +161,58 @@ namespace ExcelToWordProject.Syllabus
                 }
             }
         }
-        
+
         /// <summary>
         /// Поиск всех тегов, находящихся в последних строках таблиц.
-        /// В результате будет заполнено поле класса tablesTags,
-        /// представляющее из себя лист листов тегов.
+        /// В результате будут заполнены поля класса tablesTags и tablesTextBlockTags,
+        /// представляющие из себя листы листов тегов.
         /// 
         /// Листов по количество таблиц в документе,
         /// внутренних листов по количеству тегов в каждой таблице.
         /// </summary>
         /// <param name="doc">Документ</param>
-        /// <param name="refresh">Следует ли обновить поле</param>
+        /// <param name="refresh">Следует ли обновить поля</param>
         protected void FindTablesTags(DocX doc, bool refresh = true)
         {
-            if (tablesTags != null && !refresh)
+            if (tablesTags != null && tablesTextBlockTags != null && !refresh)
                 return;
 
             tablesTags = new Dictionary<int, List<BaseSyllabusTag>>();
             for (int i = 0; i < doc.Tables.Count; i++)
             {
                 var table = doc.Tables[i];
+                
                 Row row = table.Rows.Last();
-                List<BaseSyllabusTag> tags = Parameters.Tags.FindAll(tag
-                    => tag.Active && row.FindAll(tag.Tag).Count > 0);
+                
+                // найдем все Smart и Default теги в последней ровке траблицы
+                List<BaseSyllabusTag> tags = 
+                    Parameters
+                    .Tags
+                    .FindAll(
+                        tag => 
+                            tag.Active && 
+                            row.FindAll(tag.Tag).Count > 0
+                    );
+
                 if(tags.Count > 0)
                     tablesTags[i] = tags;
+
+                // найдем TextBlock теги
+                tablesTextBlockTags = new Dictionary<int, List<TextBlockTag>>();
+                List<TextBlockTag> textBlockTags =
+                    Parameters
+                    .UniqueTextBlockTags
+                    .FindAll(
+                        tag =>
+                            tag.Active &&
+                            row.FindAll(tag.Tag).Count > 0
+                    );
+
+                if (textBlockTags.Count > 0)
+                    tablesTextBlockTags[i] = textBlockTags;
             }
         }
-        
+
         /// <summary>
         /// Обработка таблиц в документе.
         /// Достает необходимые значения из тегов, чтобы заполнить
@@ -207,14 +230,106 @@ namespace ExcelToWordProject.Syllabus
             {
                 var table = doc.Tables[kv.Key];
                 List<BaseSyllabusTag> tags = kv.Value;
+                
+                List<TextBlockTag> textBlockTags = new List<TextBlockTag>();
+                if (tablesTextBlockTags.ContainsKey(kv.Key)) // TODO: надо решить вопрос с непересечением
+                    textBlockTags.AddRange(tablesTextBlockTags[kv.Key]);
 
-                // Заполняем массив значений тегов
-                string[][] tagsValues = new string[tags.Count][];
+                // Удалим TextBlock теги не удовлетворяющие условиям
+                for(int i = 0; i < textBlockTags.Count; i++)
+                {
+                    bool isValid = textBlockTags[i]
+                            .CheckConditions(
+                                Parameters.Tags,
+                                module,
+                                contentList,
+                                SyllabusExcelReader.ExcelData
+                            );
+                    if (!isValid)
+                    {
+                        textBlockTags.RemoveAt(i);
+                        i--;
+                    }
+                }
+
+                // Сгруппируем TextBlock теги по ключу
+                var textBlockTagsGroup = textBlockTags.GroupBy(tag => tag.Key);
+
+                // Массив значений тегов, оставим доп место для TextBlock тегов
+                string[][] tagsValues = new string[tags.Count + textBlockTagsGroup.Count()][];
+
+               // Обработка Smart и Defalut тегов
                 for (int i = 0; i < tags.Count; i++)
-                    tagsValues[i] = tags[i].GetValue(module, contentList, SyllabusExcelReader.ExcelData).Split('\n');
+                    tagsValues[i] = 
+                        tags[i]
+                            .GetValue(module, contentList, SyllabusExcelReader.ExcelData).Split('\n');
+
+                // Обработка TextBlock тегов
+                int maxLength = tagsValues.Max((arr) => arr?.Length ?? 0);
+                int k = tags.Count;
+                foreach (var group in textBlockTagsGroup) // Для каждой группы ключей TextBlock тегов
+                {
+                    // Массив с результатом, равный максимальной
+                    // высоте столбца таблицы
+                    string[] values = new string[maxLength]; 
+                    for (int i = 0; i < values.Length; i++)
+                        values[i] = "";
+
+                    // Поставим значения TextBlock тегов в нужных строках таблицы
+                    foreach (var textBlockTag in group)
+                    {
+                        // i,j - бежим по всей таблице
+                        for (int i = 0; i < maxLength; i++)
+                        {
+                            bool conditionsFlag = true;
+                            for (int j = 0; j < tags.Count; j++)
+                            {
+                                // если TextBlock не зависит от текущего Base тега, то пропускаем итерацию
+                                TextBlockCondition condition = 
+                                    textBlockTag
+                                        .Conditions
+                                        .FirstOrDefault(
+                                            _condition => _condition.TagName == tags[j].Key
+                                        );
+                                if (condition == null)
+                                    continue;
+
+                                // иначе получаем текущее значение Base тега в таблице
+                                string rowTagValue = null;
+                                if (i < tagsValues[j]?.Length)
+                                    rowTagValue = tagsValues[j][i];
+                                else if (i >= tagsValues[j]?.Length)
+                                    rowTagValue = tagsValues[j][tagsValues[j].Length - 1];
+
+                                // и сравниваем значение Base тега с условием TextBlock тега
+                                if (condition.Condition != rowTagValue)
+                                {
+                                    conditionsFlag = false;
+                                    break;
+                                }
+                            }
+                            // Если не зафакапился флаг, то тег становится на свое место
+                            // (по идее)
+                            if (conditionsFlag)
+                            {
+                                values[i] = textBlockTag.GetValue2();
+                                break;
+                            }
+                        }
+                    }
+                    tagsValues[k] = values;
+                    k++;
+                }
+
+                // В итоге смешиваем Base теги с TextBlock тегами (первыми из них)
+                List<BaseSyllabusTag> mixedTags = new List<BaseSyllabusTag>(tags);
+                mixedTags.AddRange(
+                    textBlockTagsGroup
+                        .Select(group => group.First())
+                );
 
                 // Заполняем таблицу
-                FillTable(table, tags, tagsValues);
+                FillTable(table, mixedTags, tagsValues);
             }
 
         }
@@ -296,6 +411,19 @@ namespace ExcelToWordProject.Syllabus
             catch
             {
 
+            }
+        }
+
+        protected void TextBlocksHandler(DocX doc, Module module = null, List<Content> contentList = null)
+        {
+            List<TextBlockTag> textBlockTags = Parameters.UniqueTextBlockTags;
+            foreach (TextBlockTag textBlockTag in textBlockTags)
+            {
+                if (!textBlockTag.Active) continue;
+                bool isValid = textBlockTag.CheckConditions(Parameters.Tags, module, contentList, SyllabusExcelReader.ExcelData);
+                if (!isValid) continue;
+                string tagValue = textBlockTag.GetValue2();
+                doc.ReplaceText(textBlockTag.Tag, tagValue);
             }
         }
     }

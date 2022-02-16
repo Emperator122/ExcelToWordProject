@@ -62,8 +62,85 @@ namespace ExcelToWordProject
         private void Form1_Load(object sender, EventArgs e)
         {
             return;
-            // для теста
+
             TextBlockTag textBlockTag = new TextBlockTag(
+                key: "ContentMegaTag",
+                listName: "",
+                description: "lalalalala",
+                conditions: new TextBlockCondition[]
+                {
+                    new TextBlockCondition(
+                            tagName: "ContentIndex",
+                            condition: $"УК-1",
+                            delimiter: "\n"
+                        ),
+                }
+            );
+
+            textBlockTag.SaveToDatabase("This value will be only on УК-1");
+
+            textBlockTag = new TextBlockTag(
+                    key: "ContentMegaTag",
+                    listName: "",
+                    description: "lalalalala",
+                    conditions: new TextBlockCondition[]
+                    {
+                        new TextBlockCondition(
+                                tagName: "ContentIndex",
+                                condition: $"УК-2",
+                                delimiter: "\n"
+                            ),
+                    }
+                );
+            textBlockTag.SaveToDatabase("This value will be only on УК-2");
+
+            textBlockTag = new TextBlockTag(
+                    key: "ContentMegaTag",
+                    listName: "",
+                    description: "lalalalala",
+                    conditions: new TextBlockCondition[]
+                    {
+                        new TextBlockCondition(
+                                tagName: "ContentIndex",
+                                condition: $"УК-4",
+                                delimiter: "\n"
+                            ),
+                    }
+                );
+            textBlockTag.SaveToDatabase("This value will be only on УК-4");
+
+            textBlockTag = new TextBlockTag(
+                    key: "ContentMegaTag",
+                    listName: "",
+                    description: "lalalalala",
+                    conditions: new TextBlockCondition[]
+                    {
+                        new TextBlockCondition(
+                                tagName: "ContentIndex",
+                                condition: $"ОПК-1",
+                                delimiter: "\n"
+                            ),
+                    }
+                );
+            textBlockTag.SaveToDatabase("This value will be only on ОПК-1");
+
+            textBlockTag = new TextBlockTag(
+                    key: "ContentMegaTag",
+                    listName: "",
+                    description: "lalalalala",
+                    conditions: new TextBlockCondition[]
+                    {
+                        new TextBlockCondition(
+                                tagName: "ContentIndex",
+                                condition: $"ПК-1",
+                                delimiter: "\n"
+                            ),
+                    }
+                );
+            textBlockTag.SaveToDatabase("This value will be only on ПК-1");
+
+            // для теста
+            textBlockTag = new TextBlockTag(
                     key: "RuLangTag",
                     listName: "",
                     description: "lalalalala",
@@ -165,11 +242,11 @@ namespace ExcelToWordProject
                     }
                 }
 
-                //syllabusDocWriter.ConvertToDocx(resultFolderPath, templateFilePath, prefix,
-                //            new Progress<int>(percent => progressBar1.Value = percent));
+                syllabusDocWriter.ConvertToDocx(resultFolderPath, templateFilePath, prefix,
+                            new Progress<int>(percent => progressBar1.Value = percent));
 
-                await Task.Run(() => syllabusDocWriter.ConvertToDocx(resultFolderPath, templateFilePath, prefix,
-                            new Progress<int>(percent => progressBar1.Value = percent)));
+                //await Task.Run(() => syllabusDocWriter.ConvertToDocx(resultFolderPath, templateFilePath, prefix,
+                //            new Progress<int>(percent => progressBar1.Value = percent)));
             }
             catch (Exception ex)
             {
