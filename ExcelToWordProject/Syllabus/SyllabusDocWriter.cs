@@ -126,6 +126,18 @@ namespace ExcelToWordProject.Syllabus
             if (hasSmartModulesContentTags)
                 contentList = SyllabusExcelReader.ParseContentList(module);
 
+            // обработка TextBlock
+            List<TextBlockTag> textBlockTags = Parameters.UniqueTextBlockTags;
+            foreach (TextBlockTag textBlockTag in textBlockTags)
+            {
+                if (!textBlockTag.Active) continue;
+                bool isValid = textBlockTag.CheckConditions(Parameters.Tags, module, contentList, SyllabusExcelReader.ExcelData);
+                if (!isValid) continue;
+                string tagValue = textBlockTag.GetValue2();
+                doc.ReplaceText(textBlockTag.Tag, tagValue);
+            }
+
+            // обработка таблиц
             TablesHandler(doc, module, contentList);
 
             // бежим по списку тегов

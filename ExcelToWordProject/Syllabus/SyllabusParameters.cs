@@ -27,9 +27,23 @@ namespace ExcelToWordProject.Syllabus
 
         [System.Xml.Serialization.XmlElementAttribute("SmartSyllabusTag", typeof(SmartSyllabusTag))]
         [System.Xml.Serialization.XmlElementAttribute("DefaultSyllabusTag", typeof(DefaultSyllabusTag))]
-        [System.Xml.Serialization.XmlElementAttribute("TextBlockTag", typeof(TextBlockTag))]
         public List<BaseSyllabusTag> Tags;
 
+        [System.Xml.Serialization.XmlIgnore]
+        public List<TextBlockTag> TextBlockTags { get => TextBlockTag.GetAllTextBlockTags(); }
+
+        public List<TextBlockTag> UniqueTextBlockTags 
+        { 
+            get => 
+                TextBlockTags
+                .GroupBy(tag => tag.ToXml())
+                .Select(group => group.First())
+                .ToList(); 
+        }
+
+        /// <summary>
+        /// Конструктор без параметров. В основном нужен для сериализации.
+        /// </summary>
         public SyllabusParameters() { }
 
         /// <summary>

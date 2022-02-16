@@ -61,38 +61,63 @@ namespace ExcelToWordProject
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            return;
             // для теста
             TextBlockTag textBlockTag = new TextBlockTag(
-                    key: "testTag",
-                    listName: "testListName",
+                    key: "RuLangTag",
+                    listName: "",
                     description: "lalalalala",
                     conditions: new TextBlockCondition[]
                     {
                         new TextBlockCondition(
-                                tagName: syllabusParameters.Tags[0].Key,
-                                condition: $"{syllabusParameters.Tags[0].Tag};value_2;value3",
-                                delimiter: ";"                                
-                            ),
-                        new TextBlockCondition(
-                                tagName: syllabusParameters.Tags[4].Key,
-                                condition: syllabusParameters.Tags[4].Tag + ": value_1"
-                            ),
-                        new TextBlockCondition(
-                                tagName: syllabusParameters.Tags[0].Key,
-                                condition: syllabusParameters.Tags[8].Tag + ": value_1"
-                            ),
-                        new TextBlockCondition(
-                                tagName: syllabusParameters.Tags[syllabusParameters.Tags.Count-1].Key,
-                                condition: syllabusParameters.Tags[syllabusParameters.Tags.Count-1].Tag + ": value_1"
+                                tagName: "ModuleName",
+                                condition: $"Русский язык  в профессиональной деятельности"
                             ),
                     }
                 );
 
-            textBlockTag.SaveToDatabase(new string[] { "ara pere1", "lala2", "kk3" });
+            textBlockTag.SaveToDatabase("This value will be only on RuLang");
 
-            string[] values = textBlockTag.GetValue2();
+            textBlockTag = new TextBlockTag(
+                    key: "BlockNameTag",
+                    listName: "",
+                    description: "BlockNameTag",
+                    conditions: new TextBlockCondition[]
+                    {
+                        new TextBlockCondition(
+                                tagName: "BlockName",
+                                condition: $"Блок 1.Дисциплины (модули) "
+                            ),
+                    }
+                );
+
+            textBlockTag.SaveToDatabase("This value will be only on Блок 1");
+
+            textBlockTag = new TextBlockTag(
+                    key: "BlockNameRuTag",
+                    listName: "",
+                    description: "BlockNameTag",
+                    conditions: new TextBlockCondition[]
+                    {
+                        new TextBlockCondition(
+                                tagName: "ModuleName",
+                                condition: $"Русский язык  в профессиональной деятельности"
+                            ),
+                        new TextBlockCondition(
+                                tagName: "BlockName",
+                                condition: $"Блок 1.Дисциплины (модули) "
+                            ),
+                    }
+                );
+
+            textBlockTag.SaveToDatabase("This value will be only on Блок 1 && Rulang");
+
+            //string value = textBlockTag.GetValue2();
+
+            //List<TextBlockTag> tags = syllabusParameters.TextBlockTags;
 
             Console.WriteLine("lala");
+
         }
 
         private void SetToolTips()

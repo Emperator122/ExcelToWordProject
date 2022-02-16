@@ -38,86 +38,53 @@ namespace ExcelToWordProject.Syllabus.Tags
             return "";
         }
 
-        public string[] GetValue2(Module module = null, List<Content> contentList = null, DataSet excelData = null)
+        public string GetValue2(Module module = null, List<Content> contentList = null, DataSet excelData = null)
         {
-            string DatabaseLoadHandler(TextBlockTag tag)
-            {
-                string sqlExpression =
+            string sqlExpression =
                 $"SELECT * FROM {DatabaseStrings.TextBlockTagTableName} "
-                + $"WHERE {DatabaseStrings.TextBlockKeyColumnName} = \'{tag.Key}\' "
-                + $"AND {DatabaseStrings.TextBlockConditionColumnName} = \'{tag.ToXml()}\'";
+                + $"WHERE {DatabaseStrings.TextBlockKeyColumnName} = \'{Key}\' "
+                + $"AND {DatabaseStrings.TextBlockConditionColumnName} = \'{ToXml()}\'";
 
-                string result = "";
-                using (var connection = new SqliteConnection(DatabaseStrings.ConnectionString))
+            string result = "";
+            using (var connection = new SqliteConnection(DatabaseStrings.ConnectionString))
+            {
+                connection.Open();
+                SqliteCommand command = new SqliteCommand(sqlExpression, connection);
+                using (SqliteDataReader reader = command.ExecuteReader())
                 {
-                    connection.Open();
-                    SqliteCommand command = new SqliteCommand(sqlExpression, connection);
-                    using (SqliteDataReader reader = command.ExecuteReader())
+                    if (reader.HasRows) // если есть данные
                     {
-                        if (reader.HasRows) // если есть данные
+                        int i = 0;
+                        while (reader.Read())   // построчно считываем данные
                         {
-                            int i = 0;
-                            while (reader.Read())   // построчно считываем данные
-                            {
-                                string value = reader.GetString(3);
-                                result += value;
-                                i++;
-                                break; // TODO: обработка множества значений
-                            }
+                            string value = reader.GetString(3);
+                            result += value;
+                            i++;
+                            break; // TODO: обработка множества значений
                         }
                     }
                 }
-                return result;
             }
-
-            // Все это вообще не оптимально, но хоть как
-            int maxConditionLength = MaxConditionLength;
-            if (maxConditionLength == 1)
-                return new string[] { DatabaseLoadHandler(this) };
-
-            string[] values = new string[maxConditionLength];
-            TextBlockTag[] splitted = Split();
-            for (int i = 0; i < splitted.Length; i++)
-                values[i] = splitted[i].GetValue2()[0];
-            return values;
+            return result;
         }
 
-        public void SaveToDatabase(string[] data) 
+        public void SaveToDatabase(string value) 
         {
-            Debug.Assert(data != null && data.Count() != 0);
-            void DatabaseSaveHandler(string value, TextBlockTag tag)
-            {
-                string sqlExpression =
+            string sqlExpression =
                 $"INSERT INTO {DatabaseStrings.TextBlockTagTableName} " +
                 $"({DatabaseStrings.TextBlockKeyColumnName}, {DatabaseStrings.TextBlockConditionColumnName}, " +
                 $"{DatabaseStrings.TextBlockValueColumnName}) "
                 + $"VALUES (@key, @condition, @value)";
 
-                using (var connection = new SqliteConnection(DatabaseStrings.ConnectionString))
-                {
-                    connection.Open();
-                    SqliteCommand command = new SqliteCommand(sqlExpression, connection);
-                    command.Parameters.Add(new SqliteParameter("@key", tag.Key));
-                    command.Parameters.Add(new SqliteParameter("@condition", tag.ToXml()));
-                    command.Parameters.Add(new SqliteParameter("@value", value));
-                    command.ExecuteNonQuery();
-                }
-            }
-
-            // Все это вообще не оптимально, но хоть как
-
-            int maxConditionLength = MaxConditionLength;
-            if (maxConditionLength == 1)
+            using (var connection = new SqliteConnection(DatabaseStrings.ConnectionString))
             {
-                Debug.Assert(data.Count() == 1);
-                DatabaseSaveHandler(data[0], this);
-                return;
+                connection.Open();
+                SqliteCommand command = new SqliteCommand(sqlExpression, connection);
+                command.Parameters.Add(new SqliteParameter("@key", Key));
+                command.Parameters.Add(new SqliteParameter("@condition", ToXml()));
+                command.Parameters.Add(new SqliteParameter("@value", value));
+                command.ExecuteNonQuery();
             }
-
-            TextBlockTag[] splitted = Split();
-            Debug.Assert(data.Count() == splitted.Length);
-            for (int i = 0; i < splitted.Length; i++)
-                splitted[i].SaveToDatabase(new string[] { data[i] });
         }
 
         public string ToXml()
@@ -137,6 +104,35 @@ namespace ExcelToWordProject.Syllabus.Tags
             {
                 return (TextBlockTag)serializer.Deserialize(reader);
             }
+        }
+
+        public bool CheckConditions(List<BaseSyllabusTag> tags, Module module = null, List<Content> contentList = null, DataSet excelData = null)
+        {
+            foreach (TextBlockCondition condition in Conditions)
+            {
+                BaseSyllabusTag tag = tags.Find(
+                    _tag => _tag.Key == condition.TagName
+                );
+                if (tag == null) return false;
+                string tagValue = 
+                    tag.GetValue(
+                        module: module,
+                        contentList: contentList,
+                        excelData: excelData
+                    );
+                if (condition.Delimiter == null)
+                {
+                    if (tagValue != condition.Condition) 
+                        return false;
+                }
+                else
+                {
+                    bool check = tagValue.Split(new string[] { condition.Delimiter }, StringSplitOptions.None)
+                        .Any(el => el == condition.Condition);
+                    if (!check) return false;
+                }
+            }
+            return true;
         }
 
         public TextBlockTag[] Split()
