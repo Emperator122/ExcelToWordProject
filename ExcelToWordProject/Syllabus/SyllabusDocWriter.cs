@@ -1,6 +1,4 @@
-﻿using ExcelDataReader;
-using ExcelToWordProject.Models;
-using ExcelToWordProject.Syllabus;
+﻿using ExcelToWordProject.Models;
 using ExcelToWordProject.Syllabus.Tags;
 using ExcelToWordProject.Utils;
 using System;
@@ -8,9 +6,6 @@ using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using Xceed.Document.NET;
 using Xceed.Words.NET;
 
@@ -18,7 +13,7 @@ namespace ExcelToWordProject.Syllabus
 {
     class SyllabusDocWriter : IDisposable
     {
-        public SyllabusParameters Parameters { get; set;  }
+        public SyllabusParameters Parameters { get; set; }
         public SyllabusExcelReader SyllabusExcelReader { get; set; }
 
 
@@ -35,7 +30,7 @@ namespace ExcelToWordProject.Syllabus
         public SyllabusDocWriter(SyllabusExcelReader syllabusExcelReader, SyllabusParameters parameters)
         {
             SyllabusExcelReader = syllabusExcelReader;
-            Parameters = parameters;           
+            Parameters = parameters;
         }
 
         public void Dispose()
@@ -60,13 +55,13 @@ namespace ExcelToWordProject.Syllabus
             {
                 // Есть ли смарт-теги, работающие со списком компетенций
                 bool hasSmartModulesContentTags =
-                    Parameters.Tags.FindIndex(el => 
+                    Parameters.Tags.FindIndex(el =>
                     el is SmartSyllabusTag && el.ListName == Parameters.ModulesContentListName) != -1;
 
                 // получаем все модули
                 List<Module> modules = SyllabusExcelReader.GetAllModules(Parameters.ModulesYears);
                 int i = 0;
-                foreach(Module module in modules) 
+                foreach (Module module in modules)
                 {
                     // Репортим прогресс
                     i++;
@@ -85,7 +80,7 @@ namespace ExcelToWordProject.Syllabus
 
                     // Обработаем данный модуль
                     ModuleHandler(doc, module, hasSmartModulesContentTags);
-                   
+
                     // Сохраняем файл
                     doc.Save();
                     doc.Dispose();
@@ -94,7 +89,7 @@ namespace ExcelToWordProject.Syllabus
             else // просто заменяем теги
             {
                 fileNamePrefix = fileNamePrefix == "" ? "UnsetFileName" : fileNamePrefix;
-                string safeName = PathUtils.RemoveIllegalFileNameCharacters(fileNamePrefix +".docx");
+                string safeName = PathUtils.RemoveIllegalFileNameCharacters(fileNamePrefix + ".docx");
                 string resultFilePath = Path.Combine(resultFolderPath, safeName);
                 baseDocument.SaveAs(resultFilePath);
                 DocX doc = DocX.Load(resultFilePath);
@@ -105,7 +100,7 @@ namespace ExcelToWordProject.Syllabus
                 {
                     // и заполняем каждый активный тег
                     if (tag is DefaultSyllabusTag && tag.Active)
-                        doc.ReplaceText(tag.Tag, tag.GetValue(excelData:SyllabusExcelReader.ExcelData));
+                        doc.ReplaceText(tag.Tag, tag.GetValue(excelData: SyllabusExcelReader.ExcelData));
 
                 }
                 doc.Save();
@@ -181,20 +176,20 @@ namespace ExcelToWordProject.Syllabus
             for (int i = 0; i < doc.Tables.Count; i++)
             {
                 var table = doc.Tables[i];
-                
+
                 Row row = table.Rows.Last();
-                
+
                 // найдем все Smart и Default теги в последней ровке траблицы
-                List<BaseSyllabusTag> tags = 
+                List<BaseSyllabusTag> tags =
                     Parameters
                     .Tags
                     .FindAll(
-                        tag => 
-                            tag.Active && 
+                        tag =>
+                            tag.Active &&
                             row.FindAll(tag.Tag).Count > 0
                     );
 
-                if(tags.Count > 0)
+                if (tags.Count > 0)
                     tablesTags[i] = tags;
 
                 // найдем TextBlock теги
@@ -222,7 +217,7 @@ namespace ExcelToWordProject.Syllabus
         /// <param name="module">Информация о дисциплине</param>
         /// <param name="contentList">Компетенции дисциплины</param>
         /// <param name="properties">Другие свойства дисциплины</param>
-        protected void TablesHandler(DocX doc, Module module=null, List<Content> contentList=null)
+        protected void TablesHandler(DocX doc, Module module = null, List<Content> contentList = null)
         {
             // Находим все теги, содержащиеся в таблицах
             FindTablesTags(doc, false);
@@ -230,13 +225,13 @@ namespace ExcelToWordProject.Syllabus
             {
                 var table = doc.Tables[kv.Key];
                 List<BaseSyllabusTag> tags = kv.Value;
-                
+
                 List<TextBlockTag> textBlockTags = new List<TextBlockTag>();
                 if (tablesTextBlockTags.ContainsKey(kv.Key)) // TODO: надо решить вопрос с непересечением
                     textBlockTags.AddRange(tablesTextBlockTags[kv.Key]);
 
                 // Удалим TextBlock теги не удовлетворяющие условиям
-                for(int i = 0; i < textBlockTags.Count; i++)
+                for (int i = 0; i < textBlockTags.Count; i++)
                 {
                     bool isValid = textBlockTags[i]
                             .CheckConditions(
@@ -258,9 +253,9 @@ namespace ExcelToWordProject.Syllabus
                 // Массив значений тегов, оставим доп место для TextBlock тегов
                 string[][] tagsValues = new string[tags.Count + textBlockTagsGroup.Count()][];
 
-               // Обработка Smart и Defalut тегов
+                // Обработка Smart и Defalut тегов
                 for (int i = 0; i < tags.Count; i++)
-                    tagsValues[i] = 
+                    tagsValues[i] =
                         tags[i]
                             .GetValue(module, contentList, SyllabusExcelReader.ExcelData).Split('\n');
 
@@ -271,7 +266,7 @@ namespace ExcelToWordProject.Syllabus
                 {
                     // Массив с результатом, равный максимальной
                     // высоте столбца таблицы
-                    string[] values = new string[maxLength]; 
+                    string[] values = new string[maxLength];
                     for (int i = 0; i < values.Length; i++)
                         values[i] = "";
 
@@ -285,7 +280,7 @@ namespace ExcelToWordProject.Syllabus
                             for (int j = 0; j < tags.Count; j++)
                             {
                                 // если TextBlock не зависит от текущего Base тега, то пропускаем итерацию
-                                TextBlockCondition condition = 
+                                TextBlockCondition condition =
                                     textBlockTag
                                         .Conditions
                                         .FirstOrDefault(
@@ -385,7 +380,7 @@ namespace ExcelToWordProject.Syllabus
                 // расставим знаки препинания
                 if (lines.Length > 0)
                 {
-                    for (int i = 0; i < lines.Length-1; i++)
+                    for (int i = 0; i < lines.Length - 1; i++)
                         lines[i] += ";";
                     lines[lines.Length - 1] += ".";
                 }

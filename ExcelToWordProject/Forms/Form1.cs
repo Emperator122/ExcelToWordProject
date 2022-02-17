@@ -1,19 +1,11 @@
 ﻿using ExcelToWordProject.Forms;
-using ExcelToWordProject.Models;
 using ExcelToWordProject.Syllabus;
 using ExcelToWordProject.Syllabus.Tags;
 using ExcelToWordProject.Utils;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Xceed.Words.NET;
 
 namespace ExcelToWordProject
 {
@@ -42,7 +34,7 @@ namespace ExcelToWordProject
 
         private void SwitchExcelLoadingMode(bool single)
         {
-            if(single)
+            if (single)
             {
                 excelFilesLabel.Visible = false;
                 excelFilesLabelClear.Visible = false;
@@ -219,7 +211,7 @@ namespace ExcelToWordProject
                 if (syllabusParameters.HasActiveSmartTags && !syllabusExcelReader.IsSyllabusFile)
                 {
                     DialogResult dialogResult = MessageBox.Show("Возможно данный файл " +
-                        "("+selectedFilePath+") не является " +
+                        "(" + selectedFilePath + ") не является " +
                         "файлом учебного плана, но у вас активны \"умные\" теги. Это может стать причиной " +
                         "сбоя в работе программы.\r\nОтключить \"умные\" теги?", "Внимание!", MessageBoxButtons.YesNoCancel);
                     switch (dialogResult)
@@ -250,14 +242,14 @@ namespace ExcelToWordProject
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Произошла ошибка:\r\n" + ex.Message+"" +
-                    "\r\nФайл:" + selectedFilePath, 
+                MessageBox.Show("Произошла ошибка:\r\n" + ex.Message + "" +
+                    "\r\nФайл:" + selectedFilePath,
                     "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
                 syllabusExcelReader?.CloseStreams();
-                
+
             }
         }
 
@@ -269,11 +261,11 @@ namespace ExcelToWordProject
             string selectedFilePath = filePathTextBox.Text;
             string templateFilePath = templateFilePathTextBox.Text;
             string resultFolderPath = resultFolderPathTextBox.Text;
-            
-            
-            if(selectedExcels.Length <= 1)
-                 await ConvertProcessing(selectedFilePath, templateFilePath, resultFolderPath, resultFilePrefixTextBox.Text);
-            else if(selectedExcels.Length > 1)
+
+
+            if (selectedExcels.Length <= 1)
+                await ConvertProcessing(selectedFilePath, templateFilePath, resultFolderPath, resultFilePrefixTextBox.Text);
+            else if (selectedExcels.Length > 1)
                 for (int i = 0; i < selectedExcels.Length; i++)
                 {
                     status.Text = "Файл " + (i + 1) + " из " + selectedExcels.Length + "...";
@@ -285,9 +277,9 @@ namespace ExcelToWordProject
                     {
                         Directory.CreateDirectory(folderPath);
                         await ConvertProcessing(
-                            selectedExcels[i], 
+                            selectedExcels[i],
                             templateFilePath,
-                            folderPath, 
+                            folderPath,
                             resultFilePrefixTextBox.Text);
                     }
                     catch
@@ -307,11 +299,11 @@ namespace ExcelToWordProject
             OpenFileDialog fileDialog = new OpenFileDialog();
             fileDialog.Filter = "Excel документы|*.xls;*.xlsx";
             fileDialog.Multiselect = true;
-            if(fileDialog.ShowDialog() == DialogResult.OK)
+            if (fileDialog.ShowDialog() == DialogResult.OK)
             {
                 filePathTextBox.Text = fileDialog.FileName;
                 selectedExcels = fileDialog.FileNames;
-                if(selectedExcels.Length > 1)
+                if (selectedExcels.Length > 1)
                     SwitchExcelLoadingMode(false);
                 else
                     SwitchExcelLoadingMode(true);

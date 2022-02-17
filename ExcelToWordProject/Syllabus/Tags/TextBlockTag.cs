@@ -12,8 +12,10 @@ namespace ExcelToWordProject.Syllabus.Tags
 {
     public class TextBlockTag : BaseSyllabusTag
     {
-
-        private int MaxConditionLength { get => Conditions.Max(condition => condition.Length); }
+        private int MaxConditionLength
+        {
+            get { return Conditions.Max(condition => condition.Length); }
+        }
 
         public TextBlockCondition[] Conditions { get; set; }
 
@@ -22,18 +24,17 @@ namespace ExcelToWordProject.Syllabus.Tags
             string listName,
             TextBlockCondition[] conditions,
             string description = ""
-        ) : base(
-            key: key,
-            listName: listName,
-            description: description
-        )
+        ) : base(key, listName, description)
         {
             Conditions = conditions.OrderBy(condition => condition.TagName).ToArray();
         }
 
-        public TextBlockTag() { } // для сериализации
+        public TextBlockTag()
+        {
+        } // для сериализации
 
-        public override string GetValue(Module module = null, List<Content> contentList = null, DataSet excelData = null)
+        public override string GetValue(Module module = null, List<Content> contentList = null,
+            DataSet excelData = null)
         {
             return "";
         }
@@ -55,7 +56,7 @@ namespace ExcelToWordProject.Syllabus.Tags
                     if (reader.HasRows) // если есть данные
                     {
                         int i = 0;
-                        while (reader.Read())   // построчно считываем данные
+                        while (reader.Read()) // построчно считываем данные
                         {
                             string value = reader.GetString(3);
                             result += value;
@@ -65,10 +66,11 @@ namespace ExcelToWordProject.Syllabus.Tags
                     }
                 }
             }
+
             return result;
         }
 
-        public void SaveToDatabase(string value) 
+        public void SaveToDatabase(string value)
         {
             string sqlExpression =
                 $"INSERT INTO {DatabaseStrings.TextBlockTagTableName} " +
@@ -106,7 +108,8 @@ namespace ExcelToWordProject.Syllabus.Tags
             }
         }
 
-        public bool CheckConditions(List<BaseSyllabusTag> tags, Module module = null, List<Content> contentList = null, DataSet excelData = null)
+        public bool CheckConditions(List<BaseSyllabusTag> tags, Module module = null, List<Content> contentList = null,
+            DataSet excelData = null)
         {
             foreach (TextBlockCondition condition in Conditions)
             {
@@ -114,7 +117,7 @@ namespace ExcelToWordProject.Syllabus.Tags
                     _tag => _tag.Key == condition.TagName
                 );
                 if (tag == null) return false;
-                string tagValue = 
+                string tagValue =
                     tag.GetValue(
                         module: module,
                         contentList: contentList,
@@ -122,7 +125,7 @@ namespace ExcelToWordProject.Syllabus.Tags
                     );
                 if (condition.Delimiter == null)
                 {
-                    if (tagValue != condition.Condition) 
+                    if (tagValue != condition.Condition)
                         return false;
                 }
                 else
@@ -132,6 +135,7 @@ namespace ExcelToWordProject.Syllabus.Tags
                     if (!check) return false;
                 }
             }
+
             return true;
         }
 
@@ -178,7 +182,7 @@ namespace ExcelToWordProject.Syllabus.Tags
                 {
                     if (reader.HasRows) // если есть данные
                     {
-                        while (reader.Read())   // построчно считываем данные
+                        while (reader.Read()) // построчно считываем данные
                         {
                             string xml = reader.GetString(0);
                             result.Add(FromXml(xml));
@@ -186,6 +190,7 @@ namespace ExcelToWordProject.Syllabus.Tags
                     }
                 }
             }
+
             return result;
         }
     }
@@ -194,21 +199,30 @@ namespace ExcelToWordProject.Syllabus.Tags
     {
         public string TagName { get; set; }
         public string Condition { get; set; }
-        public string Delimiter { get => delimiter; set => delimiter = value != "" ? value : "\n"; }
+
+        public string Delimiter
+        {
+            get => delimiter;
+            set => delimiter = value != "" ? value : "\n";
+        }
 
         private string delimiter;
 
-        public int Length { get => Subconditions.Length; }
+        public int Length
+        {
+            get => Subconditions.Length;
+        }
 
-        public string[] Subconditions 
-        { 
-            get 
+        public string[] Subconditions
+        {
+            get
             {
                 if (Delimiter == null)
                     return new string[] { Condition };
                 else
-                    return Condition.Split(new string[] { Delimiter }, StringSplitOptions.None); ;
-            } 
+                    return Condition.Split(new string[] { Delimiter }, StringSplitOptions.None);
+                ;
+            }
         }
 
         public TextBlockCondition(string tagName, string condition, string delimiter = null)
@@ -218,7 +232,9 @@ namespace ExcelToWordProject.Syllabus.Tags
             Delimiter = delimiter;
         }
 
-        public TextBlockCondition() { } // для сериализации
+        public TextBlockCondition()
+        {
+        } // для сериализации
 
         public TextBlockCondition[] Split()
         {
@@ -226,15 +242,15 @@ namespace ExcelToWordProject.Syllabus.Tags
             TextBlockCondition[] splittedConditions = new TextBlockCondition[subconditions.Length];
             for (int i = 0; i < subconditions.Length; i++)
             {
-                splittedConditions[i] = 
+                splittedConditions[i] =
                     new TextBlockCondition(
                         tagName: TagName,
                         condition: subconditions[i],
                         delimiter: Delimiter
                     );
             }
+
             return splittedConditions;
         }
-
     }
 }

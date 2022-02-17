@@ -4,13 +4,9 @@ using ExcelToWordProject.Syllabus.Tags;
 using ExcelToWordProject.Utils;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Media;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace ExcelToWordProject
@@ -18,8 +14,8 @@ namespace ExcelToWordProject
     public partial class DefaultTagSettingsForm : Form
     {
         // Настройки для генерации таблички с параметрами тегов
-        string[] names = new string[] { "rowIndexTextBox", "columnIndexTextBox", "tagTextBox", "listTextBox"};
-        string[] titles = new string[] { "Индекс строки", "Индекс столбца", "Тег", "Рабочий лист", "Рег. выражение",  "Описание", "Копировать", "Удалить" };
+        string[] names = new string[] { "rowIndexTextBox", "columnIndexTextBox", "tagTextBox", "listTextBox" };
+        string[] titles = new string[] { "Индекс строки", "Индекс столбца", "Тег", "Рабочий лист", "Рег. выражение", "Описание", "Копировать", "Удалить" };
         int defaultTextBoxWidth = 180;
         int defaultMargin = 10;
 
@@ -40,7 +36,7 @@ namespace ExcelToWordProject
             Tags = new List<BaseSyllabusTag>(syllabusParameters.Tags);
 
             Control[] controls = GenerateSmartTagsSettingsElements(defaultTagsPanel);
-            
+
             defaultTagsPanel.Controls.AddRange(controls);
             foreach (Control control in controls)
                 control.BringToFront();
@@ -53,7 +49,8 @@ namespace ExcelToWordProject
 
             // получим все смарт теги
             List<DefaultSyllabusTag> defaultSyllabusTags = new List<DefaultSyllabusTag>();
-            Tags.ForEach(tag => {
+            Tags.ForEach(tag =>
+            {
                 if (tag is DefaultSyllabusTag)
                     defaultSyllabusTags.Add(tag as DefaultSyllabusTag);
             });
@@ -101,7 +98,7 @@ namespace ExcelToWordProject
             panel.Top = (i + 1) * (panel.Height + defaultMargin);
             panel.Dock = DockStyle.Top;
             panel.Margin = new Padding(10);
-            
+
 
             // Добавим все тектовые поля
             string[] textBoxValues = new string[] { tag.RowIndex.ToString(), tag.ColumnIndex.ToString(),
@@ -151,7 +148,7 @@ namespace ExcelToWordProject
             {
                 DescriptionEditForm editForm = new DescriptionEditForm(tag);
                 editForm.ShowDialog();
-                
+
 
             };
             panel.Controls.Add(infoButton);
@@ -189,7 +186,8 @@ namespace ExcelToWordProject
                 SizeMode = PictureBoxSizeMode.StretchImage
             };
 
-            removeButton.Click += (Object sender, EventArgs e) => {
+            removeButton.Click += (Object sender, EventArgs e) =>
+            {
                 DialogResult dialogResult = MessageBox.Show("Вы уверены, что хотите удалить " +
                     "данный тег?", "Внимание", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                 if (dialogResult == DialogResult.Yes)
@@ -214,7 +212,8 @@ namespace ExcelToWordProject
         {
             // получим все обычные теги
             List<DefaultSyllabusTag> defaultSyllabusTags = new List<DefaultSyllabusTag>();
-            Tags.ForEach(tag => {
+            Tags.ForEach(tag =>
+            {
                 if (tag is DefaultSyllabusTag)
                     defaultSyllabusTags.Add(tag as DefaultSyllabusTag);
             });

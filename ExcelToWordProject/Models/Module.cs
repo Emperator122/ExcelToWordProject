@@ -1,13 +1,4 @@
 ﻿using ExcelToWordProject.Models;
-using ExcelToWordProject.Syllabus;
-using ExcelToWordProject.Utils;
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace ExcelToWordProject
 {
@@ -19,7 +10,7 @@ namespace ExcelToWordProject
 
         public ModuleProperties Properties;
 
-        public Module(string index, string name,string сontentIndexesStr, char contentDelimiter = ';', ModuleProperties moduleProperties = null)
+        public Module(string index, string name, string сontentIndexesStr, char contentDelimiter = ';', ModuleProperties moduleProperties = null)
         {
             Properties = moduleProperties;
             Index = index;

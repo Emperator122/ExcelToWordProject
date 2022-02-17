@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
+﻿using System.IO;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using Xceed.Words.NET;
 
 namespace ExcelToWordProject.Utils
@@ -16,7 +11,7 @@ namespace ExcelToWordProject.Utils
             string regexSearch = new string(Path.GetInvalidFileNameChars());
             Regex r = new Regex(string.Format("[{0}]", Regex.Escape(regexSearch)));
             return r.Replace(fileName, "");
-        } 
+        }
 
         public static string FixFileNameLimit(string fileName)
         {
@@ -35,7 +30,7 @@ namespace ExcelToWordProject.Utils
             {
                 DocX doc = DocX.Load(baseDocumentPath);
 
-                if(randomName)
+                if (randomName)
                 {
                     string newName = Path.GetRandomFileName() + Path.GetExtension(copyPath);
                     string newPath = Path.Combine(Path.GetDirectoryName(copyPath), newName);

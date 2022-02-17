@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ExcelToWordProject.Models
 {
@@ -55,7 +51,7 @@ namespace ExcelToWordProject.Models
                     result.Add(ExcelData.Tables[ListName].Rows[rowIndex][i] as string);
                     if (first) return result;
                 }
-                    
+
             }
             return result;
         }

@@ -1,14 +1,6 @@
-﻿using ExcelToWordProject.Syllabus;
-using ExcelToWordProject.Syllabus.Tags;
+﻿using ExcelToWordProject.Syllabus.Tags;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace ExcelToWordProject.Forms
@@ -23,7 +15,7 @@ namespace ExcelToWordProject.Forms
             // Получим все возмодные настройки регулярного выражения
             // и дропнем оттуда вариант "None"
             Array enumValues = Enum.GetValues(typeof(RegexOptions));
-            RegexOptions[] enumValuesWithoutNone = new RegexOptions[enumValues.Length-1];
+            RegexOptions[] enumValuesWithoutNone = new RegexOptions[enumValues.Length - 1];
             Array.Copy(enumValues, 1, enumValuesWithoutNone, 0, enumValues.Length - 1);
 
             // Загрузим настройки в checkList
@@ -93,11 +85,11 @@ namespace ExcelToWordProject.Forms
                 else // иначе вывод результата
                     MessageBox.Show(match.Groups[groupNumber].Value, "Результат");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                MessageBox.Show("Произошла ошибка:\r\n"+ex.Message ,"Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Произошла ошибка:\r\n" + ex.Message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-           
+
         }
     }
 }

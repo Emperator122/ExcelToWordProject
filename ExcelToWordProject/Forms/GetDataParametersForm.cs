@@ -2,12 +2,7 @@
 using ExcelToWordProject.Utils;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace ExcelToWordProject.Forms
@@ -20,7 +15,7 @@ namespace ExcelToWordProject.Forms
         int defaultTextBoxWidth = 250;
         int defaultMargin = 10;
         string[] names = new string[] { "headerTitle" };
-        string[] titles = new string[] { "Тип заголовка", "Заголовок"};
+        string[] titles = new string[] { "Тип заголовка", "Заголовок" };
 
         public GetDataParametersForm(SyllabusParameters syllabusParameters)
         {
@@ -59,7 +54,7 @@ namespace ExcelToWordProject.Forms
                 SyllabusParameters.ModulesYears = years.ToArray();
             else
                 Errors.Add("[*]\tВозможно неправильно заполнен фильтр курсов!");
-            
+
         }
 
         void ApplyListNames()
@@ -137,7 +132,7 @@ namespace ExcelToWordProject.Forms
 
 
             // Добавим все тектовые поля
-            string[] values = new string[] { kv.Key, kv.Value};
+            string[] values = new string[] { kv.Key, kv.Value };
 
             Label label = new Label()
             {
@@ -161,7 +156,7 @@ namespace ExcelToWordProject.Forms
             textBox.ScrollBars = ScrollBars.Both;
             textBox.Tag = kv.Key;
             textBox.WordWrap = false;
-            
+
 
             panel.Controls.Add(textBox);
 
@@ -177,7 +172,7 @@ namespace ExcelToWordProject.Forms
             ApplyListNames();
             ApplyPlanHeaderParameters();
 
-            if(Errors.Count > 0)
+            if (Errors.Count > 0)
             {
                 string errorMessage = "При сохранениии произошли следующие ошибки:\r\n\r\n";
                 Errors.ForEach(error => errorMessage += error + "\r\n");

@@ -3,13 +3,9 @@ using ExcelToWordProject.Syllabus.Tags;
 using ExcelToWordProject.Utils;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Media;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace ExcelToWordProject
@@ -33,7 +29,8 @@ namespace ExcelToWordProject
             InitializeComponent();
             // получим все смарт теги
             List<SmartSyllabusTag> smartSyllabusTags = new List<SmartSyllabusTag>();
-            syllabusParameters.Tags.ForEach(tag => {
+            syllabusParameters.Tags.ForEach(tag =>
+            {
                 if (tag is SmartSyllabusTag)
                     smartSyllabusTags.Add(tag as SmartSyllabusTag);
             });
@@ -53,10 +50,10 @@ namespace ExcelToWordProject
         {
             foreach (Control item in smartTagsPanel.Controls)
             {
-                if(item.Name != "headerPanel")
+                if (item.Name != "headerPanel")
                 {
                     SmartSyllabusTag tag = item.Tag as SmartSyllabusTag;
-                    if(tag.ListName == listName)
+                    if (tag.ListName == listName)
                     {
                         tag.Active = state;
                         item.Enabled = state;
@@ -71,7 +68,8 @@ namespace ExcelToWordProject
             SmartSyllabusTag tempTag = smartSyllabusTags.Find(tag => tag.ListName == syllabusParameters.PlanListName);
 
             // Сгенерируем корневую ноду
-            TreeNode rootNode = new TreeNode("Теги с листа " + syllabusParameters.PlanListName) {
+            TreeNode rootNode = new TreeNode("Теги с листа " + syllabusParameters.PlanListName)
+            {
                 Checked = tempTag.Active,
                 Name = "planCheckBox"
             };
@@ -98,7 +96,7 @@ namespace ExcelToWordProject
             headerPanel.Height = 20;
             headerPanel.Width = parent.Width;
             headerPanel.Name = "headerPanel";
-            headerPanel.AutoSize = true; 
+            headerPanel.AutoSize = true;
             headerPanel.Top = defaultMargin;
             for (int i = 0; i < titles.Length; i++)
             {
@@ -148,7 +146,7 @@ namespace ExcelToWordProject
                 textBox.Left = j * (textBox.Width + defaultMargin) + defaultMargin;
                 textBox.Name = names[j];
                 textBox.Text = textBoxValues[j];
-                textBox.Enabled = !(j == 0 && textBoxValues[j] == "-1"); 
+                textBox.Enabled = !(j == 0 && textBoxValues[j] == "-1");
 
                 panel.Controls.Add(textBox);
             }
@@ -184,7 +182,8 @@ namespace ExcelToWordProject
 
 
             // Кнопку копирования
-            PictureBox copyButton = new PictureBox() {
+            PictureBox copyButton = new PictureBox()
+            {
                 Width = 26,
                 Height = 26,
                 Top = 0,
@@ -201,7 +200,7 @@ namespace ExcelToWordProject
             panel.Controls.Add(copyButton);
 
 
-            
+
 
             return panel;
         }
@@ -211,16 +210,17 @@ namespace ExcelToWordProject
         {
             // получим все смарт теги
             List<SmartSyllabusTag> smartSyllabusTags = new List<SmartSyllabusTag>();
-            syllabusParameters.Tags.ForEach(tag => {
+            syllabusParameters.Tags.ForEach(tag =>
+            {
                 if (tag is SmartSyllabusTag)
                     smartSyllabusTags.Add(tag as SmartSyllabusTag);
             });
 
             // Загоним информацию из филдов в теги
             int i = 0;
-            foreach(Control child in smartTagsPanel.Controls)
+            foreach (Control child in smartTagsPanel.Controls)
             {
-                if(child.Name != "headerPanel")
+                if (child.Name != "headerPanel")
                 {
                     SmartSyllabusTag tag = smartSyllabusTags[i];
                     tag.ColumnIndex = Convert.ToInt32((child.Controls["indexTextBox"] as TextBox).Text);
@@ -246,7 +246,8 @@ namespace ExcelToWordProject
                     node.Checked = false;
 
 
-            } else if(e.Node.Parent != null)
+            }
+            else if (e.Node.Parent != null)
             {
                 e.Node.Parent.Checked = true;
             }

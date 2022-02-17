@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace ExcelToWordProject.Models
 {
@@ -13,7 +10,8 @@ namespace ExcelToWordProject.Models
 
         public List<int> TotalLessonsHoursBySemesters
         {
-            get {
+            get
+            {
                 List<int> result = new List<int>(LecturesHoursBySemesters);
                 for (int i = 0; i < LecturesHoursBySemesters.Count; i++)
                     result[i] += PracticalLessonsHoursBySemesters[i] + LaboratoryLessonsHoursBySemesters[i];
@@ -74,7 +72,7 @@ namespace ExcelToWordProject.Models
         public List<int> Semesters = new List<int>();
 
         // Соответсвие между формой контроля и перечислением семестров
-        public Dictionary<ControlForm, List<int>> ControlFormsBySemesters 
+        public Dictionary<ControlForm, List<int>> ControlFormsBySemesters
                                     = new Dictionary<ControlForm, List<int>>() {
                                         { ControlForm.Credit, new List<int>() },
                                         { ControlForm.Exam, new List<int>() },

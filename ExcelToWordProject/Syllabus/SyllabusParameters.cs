@@ -32,13 +32,13 @@ namespace ExcelToWordProject.Syllabus
         [System.Xml.Serialization.XmlIgnore]
         public List<TextBlockTag> TextBlockTags { get => TextBlockTag.GetAllTextBlockTags(); }
 
-        public List<TextBlockTag> UniqueTextBlockTags 
-        { 
-            get => 
+        public List<TextBlockTag> UniqueTextBlockTags
+        {
+            get =>
                 TextBlockTags
                 .GroupBy(tag => tag.ToXml())
                 .Select(group => group.First())
-                .ToList(); 
+                .ToList();
         }
 
         /// <summary>
@@ -50,7 +50,8 @@ namespace ExcelToWordProject.Syllabus
         /// Конструктор с набором стандартных параметров
         /// </summary>
         /// <param name="fillWithValues">Заполнить стандартными параметрами</param>
-        public SyllabusParameters(bool fillWithValues) {
+        public SyllabusParameters(bool fillWithValues)
+        {
             if (!fillWithValues) return;
 
             ModulesYears = new int[0];

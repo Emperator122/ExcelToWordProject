@@ -127,7 +127,8 @@ namespace ExcelToWordProject.Syllabus.Tags
                         return "-";
 
                     tempList = new List<int>();
-                    properties.Semesters.ForEach(semesterNumber => {
+                    properties.Semesters.ForEach(semesterNumber =>
+                    {
                         tempList.Add(properties.LecturesHoursBySemesters[semesterNumber - 1]);
                     });
                     return OtherUtils.ListToDelimiteredString("/", "", tempList);
@@ -137,7 +138,8 @@ namespace ExcelToWordProject.Syllabus.Tags
                         return "-";
 
                     tempList = new List<int>();
-                    properties.Semesters.ForEach(semesterNumber => {
+                    properties.Semesters.ForEach(semesterNumber =>
+                    {
                         tempList.Add(properties.PracticalLessonsHoursBySemesters[semesterNumber - 1]);
                     });
                     return OtherUtils.ListToDelimiteredString("/", "", tempList);
@@ -147,7 +149,8 @@ namespace ExcelToWordProject.Syllabus.Tags
                         return "-";
 
                     tempList = new List<int>();
-                    properties.Semesters.ForEach(semesterNumber => {
+                    properties.Semesters.ForEach(semesterNumber =>
+                    {
                         tempList.Add(properties.LaboratoryLessonsHoursBySemesters[semesterNumber - 1]);
                     });
                     return OtherUtils.ListToDelimiteredString("/", "", tempList);
@@ -157,7 +160,8 @@ namespace ExcelToWordProject.Syllabus.Tags
                         return "-";
 
                     tempList = new List<int>();
-                    properties.Semesters.ForEach(semesterNumber => {
+                    properties.Semesters.ForEach(semesterNumber =>
+                    {
                         tempList.Add(properties.IndependentWorkHoursBySemesters[semesterNumber - 1]);
                     });
                     return OtherUtils.ListToDelimiteredString("/", "", tempList);
@@ -167,7 +171,8 @@ namespace ExcelToWordProject.Syllabus.Tags
                         return "-";
 
                     tempList = new List<int>();
-                    properties.Semesters.ForEach(semesterNumber => {
+                    properties.Semesters.ForEach(semesterNumber =>
+                    {
                         tempList.Add(properties.ControlHoursBySemesters[semesterNumber - 1]);
                     });
                     return OtherUtils.ListToDelimiteredString("/", "", tempList);
@@ -180,7 +185,8 @@ namespace ExcelToWordProject.Syllabus.Tags
 
                     // Иначе выводим инфу
                     tempList = new List<int>();
-                    properties.Semesters.ForEach(semesterNumber => {
+                    properties.Semesters.ForEach(semesterNumber =>
+                    {
                         tempList.Add(properties.TotalLessonsHoursBySemesters[semesterNumber - 1]);
                     });
                     return OtherUtils.ListToDelimiteredString("/", "", tempList);
@@ -191,7 +197,8 @@ namespace ExcelToWordProject.Syllabus.Tags
                         return "-";
 
                     List<string> isCreditBySemesters = new List<string>();
-                    properties.Semesters.ForEach(semesterNumber => {
+                    properties.Semesters.ForEach(semesterNumber =>
+                    {
                         if (properties.ControlFormsBySemesters[ControlForm.Credit]?.Contains(semesterNumber) == true)
                             isCreditBySemesters.Add("+");
                         else

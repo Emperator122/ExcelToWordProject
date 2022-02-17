@@ -1,14 +1,8 @@
-﻿using ExcelToWordProject.Syllabus;
-using ExcelToWordProject.Syllabus.Tags;
+﻿using ExcelToWordProject.Syllabus.Tags;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
 using System.Media;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace ExcelToWordProject
@@ -16,7 +10,7 @@ namespace ExcelToWordProject
     public partial class TagListForm : Form
     {
         // Настройки для генерации таблички с параметрами тегов
-        string[] titles = new string[] { "Тег", "Описание", "Копировать"};
+        string[] titles = new string[] { "Тег", "Описание", "Копировать" };
         int[] defaultWidths = { 300, 100, 110 };
         int defaultMargin = 5;
         Bitmap infoIcon = Properties.Resources.information;
@@ -90,7 +84,7 @@ namespace ExcelToWordProject
             return result.ToArray();
         }
 
-       
+
 
         protected Panel GenerateSmartTagRow(int i, BaseSyllabusTag tag)
         {
@@ -118,7 +112,7 @@ namespace ExcelToWordProject
                 Width = 26,
                 Height = 26,
                 Top = 0,
-                Left = GetLeft(1)+20,
+                Left = GetLeft(1) + 20,
                 Image = infoIcon,
                 Cursor = Cursors.Hand,
                 SizeMode = PictureBoxSizeMode.StretchImage,
@@ -136,7 +130,7 @@ namespace ExcelToWordProject
                 Width = 26,
                 Height = 26,
                 Top = 0,
-                Left = GetLeft(2)+20,
+                Left = GetLeft(2) + 20,
                 Image = clipboardIcon,
                 Cursor = Cursors.Hand,
                 SizeMode = PictureBoxSizeMode.StretchImage,
@@ -153,7 +147,7 @@ namespace ExcelToWordProject
 
         private void ПоверхВсехОконToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            
+
         }
 
         private void TopMostCheckBox_CheckedChanged(object sender, EventArgs e)
