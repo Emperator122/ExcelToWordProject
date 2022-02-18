@@ -1,8 +1,10 @@
-﻿using ExcelToWordProject.Models;
-using ExcelToWordProject.Utils;
+﻿// ReSharper disable CommentTypo
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.Linq;
+using ExcelToWordProject.Models;
+using ExcelToWordProject.Utils;
 
 namespace ExcelToWordProject.Syllabus.Tags
 {
@@ -11,20 +13,25 @@ namespace ExcelToWordProject.Syllabus.Tags
         public int ColumnIndex; // номер столбца, в котором будут искаться значения
         public SmartTagType Type;
 
-        public SmartSyllabusTag() { }
+        public SmartSyllabusTag()
+        {
+        }
 
-        public SmartSyllabusTag(int columnIndex, string key, string listName, SmartTagType type, string description = "") : base(key, listName, description)
+        public SmartSyllabusTag(int columnIndex, string key, string listName, SmartTagType type,
+            string description = "") : base(key, listName, description)
         {
             ColumnIndex = columnIndex;
             Type = type;
         }
 
-        public override string GetValue(Module module = null, List<Content> contentList = null, DataSet excelData = null)
+        public override string GetValue(Module module = null, List<Content> contentList = null,
+            DataSet excelData = null)
         {
             return ExtractDataFromModule(this, module, contentList, module.Properties);
         }
 
-        public static string ExtractDataFromModule(SmartSyllabusTag tag, Module module, List<Content> contentList = null, ModuleProperties properties = null)
+        public static string ExtractDataFromModule(SmartSyllabusTag tag, Module module,
+            List<Content> contentList = null, ModuleProperties properties = null)
         {
             List<int> tempList;
             switch (tag.Type)
@@ -36,32 +43,37 @@ namespace ExcelToWordProject.Syllabus.Tags
                     return module.Index;
 
                 case SmartTagType.Content:
-                    string contentStr = "";
-                    for (int i = 0; i < contentList.Count(); i++)
+                    var contentStr = "";
+                    for (var i = 0; i < contentList.Count(); i++)
                     {
-                        Content content = contentList[i];
-                        contentStr += (i == contentList.Count() - 1) ? content.Value + "" : content.Value + "\n";
+                        var content = contentList[i];
+                        contentStr += i == contentList.Count() - 1 ? content.Value + "" : content.Value + "\n";
                     }
+
                     return contentStr;
 
                 case SmartTagType.ModuleContentIndexes:
                 case SmartTagType.ContentIndex:
-                    string contentIndexesStr = "";
-                    for (int i = 0; i < contentList.Count(); i++)
+                    var contentIndexesStr = "";
+                    for (var i = 0; i < contentList.Count(); i++)
                     {
-                        Content content = contentList[i];
-                        contentIndexesStr += (i == contentList.Count() - 1) ? content.Index + "" : content.Index + "\n";
+                        var content = contentList[i];
+                        contentIndexesStr += i == contentList.Count() - 1 ? content.Index + "" : content.Index + "\n";
                     }
+
                     return contentIndexesStr;
 
                 case SmartTagType.ExtendedContent:
-                    string extContentStr = "";
-                    for (int i = 0; i < contentList.Count(); i++)
+                    var extContentStr = "";
+                    for (var i = 0; i < contentList.Count(); i++)
                     {
-                        Content content = contentList[i];
+                        var content = contentList[i];
                         extContentStr +=
-                            (i == contentList.Count() - 1) ? content.Value + " (" + content.Index + ")" : content.Value + " (" + content.Index + ")\n";
+                            i == contentList.Count() - 1
+                                ? content.Value + " (" + content.Index + ")"
+                                : content.Value + " (" + content.Index + ")\n";
                     }
+
                     return extContentStr;
 
                 case SmartTagType.BlockName:
@@ -76,10 +88,10 @@ namespace ExcelToWordProject.Syllabus.Tags
                 case SmartTagType.Control:
                     if (properties.Control.Count == 0)
                         return "-";
-                    string controlString = "";
-                    for (int i = 0; i < properties.Control.Count(); i++)
+                    var controlString = "";
+                    for (var i = 0; i < properties.Control.Count(); i++)
                     {
-                        ControlForm controlForm = properties.Control[i];
+                        var controlForm = properties.Control[i];
                         if (controlForm == ControlForm.Exam)
                             controlString += "экзамен";
                         if (controlForm == ControlForm.Credit)
@@ -90,6 +102,7 @@ namespace ExcelToWordProject.Syllabus.Tags
                         if (i != properties.Control.Count() - 1)
                             controlString += ", ";
                     }
+
                     return controlString;
 
                 case SmartTagType.CreditUnits:
@@ -123,7 +136,8 @@ namespace ExcelToWordProject.Syllabus.Tags
                     return properties.TotalLessonsHours.ToString();
 
                 case SmartTagType.LecturesHoursBySemesters:
-                    if (properties.LecturesHoursBySemesters.Count(el => el == 0) == properties.LecturesHoursBySemesters.Count)
+                    if (properties.LecturesHoursBySemesters.Count(el => el == 0) ==
+                        properties.LecturesHoursBySemesters.Count)
                         return "-";
 
                     tempList = new List<int>();
@@ -134,7 +148,8 @@ namespace ExcelToWordProject.Syllabus.Tags
                     return OtherUtils.ListToDelimiteredString("/", "", tempList);
 
                 case SmartTagType.PracticalLessonsHoursBySemesters:
-                    if (properties.PracticalLessonsHoursBySemesters.Count(el => el == 0) == properties.PracticalLessonsHoursBySemesters.Count)
+                    if (properties.PracticalLessonsHoursBySemesters.Count(el => el == 0) ==
+                        properties.PracticalLessonsHoursBySemesters.Count)
                         return "-";
 
                     tempList = new List<int>();
@@ -145,7 +160,8 @@ namespace ExcelToWordProject.Syllabus.Tags
                     return OtherUtils.ListToDelimiteredString("/", "", tempList);
 
                 case SmartTagType.LaboratoryLessonsHoursBySemesters:
-                    if (properties.LaboratoryLessonsHoursBySemesters.Count(el => el == 0) == properties.LaboratoryLessonsHoursBySemesters.Count)
+                    if (properties.LaboratoryLessonsHoursBySemesters.Count(el => el == 0) ==
+                        properties.LaboratoryLessonsHoursBySemesters.Count)
                         return "-";
 
                     tempList = new List<int>();
@@ -156,7 +172,8 @@ namespace ExcelToWordProject.Syllabus.Tags
                     return OtherUtils.ListToDelimiteredString("/", "", tempList);
 
                 case SmartTagType.IndependentWorkHoursBySemesters:
-                    if (properties.IndependentWorkHoursBySemesters.Count(el => el == 0) == properties.IndependentWorkHoursBySemesters.Count)
+                    if (properties.IndependentWorkHoursBySemesters.Count(el => el == 0) ==
+                        properties.IndependentWorkHoursBySemesters.Count)
                         return "-";
 
                     tempList = new List<int>();
@@ -167,7 +184,8 @@ namespace ExcelToWordProject.Syllabus.Tags
                     return OtherUtils.ListToDelimiteredString("/", "", tempList);
 
                 case SmartTagType.ControlHoursBySemesters:
-                    if (properties.ControlHoursBySemesters.Count(el => el == 0) == properties.ControlHoursBySemesters.Count)
+                    if (properties.ControlHoursBySemesters.Count(el => el == 0) ==
+                        properties.ControlHoursBySemesters.Count)
                         return "-";
 
                     tempList = new List<int>();
@@ -180,7 +198,8 @@ namespace ExcelToWordProject.Syllabus.Tags
                 case SmartTagType.TotalLessonsBySemesters:
                     // Если за семестр не было аудиторных занятий
                     // то пропуск
-                    if (properties.TotalLessonsHoursBySemesters.Count(el => el == 0) == properties.TotalLessonsHoursBySemesters.Count)
+                    if (properties.TotalLessonsHoursBySemesters.Count(el => el == 0) ==
+                        properties.TotalLessonsHoursBySemesters.Count)
                         return "-";
 
                     // Иначе выводим инфу
@@ -196,7 +215,7 @@ namespace ExcelToWordProject.Syllabus.Tags
                     if ((properties.ControlFormsBySemesters[ControlForm.Credit]?.Count ?? 0) == 0)
                         return "-";
 
-                    List<string> isCreditBySemesters = new List<string>();
+                    var isCreditBySemesters = new List<string>();
                     properties.Semesters.ForEach(semesterNumber =>
                     {
                         if (properties.ControlFormsBySemesters[ControlForm.Credit]?.Contains(semesterNumber) == true)
@@ -211,8 +230,8 @@ namespace ExcelToWordProject.Syllabus.Tags
 
                 case SmartTagType.DepartmentName:
                     return properties.DepartmentName;
-
             }
+
             return "";
         }
     }

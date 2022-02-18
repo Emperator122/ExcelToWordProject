@@ -53,9 +53,25 @@ namespace ExcelToWordProject
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            
             return;
 
             TextBlockTag textBlockTag = new TextBlockTag(
+                key: "DefaultTagForTest",
+                listName: "",
+                description: "lalalalala",
+                conditions: new TextBlockCondition[]
+                {
+                    new TextBlockCondition(
+                        tagName: "ProgramValue",
+                        condition: "Программа \"Математическое и информационное обеспечение экономической деятельности\" "
+                    ),
+                }
+            );
+
+            textBlockTag.SaveToDatabase("It's DirectionCode value: <DirectionCode>");
+
+            textBlockTag = new TextBlockTag(
                 key: "ContentMegaTag",
                 listName: "",
                 description: "lalalalala",

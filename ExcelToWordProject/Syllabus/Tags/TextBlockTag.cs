@@ -12,10 +12,7 @@ namespace ExcelToWordProject.Syllabus.Tags
 {
     public class TextBlockTag : BaseSyllabusTag
     {
-        private int MaxConditionLength
-        {
-            get { return Conditions.Max(condition => condition.Length); }
-        }
+        private int MaxConditionLength => Conditions.Max(condition => condition.Length);
 
         public TextBlockCondition[] Conditions { get; set; }
 
@@ -29,9 +26,9 @@ namespace ExcelToWordProject.Syllabus.Tags
             Conditions = conditions.OrderBy(condition => condition.TagName).ToArray();
         }
 
-        public TextBlockTag()
+        public TextBlockTag() // для сериализации
         {
-        } // для сериализации
+        } 
 
         public override string GetValue(Module module = null, List<Content> contentList = null,
             DataSet excelData = null)
@@ -114,7 +111,7 @@ namespace ExcelToWordProject.Syllabus.Tags
             foreach (TextBlockCondition condition in Conditions)
             {
                 BaseSyllabusTag tag = tags.Find(
-                    _tag => _tag.Key == condition.TagName
+                    baseSyllabusTag => baseSyllabusTag.Key == condition.TagName && baseSyllabusTag.Active
                 );
                 if (tag == null) return false;
                 string tagValue =
@@ -202,28 +199,15 @@ namespace ExcelToWordProject.Syllabus.Tags
 
         public string Delimiter
         {
-            get => delimiter;
-            set => delimiter = value != "" ? value : "\n";
+            get => _delimiter;
+            set => _delimiter = value != "" ? value : "\n";
         }
 
-        private string delimiter;
+        private string _delimiter;
 
-        public int Length
-        {
-            get => Subconditions.Length;
-        }
+        public int Length => Subconditions.Length;
 
-        public string[] Subconditions
-        {
-            get
-            {
-                if (Delimiter == null)
-                    return new string[] { Condition };
-                else
-                    return Condition.Split(new string[] { Delimiter }, StringSplitOptions.None);
-                ;
-            }
-        }
+        public string[] Subconditions => Delimiter == null ? new string[] { Condition } : Condition.Split(new string[] { Delimiter }, StringSplitOptions.None);
 
         public TextBlockCondition(string tagName, string condition, string delimiter = null)
         {
