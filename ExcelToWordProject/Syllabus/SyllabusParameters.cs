@@ -9,12 +9,6 @@ namespace ExcelToWordProject.Syllabus
 {
     public class SyllabusParameters
     {
-        [System.Xml.Serialization.XmlIgnore]
-        public bool HasActiveSmartTags
-        {
-            get { return Tags.FindIndex(el => el is SmartSyllabusTag && el.Active) != -1; }
-        }
-
         public string ModulesContentListName;
         public string PlanListName;
         public int PlanListHeaderRowIndex;
@@ -30,12 +24,8 @@ namespace ExcelToWordProject.Syllabus
         public List<BaseSyllabusTag> Tags;
 
         [System.Xml.Serialization.XmlIgnore]
-        public List<TextBlockTag> TextBlockTags { get => TextBlockTag.GetAllTextBlockTags(); }
+        public List<TextBlockTag> TextBlockTags => TextBlockTag.GetAllTextBlockTags();
         
-        public IEnumerable<IGrouping<string, TextBlockTag>> GroupedTextBlockTags =>
-            TextBlockTags
-                .GroupBy(tag => tag.ToXml());
-
         /// <summary>
         /// Конструктор без параметров. В основном нужен для сериализации.
         /// </summary>
@@ -59,16 +49,18 @@ namespace ExcelToWordProject.Syllabus
             PlanListHeaderRowIndex = 2;
 
             // хедеры с листа "План"
-            planListHeaderNames = new Dictionary<string, string>();
-            planListHeaderNames["LecturesHoursHeaderName"] = "Лек";
-            planListHeaderNames["LaboratoryLessonsHoursHeaderName"] = "Лаб";
-            planListHeaderNames["PracticalLessonsHoursHeaderName"] = "Пр";
-            planListHeaderNames["ControlHoursHeaderName"] = "Конт роль";
-            planListHeaderNames["IndependentWorkHoursHeaderName"] = "СР";
-            planListHeaderNames["TotalHoursByPlanHeaderName"] = "По плану";
-            planListHeaderNames["SemesterCountingCreditUnitsPlanHeaderName"] = "з.е.";
-            planListHeaderNames["DepartmentName"] = "Наименование";
-            planListHeaderNames["Competitions"] = "Компетенции";
+            planListHeaderNames = new Dictionary<string, string>
+            {
+                ["LecturesHoursHeaderName"] = "Лек",
+                ["LaboratoryLessonsHoursHeaderName"] = "Лаб",
+                ["PracticalLessonsHoursHeaderName"] = "Пр",
+                ["ControlHoursHeaderName"] = "Конт роль",
+                ["IndependentWorkHoursHeaderName"] = "СР",
+                ["TotalHoursByPlanHeaderName"] = "По плану",
+                ["SemesterCountingCreditUnitsPlanHeaderName"] = "з.е.",
+                ["DepartmentName"] = "Наименование",
+                ["Competitions"] = "Компетенции"
+            };
             // заполняем временный массив для сериализации
             tempPlanListHeaderNames = new List<TempDictionaryItem>(planListHeaderNames.Select(kv
                 => new TempDictionaryItem() { Name = kv.Key, Value = kv.Value }).ToArray());
@@ -217,4 +209,13 @@ namespace ExcelToWordProject.Syllabus
             });
         }
     }
+}
+
+static class SyllabusExtensions
+{
+    public static IEnumerable<IGrouping<string, TextBlockTag>> GroupedByKey(this IEnumerable<TextBlockTag> tags) 
+        => tags
+            .GroupBy(tag => tag.ToXml());
+    public static bool HasActiveSmartTags(this IEnumerable<BaseSyllabusTag> tags) => 
+        tags.FirstOrDefault(el => el is SmartSyllabusTag && el.Active) != null;
 }

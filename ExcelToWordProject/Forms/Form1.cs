@@ -222,7 +222,7 @@ namespace ExcelToWordProject
             syllabusExcelReader = new SyllabusExcelReader(selectedFilePath, syllabusParameters);
             syllabusDocWriter = new SyllabusDocWriter(syllabusExcelReader, syllabusParameters);
             // Проверка на активные смарт теги при неправильном файле
-            if (syllabusParameters.HasActiveSmartTags && !syllabusExcelReader.IsSyllabusFile)
+            if (syllabusParameters.Tags.HasActiveSmartTags() && !syllabusExcelReader.IsSyllabusFile)
             {
                 DialogResult dialogResult = MessageBox.Show("Возможно данный файл " +
                     "(" + selectedFilePath + ") не является " +
@@ -259,7 +259,7 @@ namespace ExcelToWordProject
                 syllabusExcelReader = new SyllabusExcelReader(selectedFilePath, syllabusParameters);
                 syllabusDocWriter = new SyllabusDocWriter(syllabusExcelReader, syllabusParameters);
                 // Проверка на активные смарт теги при неправильном файле
-                if (syllabusParameters.HasActiveSmartTags && !syllabusExcelReader.IsSyllabusFile)
+                if (syllabusParameters.Tags.HasActiveSmartTags() && !syllabusExcelReader.IsSyllabusFile)
                 {
                     DialogResult dialogResult = MessageBox.Show("Возможно данный файл " +
                         "(" + selectedFilePath + ") не является " +

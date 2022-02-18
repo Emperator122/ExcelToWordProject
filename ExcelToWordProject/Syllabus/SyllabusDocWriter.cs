@@ -51,7 +51,7 @@ namespace ExcelToWordProject.Syllabus
 
             FindTablesTags(baseDocument);
 
-            if (Parameters.HasActiveSmartTags)
+            if (Parameters.Tags.HasActiveSmartTags())
                 SmartTagsDocumentHandler(resultFolderPath, baseDocumentPath, fileNamePrefix, progress);
             else // просто заменяем теги
                 DefaultTagsDocumentHandler(resultFolderPath, baseDocument, fileNamePrefix, progress);
@@ -192,7 +192,8 @@ namespace ExcelToWordProject.Syllabus
                 _tablesTextBlockTags = new Dictionary<int, List<TextBlockTag>>();
                 var textBlockTagsFilteredGroup =
                     Parameters
-                        .GroupedTextBlockTags
+                        .TextBlockTags
+                        .GroupedByKey()
                         .Where(
                             group =>
                                 (group.FirstOrDefault()?.Active ?? false) &&
@@ -402,7 +403,7 @@ namespace ExcelToWordProject.Syllabus
 
         protected void TextBlocksHandler(DocX doc, Module module = null, List<Content> contentList = null)
         {
-            var textBlockTagsGroups = Parameters.GroupedTextBlockTags;
+            var textBlockTagsGroups = Parameters.TextBlockTags.GroupedByKey();
 
             foreach (var textBlockTagsGroup in textBlockTagsGroups)
             {
