@@ -156,6 +156,7 @@
       <DependentUpon>SmartTagSettingsForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Syllabus\SyllabusExcelReader.cs" />
+    <Compile Include="Syllabus\SyllabusExceptions.cs" />
     <Compile Include="Syllabus\SyllabusParameters.cs" />
     <Compile Include="Syllabus\SyllabusDocWriter.cs" />
     <Compile Include="Forms\Form1.cs">

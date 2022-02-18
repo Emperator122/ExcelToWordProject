@@ -31,15 +31,10 @@ namespace ExcelToWordProject.Syllabus
 
         [System.Xml.Serialization.XmlIgnore]
         public List<TextBlockTag> TextBlockTags { get => TextBlockTag.GetAllTextBlockTags(); }
-
-        public List<TextBlockTag> UniqueTextBlockTags
-        {
-            get =>
-                TextBlockTags
-                .GroupBy(tag => tag.ToXml())
-                .Select(group => group.First())
-                .ToList();
-        }
+        
+        public IEnumerable<IGrouping<string, TextBlockTag>> GroupedTextBlockTags =>
+            TextBlockTags
+                .GroupBy(tag => tag.ToXml());
 
         /// <summary>
         /// Конструктор без параметров. В основном нужен для сериализации.

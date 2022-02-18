@@ -53,8 +53,9 @@ namespace ExcelToWordProject
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            
             return;
+
+            TextBlockTag.SetDefaultValue("DefaultTagForTest", "Defalut value for 'DefaultTagForTest'");
 
             TextBlockTag textBlockTag = new TextBlockTag(
                 key: "DefaultTagForTest",
@@ -218,7 +219,41 @@ namespace ExcelToWordProject
         {
             SyllabusExcelReader syllabusExcelReader = null;
             SyllabusDocWriter syllabusDocWriter = null;
+            syllabusExcelReader = new SyllabusExcelReader(selectedFilePath, syllabusParameters);
+            syllabusDocWriter = new SyllabusDocWriter(syllabusExcelReader, syllabusParameters);
+            // Проверка на активные смарт теги при неправильном файле
+            if (syllabusParameters.HasActiveSmartTags && !syllabusExcelReader.IsSyllabusFile)
+            {
+                DialogResult dialogResult = MessageBox.Show("Возможно данный файл " +
+                    "(" + selectedFilePath + ") не является " +
+                    "файлом учебного плана, но у вас активны \"умные\" теги. Это может стать причиной " +
+                    "сбоя в работе программы.\r\nОтключить \"умные\" теги?", "Внимание!", MessageBoxButtons.YesNoCancel);
+                switch (dialogResult)
+                {
+                    case DialogResult.Yes:
+                        // Склонируем новые параметры
+                        SyllabusParameters tempParameters = ConfigManager.GetConfigData();
 
+                        // Закроем старые потоки чтения
+                        syllabusExcelReader.Dispose();
+                        syllabusDocWriter.Dispose();
+
+                        // Отключим умные теги
+                        tempParameters.DisableSmartTags();
+                        syllabusExcelReader = new SyllabusExcelReader(selectedFilePath, tempParameters);
+                        syllabusDocWriter = new SyllabusDocWriter(syllabusExcelReader, tempParameters);
+                        break;
+                    case DialogResult.Cancel:
+                        return;
+                }
+            }
+
+            syllabusDocWriter.ConvertToDocx(resultFolderPath, templateFilePath, prefix,
+                        new Progress<int>(percent => progressBar1.Value = percent));
+
+            //await Task.Run(() => syllabusDocWriter.ConvertToDocx(resultFolderPath, templateFilePath, prefix,
+            //            new Progress<int>(percent => progressBar1.Value = percent)));
+            return;
             try
             {
                 syllabusExcelReader = new SyllabusExcelReader(selectedFilePath, syllabusParameters);

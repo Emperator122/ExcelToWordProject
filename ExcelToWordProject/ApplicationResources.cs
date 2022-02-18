@@ -10,6 +10,7 @@
         public static readonly string TextBlockKeyColumnName = "tag_key";
         public static readonly string TextBlockConditionColumnName = "condition_object";
         public static readonly string TextBlockValueColumnName = "value";
+        public static readonly string TextBlockIsDefaultColumnName = "is_default";
 
     }
 }

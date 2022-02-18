@@ -13,14 +13,14 @@ namespace ExcelToWordProject.Syllabus
     internal class SyllabusDocWriter : IDisposable
     {
         // Список смарт тегов, для которых будут пробегаться параграфы
-        private readonly SmartTagType[] smartTagParagraphJob = {SmartTagType.Content, SmartTagType.ExtendedContent};
+        private readonly SmartTagType[] _smartTagParagraphJob = {SmartTagType.Content, SmartTagType.ExtendedContent};
 
 
         // Список тегов в таблицах текущего шаблона
-        private Dictionary<int, List<BaseSyllabusTag>> tablesTags;
+        private Dictionary<int, List<BaseSyllabusTag>> _tablesTags;
 
         // Список TextBlock тегов в таблицах текущего шаблона
-        private Dictionary<int, List<TextBlockTag>> tablesTextBlockTags;
+        private Dictionary<int, List<TextBlockTag>> _tablesTextBlockTags;
 
 
         public SyllabusDocWriter(SyllabusExcelReader syllabusExcelReader, SyllabusParameters parameters)
@@ -72,7 +72,7 @@ namespace ExcelToWordProject.Syllabus
             {
                 // Репортим прогресс
                 i++;
-                progress?.Report(i * 100 / modules.Count());
+                progress?.Report(i * 100 / modules.Count);
 
                 // Приготовим имя и путь к файлу
                 var safeName =
@@ -139,22 +139,18 @@ namespace ExcelToWordProject.Syllabus
             foreach (var tag in Parameters.Tags)
             {
                 // и заполняем каждый активный тег
-                var tagValue = "err";
-                if (tag.Active)
+                if (!tag.Active) continue;
+                // получаем значение тега
+                var tagValue = tag.GetValue(module, contentList, SyllabusExcelReader.ExcelData);
+
+                if (tag is SmartSyllabusTag smartTag) // если у нас контент-тег, то заполняем параграфы
                 {
-                    // получаем значение тега
-                    tagValue = tag.GetValue(module, contentList, SyllabusExcelReader.ExcelData);
-
-                    if (tag is SmartSyllabusTag) // если у нас контент-тег, то заполняем параграфы
-                    {
-                        var smartTag = tag as SmartSyllabusTag;
-                        // Для некоторых тегов используется доп. хендлер
-                        if (smartTagParagraphJob.Contains(smartTag.Type))
-                            ArrayToParagraps(doc, smartTag, tagValue.Split('\n'));
-                    }
-
-                    doc.ReplaceText(tag.Tag, tagValue);
+                    // Для некоторых тегов используется доп. хендлер
+                    if (_smartTagParagraphJob.Contains(smartTag.Type))
+                        ArrayToParagraphs(doc, smartTag, tagValue.Split('\n'));
                 }
+
+                doc.ReplaceText(tag.Tag, tagValue);
             }
         }
 
@@ -169,10 +165,10 @@ namespace ExcelToWordProject.Syllabus
         /// <param name="refresh">Следует ли обновить поля</param>
         protected void FindTablesTags(DocX doc, bool refresh = true)
         {
-            if (tablesTags != null && tablesTextBlockTags != null && !refresh)
+            if (_tablesTags != null && _tablesTextBlockTags != null && !refresh)
                 return;
 
-            tablesTags = new Dictionary<int, List<BaseSyllabusTag>>();
+            _tablesTags = new Dictionary<int, List<BaseSyllabusTag>>();
             for (var i = 0; i < doc.Tables.Count; i++)
             {
                 var table = doc.Tables[i];
@@ -190,21 +186,24 @@ namespace ExcelToWordProject.Syllabus
                         );
 
                 if (tags.Count > 0)
-                    tablesTags[i] = tags;
+                    _tablesTags[i] = tags;
 
                 // найдем TextBlock теги
-                tablesTextBlockTags = new Dictionary<int, List<TextBlockTag>>();
-                var textBlockTags =
+                _tablesTextBlockTags = new Dictionary<int, List<TextBlockTag>>();
+                var textBlockTagsFilteredGroup =
                     Parameters
-                        .UniqueTextBlockTags
-                        .FindAll(
-                            tag =>
-                                tag.Active &&
-                                row.FindAll(tag.Tag).Count > 0
+                        .GroupedTextBlockTags
+                        .Where(
+                            group =>
+                                (group.FirstOrDefault()?.Active ?? false) &&
+                                row.FindAll(group.First().Tag).Count > 0
                         );
+                var textBlockTagsMixedList = new List<TextBlockTag>();
+                foreach (var textBlockTagGroup in textBlockTagsFilteredGroup)
+                    textBlockTagsMixedList.AddRange(textBlockTagGroup);
 
-                if (textBlockTags.Count > 0)
-                    tablesTextBlockTags[i] = textBlockTags;
+                if (textBlockTagsMixedList.Count > 0)
+                    _tablesTextBlockTags[i] = textBlockTagsMixedList;
             }
         }
 
@@ -216,19 +215,18 @@ namespace ExcelToWordProject.Syllabus
         /// <param name="doc">Документ</param>
         /// <param name="module">Информация о дисциплине</param>
         /// <param name="contentList">Компетенции дисциплины</param>
-        /// <param name="properties">Другие свойства дисциплины</param>
         protected void TablesHandler(DocX doc, Module module = null, List<Content> contentList = null)
         {
             // Находим все теги, содержащиеся в таблицах
             FindTablesTags(doc, false);
-            foreach (var kv in tablesTags)
+            foreach (var kv in _tablesTags)
             {
                 var table = doc.Tables[kv.Key];
                 var tags = kv.Value;
 
                 var textBlockTags = new List<TextBlockTag>();
-                if (tablesTextBlockTags.ContainsKey(kv.Key))
-                    textBlockTags.AddRange(tablesTextBlockTags[kv.Key]);
+                if (_tablesTextBlockTags.ContainsKey(kv.Key))
+                    textBlockTags.AddRange(_tablesTextBlockTags[kv.Key]);
 
                 // Удалим TextBlock теги не удовлетворяющие условиям
                 for (var i = 0; i < textBlockTags.Count; i++)
@@ -240,20 +238,18 @@ namespace ExcelToWordProject.Syllabus
                             contentList,
                             SyllabusExcelReader.ExcelData
                         );
-                    if (!isValid)
-                    {
-                        textBlockTags.RemoveAt(i);
-                        i--;
-                    }
+                    if (isValid) continue;
+                    textBlockTags.RemoveAt(i);
+                    i--;
                 }
 
                 // Сгруппируем TextBlock теги по ключу
-                var textBlockTagsGroup = textBlockTags.GroupBy(tag => tag.Key);
+                var textBlockTagsGroup = textBlockTags.GroupBy(tag => tag.Key).ToList();
 
                 // Массив значений тегов, оставим доп место для TextBlock тегов
-                var tagsValues = new string[tags.Count + textBlockTagsGroup.Count()][];
+                var tagsValues = new string[tags.Count + textBlockTagsGroup.Count][];
 
-                // Обработка Smart и Defalut тегов
+                // Обработка Smart и Default тегов
                 for (var i = 0; i < tags.Count; i++)
                     tagsValues[i] =
                         tags[i]
@@ -267,15 +263,18 @@ namespace ExcelToWordProject.Syllabus
                     // Массив с результатом, равный максимальной
                     // высоте столбца таблицы
                     var values = new string[maxLength];
+                    var defaultValue = group.FirstOrDefault()?.DefaultValue ?? "";
                     for (var i = 0; i < values.Length; i++)
-                        values[i] = "";
+                        values[i] = defaultValue;
 
                     // Поставим значения TextBlock тегов в нужных строках таблицы
                     foreach (var textBlockTag in group)
+                    {
+                        if (textBlockTag.IsDefault) continue;
                         // i,j - бежим по всей таблице
                         for (var i = 0; i < maxLength; i++)
                         {
-                            var conditionsFlag = true;
+                            var allConditionsSatisfied = true;
                             for (var j = 0; j < tags.Count; j++)
                             {
                                 // если TextBlock не зависит от текущего Base тега, то пропускаем итерацию
@@ -283,7 +282,7 @@ namespace ExcelToWordProject.Syllabus
                                     textBlockTag
                                         .Conditions
                                         .FirstOrDefault(
-                                            _condition => _condition.TagName == tags[j].Key
+                                            textBlockCondition => textBlockCondition.TagName == tags[j].Key
                                         );
                                 if (condition == null)
                                     continue;
@@ -296,21 +295,18 @@ namespace ExcelToWordProject.Syllabus
                                     rowTagValue = tagsValues[j][tagsValues[j].Length - 1];
 
                                 // и сравниваем значение Base тега с условием TextBlock тега
-                                if (condition.Condition != rowTagValue)
-                                {
-                                    conditionsFlag = false;
-                                    break;
-                                }
+                                if (condition.Condition == rowTagValue) continue;
+                                allConditionsSatisfied = false;
+                                break;
                             }
 
                             // Если не зафакапился флаг, то тег становится на свое место
                             // (по идее)
-                            if (conditionsFlag)
-                            {
-                                values[i] = textBlockTag.GetValue2();
-                                break;
-                            }
+                            if (!allConditionsSatisfied) continue;
+                            values[i] = textBlockTag.GetValue2();
+                            break;
                         }
+                    }
 
                     tagsValues[k] = values;
                     k++;
@@ -338,7 +334,7 @@ namespace ExcelToWordProject.Syllabus
         {
             try
             {
-                var patternRowIndex = table.Rows.Count() - 1;
+                var patternRowIndex = table.Rows.Count - 1;
                 var patternRow = table.Rows.Last();
 
                 var maxLength = tagsValues.Max(arr => arr?.Length ?? 0);
@@ -359,6 +355,7 @@ namespace ExcelToWordProject.Syllabus
             }
             catch
             {
+                Console.WriteLine(@"Ошибка при обработке таблицы");
             }
         }
 
@@ -369,7 +366,7 @@ namespace ExcelToWordProject.Syllabus
         /// <param name="doc">Документ DocX</param>
         /// <param name="contentTag">Тег</param>
         /// <param name="lines">Массив строк, которые станут параграфами на месте тега</param>
-        protected void ArrayToParagraps(DocX doc, SmartSyllabusTag contentTag, string[] lines)
+        protected void ArrayToParagraphs(DocX doc, SmartSyllabusTag contentTag, string[] lines)
         {
             try
             {
@@ -399,20 +396,33 @@ namespace ExcelToWordProject.Syllabus
             }
             catch
             {
+                Console.WriteLine(@"Ошибка при заполнении параграфа");
             }
         }
 
         protected void TextBlocksHandler(DocX doc, Module module = null, List<Content> contentList = null)
         {
-            var textBlockTags = Parameters.UniqueTextBlockTags;
-            foreach (var textBlockTag in textBlockTags)
+            var textBlockTagsGroups = Parameters.GroupedTextBlockTags;
+
+            foreach (var textBlockTagsGroup in textBlockTagsGroups)
             {
-                if (!textBlockTag.Active) continue;
-                var isValid = textBlockTag.CheckConditions(Parameters.Tags, module, contentList,
-                    SyllabusExcelReader.ExcelData);
-                if (!isValid) continue;
-                var tagValue = textBlockTag.GetValue2();
-                doc.ReplaceText(textBlockTag.Tag, tagValue);
+                if (!textBlockTagsGroup.FirstOrDefault()?.Active ?? true) continue;
+                var isValid = false;
+                TextBlockTag outTextBlockTag = null;
+                foreach (var textBlockTag in textBlockTagsGroup)
+                {
+                    outTextBlockTag = textBlockTag;
+                    if(textBlockTag.IsDefault) continue;
+                    isValid = textBlockTag.CheckConditions(Parameters.Tags, module, contentList,
+                        SyllabusExcelReader.ExcelData);
+                    if (isValid) break;
+                }
+
+                if (outTextBlockTag == null)
+                    continue;
+
+                var tagValue = isValid ? outTextBlockTag.GetValue2() : (outTextBlockTag.DefaultValue ?? "");
+                doc.ReplaceText(outTextBlockTag.Tag, tagValue);
             }
         }
     }
