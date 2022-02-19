@@ -6,6 +6,7 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Xml;
 
 namespace ExcelToWordProject
 {
@@ -54,12 +55,28 @@ namespace ExcelToWordProject
         private void Form1_Load(object sender, EventArgs e)
         {
             return;
+            using (var streamReader = new StreamReader("word_extract_example/extracted_table.xml"))
+            {
+                var textBlockTag2 = new TextBlockTag(
+                    key: "PureXMLTest",
+                    description: "lalalalala",
+                    conditions: new TextBlockCondition[]
+                    {
+                        new TextBlockCondition(
+                            tagName: "ProgramValue",
+                            condition: "Программа \"Математическое и информационное обеспечение экономической деятельности\" "
+                        ),
+                    },
+                    valueIsPureXml: true
+                );
+
+                textBlockTag2.SaveToDatabase(streamReader.ReadToEnd());
+            }
 
             TextBlockTag.SetDefaultValue("DefaultTagForTest", "Defalut value for 'DefaultTagForTest'");
 
             TextBlockTag textBlockTag = new TextBlockTag(
                 key: "DefaultTagForTest",
-                listName: "",
                 description: "lalalalala",
                 conditions: new TextBlockCondition[]
                 {
@@ -74,7 +91,6 @@ namespace ExcelToWordProject
 
             textBlockTag = new TextBlockTag(
                 key: "ContentMegaTag",
-                listName: "",
                 description: "lalalalala",
                 conditions: new TextBlockCondition[]
                 {
@@ -90,7 +106,6 @@ namespace ExcelToWordProject
 
             textBlockTag = new TextBlockTag(
                     key: "ContentMegaTag",
-                    listName: "",
                     description: "lalalalala",
                     conditions: new TextBlockCondition[]
                     {
@@ -105,7 +120,6 @@ namespace ExcelToWordProject
 
             textBlockTag = new TextBlockTag(
                     key: "ContentMegaTag",
-                    listName: "",
                     description: "lalalalala",
                     conditions: new TextBlockCondition[]
                     {
@@ -120,7 +134,6 @@ namespace ExcelToWordProject
 
             textBlockTag = new TextBlockTag(
                     key: "ContentMegaTag",
-                    listName: "",
                     description: "lalalalala",
                     conditions: new TextBlockCondition[]
                     {
@@ -135,7 +148,6 @@ namespace ExcelToWordProject
 
             textBlockTag = new TextBlockTag(
                     key: "ContentMegaTag",
-                    listName: "",
                     description: "lalalalala",
                     conditions: new TextBlockCondition[]
                     {
@@ -151,7 +163,6 @@ namespace ExcelToWordProject
             // для теста
             textBlockTag = new TextBlockTag(
                     key: "RuLangTag",
-                    listName: "",
                     description: "lalalalala",
                     conditions: new TextBlockCondition[]
                     {
@@ -166,7 +177,6 @@ namespace ExcelToWordProject
 
             textBlockTag = new TextBlockTag(
                     key: "BlockNameTag",
-                    listName: "",
                     description: "BlockNameTag",
                     conditions: new TextBlockCondition[]
                     {
@@ -181,7 +191,6 @@ namespace ExcelToWordProject
 
             textBlockTag = new TextBlockTag(
                     key: "BlockNameRuTag",
-                    listName: "",
                     description: "BlockNameTag",
                     conditions: new TextBlockCondition[]
                     {

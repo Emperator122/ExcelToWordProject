@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Windows.Forms;
 using System.Xml.Serialization;
 using ExcelToWordProject.Models;
 using Microsoft.Data.Sqlite;
@@ -12,27 +12,30 @@ namespace ExcelToWordProject.Syllabus.Tags
 {
     public class TextBlockTag : BaseSyllabusTag
     {
+        public TextBlockCondition[] Conditions { get; set; }
+
+        public bool ValueIsPureXML { get; set; }
+
+        public string DefaultValue => GetDefaultValue(Key);
+
+        public KeyValuePair<TextBlockTag, string> DefaultTag => GetDefaultTag(Key);
+
+        public bool IsDefault => Conditions.Length == 0;
+
         public TextBlockTag(
             string key,
-            string listName,
-            TextBlockCondition[] conditions,
-            string description = ""
-        ) : base(key, listName, description)
+            IEnumerable<TextBlockCondition> conditions,
+            string description = "",
+            bool valueIsPureXml = false
+        ) : base(key, "", description)
         {
             Conditions = conditions.OrderBy(condition => condition.TagName).ToArray();
+            ValueIsPureXML = valueIsPureXml;
         }
 
         public TextBlockTag() // для сериализации
         {
         }
-
-        private int MaxConditionLength => Conditions.Max(condition => condition.Length);
-
-        public TextBlockCondition[] Conditions { get; set; }
-
-        public string DefaultValue => GetDefaultValue(Key);
-
-        public bool IsDefault => Conditions.Length == 0;
 
         public override string GetValue(Module module = null, List<Content> contentList = null,
             DataSet excelData = null)
@@ -92,7 +95,7 @@ namespace ExcelToWordProject.Syllabus.Tags
 
         public void SetAsDefault()
         {
-            SetDefaultValue(Key, GetValue2(), Description);
+            SetDefaultValue(Key, GetValue2(), Description, ValueIsPureXML);
         }
 
         public string ToXml()
@@ -138,35 +141,6 @@ namespace ExcelToWordProject.Syllabus.Tags
             }
 
             return true;
-        }
-        
-        public TextBlockTag[] Split()
-        {
-            var maxConditionLength = Conditions.Max(condition => condition.Length);
-            var minDelimeteredConditionLength =
-                Conditions.Min(condition => condition.Delimiter != null ? condition.Length : maxConditionLength);
-            Debug.Assert(minDelimeteredConditionLength == maxConditionLength);
-
-            var splittedConditions = new List<TextBlockCondition[]>();
-            foreach (var condition in Conditions)
-                splittedConditions.Add(condition.Split());
-
-
-            var splittedBlockTags = new TextBlockTag[maxConditionLength];
-            for (var i = 0; i < maxConditionLength; i++)
-            {
-                var conditions = new TextBlockCondition[Conditions.Length];
-                for (var j = 0; j < conditions.Length; j++)
-                    conditions[j] = splittedConditions[j][splittedConditions[j].Length > 1 ? i : 0];
-                splittedBlockTags[i] = new TextBlockTag(
-                    Key,
-                    ListName,
-                    conditions,
-                    Description
-                );
-            }
-
-            return splittedBlockTags;
         }
 
         public static List<TextBlockTag> GetAllTextBlockTags()
@@ -225,7 +199,35 @@ namespace ExcelToWordProject.Syllabus.Tags
             return result;
         }
 
-        public static void SetDefaultValue(string tagKey, string value, string description="")
+        public static KeyValuePair<TextBlockTag, string> GetDefaultTag(string tagKey)
+        {
+            var sqlExpression =
+                $"SELECT * FROM {DatabaseStrings.TextBlockTagTableName} "
+                + $"WHERE {DatabaseStrings.TextBlockKeyColumnName} = \'{tagKey}\' "
+                + $"AND {DatabaseStrings.TextBlockIsDefaultColumnName} = 1";
+
+            string tagValue = null;
+            TextBlockTag tag = null;
+            using (var connection = new SqliteConnection(DatabaseStrings.ConnectionString))
+            {
+                connection.Open();
+                var command = new SqliteCommand(sqlExpression, connection);
+                using (var reader = command.ExecuteReader())
+                {
+                    if (reader.HasRows) // если есть данные
+                    {
+                        reader.Read();
+
+                        tagValue = reader.GetString(3);
+                        tag = FromXml(reader.GetString(2));
+                    }
+                }
+            }
+
+            return new KeyValuePair<TextBlockTag, string>(tag, tagValue);
+        }
+
+        public static void SetDefaultValue(string tagKey, string value, string description="", bool valueIsPureXml = false)
         {
             if (GetDefaultValue(tagKey) != null)
                 throw new SyllabusDatabaseException(SyllabusDatabaseErrorType.UniqueDefaultValueError);
@@ -239,7 +241,7 @@ namespace ExcelToWordProject.Syllabus.Tags
             using (var connection = new SqliteConnection(DatabaseStrings.ConnectionString))
             {
                 connection.Open();
-                var tempCondition = new TextBlockTag(tagKey, "", Array.Empty<TextBlockCondition>(), description);
+                var tempCondition = new TextBlockTag(tagKey, Array.Empty<TextBlockCondition>(), description, valueIsPureXml);
                 var command = new SqliteCommand(sqlExpression, connection);
                 command.Parameters.Add(new SqliteParameter("@key", tagKey));
                 command.Parameters.Add(new SqliteParameter("@condition", tempCondition.ToXml()));
@@ -273,27 +275,6 @@ namespace ExcelToWordProject.Syllabus.Tags
         {
             get => _delimiter;
             set => _delimiter = value != "" ? value : "\n";
-        }
-
-        public int Length => Subconditions.Length;
-
-        public string[] Subconditions => Delimiter == null
-            ? new[] {Condition}
-            : Condition.Split(new[] {Delimiter}, StringSplitOptions.None);
-
-        public TextBlockCondition[] Split()
-        {
-            var subconditions = Subconditions;
-            var splittedConditions = new TextBlockCondition[subconditions.Length];
-            for (var i = 0; i < subconditions.Length; i++)
-                splittedConditions[i] =
-                    new TextBlockCondition(
-                        TagName,
-                        subconditions[i],
-                        Delimiter
-                    );
-
-            return splittedConditions;
         }
     }
 }

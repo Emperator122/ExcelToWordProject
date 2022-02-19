@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text.RegularExpressions;
+using ExcelToWordProject;
+using ExcelToWordProject.Syllabus;
 
 namespace ExcelToWordProject.Syllabus
 {
@@ -215,7 +217,42 @@ static class SyllabusExtensions
 {
     public static IEnumerable<IGrouping<string, TextBlockTag>> GroupedByKey(this IEnumerable<TextBlockTag> tags) 
         => tags
-            .GroupBy(tag => tag.ToXml());
+            .GroupBy(tag => tag.Key);
+    public static List<KeyValuePair<string, List<TextBlockTag>>> XMLValuesOnly(this IEnumerable<IGrouping<string, TextBlockTag>> groups) 
+        => groups
+            .Select(group =>
+                new KeyValuePair<string, List<TextBlockTag>>(
+                    group.Key, 
+                    group.Where(
+                        tag => tag.ValueIsPureXML
+                    )
+                    .ToList()
+                )
+            )
+            .ToList();
+    
     public static bool HasActiveSmartTags(this IEnumerable<BaseSyllabusTag> tags) => 
         tags.FirstOrDefault(el => el is SmartSyllabusTag && el.Active) != null;
+
+    public static TextBlockTag GetFirstValidTag(this IGrouping<string, TextBlockTag> group, List<BaseSyllabusTag> tags,
+        Module module = null, List<Content> contentList = null, DataSet excelData = null, bool ignoreDefault = true)
+    {
+        return group.ToList().GetFirstValidTag(tags, module, contentList, excelData, ignoreDefault);
+    }
+
+    public static TextBlockTag GetFirstValidTag(this IEnumerable<TextBlockTag> textBlockTags, List<BaseSyllabusTag> allTags,
+        Module module = null, List<Content> contentList = null, DataSet excelData = null, bool ignoreDefault = true)
+    {
+        foreach (var textBlockTag in textBlockTags)
+        {
+            if (!ignoreDefault && textBlockTag.IsDefault) // дефолтное значение валидно всегда
+                return textBlockTag;
+
+            var isValid = textBlockTag.CheckConditions(allTags, module, contentList,
+                excelData);
+            if (isValid) return textBlockTag;
+        }
+
+        return null;
+    }
 }

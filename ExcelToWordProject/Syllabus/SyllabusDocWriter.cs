@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Xml.Linq;
 using ExcelToWordProject.Models;
 using ExcelToWordProject.Syllabus.Tags;
 using ExcelToWordProject.Utils;
@@ -132,6 +135,9 @@ namespace ExcelToWordProject.Syllabus
             // обработка таблиц
             TablesHandler(doc, module, contentList);
 
+            // обработка параграфов, содержащих TextBlock теги
+            TextBlocksParagraphsHandler(doc, module, contentList);
+
             // обработка TextBlock
             TextBlocksHandler(doc, module, contentList);
 
@@ -143,10 +149,9 @@ namespace ExcelToWordProject.Syllabus
                 // получаем значение тега
                 var tagValue = tag.GetValue(module, contentList, SyllabusExcelReader.ExcelData);
 
-                if (tag is SmartSyllabusTag smartTag) // если у нас контент-тег, то заполняем параграфы
+                if (tag is SmartSyllabusTag smartTag) 
                 {
-                    // Для некоторых тегов используется доп. хендлер
-                    if (_smartTagParagraphJob.Contains(smartTag.Type))
+                    if (_smartTagParagraphJob.Contains(smartTag.Type)) // если у нас контент-тег, то заполняем параграфы
                         ArrayToParagraphs(doc, smartTag, tagValue.Split('\n'));
                 }
 
@@ -403,7 +408,7 @@ namespace ExcelToWordProject.Syllabus
 
         protected void TextBlocksHandler(DocX doc, Module module = null, List<Content> contentList = null)
         {
-            var textBlockTagsGroups = Parameters.TextBlockTags.GroupedByKey();
+            var textBlockTagsGroups = Parameters.TextBlockTags.GroupedByKey().ToList();
 
             foreach (var textBlockTagsGroup in textBlockTagsGroups)
             {
@@ -424,6 +429,48 @@ namespace ExcelToWordProject.Syllabus
 
                 var tagValue = isValid ? outTextBlockTag.GetValue2() : (outTextBlockTag.DefaultValue ?? "");
                 doc.ReplaceText(outTextBlockTag.Tag, tagValue);
+            }
+        }
+
+        protected void TextBlocksParagraphsHandler(DocX doc, Module module = null, List<Content> contentList = null)
+        {
+            // Возьмем только те теги, которые значения которых
+            // чистый XML
+            var textBlockTagsGroups = 
+                Parameters
+                    .TextBlockTags
+                    .GroupedByKey()
+                    .XMLValuesOnly();
+
+            foreach (var paragraph in doc.Paragraphs)
+            {
+                foreach (var textBlockTagsGroup in textBlockTagsGroups)
+                {
+                    var tagKey = $"<{textBlockTagsGroup.Key}>";
+
+                    if (paragraph.Text.Trim() != tagKey) continue;
+
+                    var validTag = textBlockTagsGroup.Value.GetFirstValidTag(Parameters.Tags, module, contentList,
+                        SyllabusExcelReader.ExcelData);
+                    var tagValue = validTag?.GetValue2();
+                    if (tagValue == null)
+                    {
+                        var defaultTagKeyValue = TextBlockTag.GetDefaultTag(tagKey);
+                        if (defaultTagKeyValue.Key?.ValueIsPureXML ?? false)
+                            tagValue = defaultTagKeyValue.Value;
+                    }
+
+                    if (tagValue != null)
+                    {
+                        var p = paragraph.InsertParagraphAfterSelf("test");
+                        Type[] types = { typeof(DocX), typeof(XElement), typeof(int), typeof(ContainerType) };
+                        var p2 = typeof(Paragraph)
+                            .GetConstructor(BindingFlags.NonPublic | BindingFlags.Instance, null, types, null)
+                            ?.Invoke(new object[] { doc, XElement.Parse(tagValue), 0, ContainerType.None });
+                        p.InsertParagraphAfterSelf(p2 as Paragraph);
+                        paragraph.Remove(false);
+                    }
+                }
             }
         }
     }
