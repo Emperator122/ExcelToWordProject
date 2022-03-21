@@ -15,6 +15,7 @@ namespace ExcelToWordProject
         DefaultTagSettingsForm DefaultTagSettingsForm;
         SmartTagSettingsForm SmartTagSettingsForm;
         TagListForm TagListForm;
+        TextBlocksForm TextBlocksForm;
         AboutProgramForm aboutProgramForm;
         GetDataParametersForm getDataParametersForm;
 
@@ -439,6 +440,17 @@ namespace ExcelToWordProject
             }
             else
                 getDataParametersForm.Focus();
+        }
+
+        private void блокиТекстаToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (TextBlocksForm == null || TextBlocksForm.IsDisposed)
+            {
+                TextBlocksForm = new TextBlocksForm(syllabusParameters);
+                TextBlocksForm.Show();
+            }
+            else
+                TextBlocksForm.Focus();
         }
     }
 }

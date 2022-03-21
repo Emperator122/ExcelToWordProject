@@ -193,7 +193,7 @@ namespace ExcelToWordProject.Syllabus
                 var textBlockTagsFilteredGroup =
                     Parameters
                         .TextBlockTags
-                        .GroupedByKey()
+                        .GroupedByXml()
                         .Where(
                             group =>
                                 (group.FirstOrDefault()?.Active ?? false) &&
@@ -403,7 +403,7 @@ namespace ExcelToWordProject.Syllabus
 
         protected void TextBlocksHandler(DocX doc, Module module = null, List<Content> contentList = null)
         {
-            var textBlockTagsGroups = Parameters.TextBlockTags.GroupedByKey();
+            var textBlockTagsGroups = Parameters.TextBlockTags.GroupedByXml();
 
             foreach (var textBlockTagsGroup in textBlockTagsGroups)
             {

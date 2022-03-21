@@ -55,6 +55,7 @@
             this.filePathTextBox = new System.Windows.Forms.TextBox();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.status = new System.Windows.Forms.ToolStripStatusLabel();
+            this.блокиТекстаToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.bodyPanel.SuspendLayout();
             this.bodyGroupBox.SuspendLayout();
@@ -83,6 +84,7 @@
             this.toolStripMenuItem1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.defaultТегиToolStripMenuItem,
             this.smartTagsToolStripMenuItem,
+            this.блокиТекстаToolStripMenuItem,
             this.constantsToolStripMenuItem});
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
             this.toolStripMenuItem1.Size = new System.Drawing.Size(79, 20);
@@ -353,6 +355,13 @@
             this.status.Size = new System.Drawing.Size(73, 17);
             this.status.Text = "Ожидание...";
             // 
+            // блокиТекстаToolStripMenuItem
+            // 
+            this.блокиТекстаToolStripMenuItem.Name = "блокиТекстаToolStripMenuItem";
+            this.блокиТекстаToolStripMenuItem.Size = new System.Drawing.Size(245, 22);
+            this.блокиТекстаToolStripMenuItem.Text = "Блоки текста";
+            this.блокиТекстаToolStripMenuItem.Click += new System.EventHandler(this.блокиТекстаToolStripMenuItem_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 18F);
@@ -412,6 +421,7 @@
         private System.Windows.Forms.ToolStripMenuItem оПрограммеToolStripMenuItem;
         private System.Windows.Forms.LinkLabel excelFilesLabelClear;
         private System.Windows.Forms.Label excelFilesLabel;
+        private System.Windows.Forms.ToolStripMenuItem блокиТекстаToolStripMenuItem;
     }
 }
 

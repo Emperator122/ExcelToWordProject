@@ -133,6 +133,16 @@ namespace ExcelToWordProject.Properties {
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap more {
+            get {
+                object obj = ResourceManager.GetObject("more", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap plus {
             get {
                 object obj = ResourceManager.GetObject("plus", resourceCulture);
@@ -156,6 +166,16 @@ namespace ExcelToWordProject.Properties {
         internal static System.Drawing.Bitmap remove {
             get {
                 object obj = ResourceManager.GetObject("remove", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap right_arrow {
+            get {
+                object obj = ResourceManager.GetObject("right_arrow", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
