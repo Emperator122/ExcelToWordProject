@@ -29,5 +29,26 @@ namespace ExcelToWordProject.Forms
         {
 
         }
+
+        private void OnGoToConditionsButtonClick(string tagName)
+        {
+            var form = new TextBlockConditionsForm(tagName, _parameters, this);
+            form.Show();
+            Hide();
+        }
+
+        private void addNewTagButton_Click(object sender, EventArgs e)
+        {
+            var form = new TextBlockAddForm("", this);
+            form.ShowDialog();
+        }
+
+        public override void Refresh()
+        {
+            base.Refresh();
+            Controls.Clear();
+            InitializeComponent();
+            InittializeCustomComponents();
+        }
     }
 }

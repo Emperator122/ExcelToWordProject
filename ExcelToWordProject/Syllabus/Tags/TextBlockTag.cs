@@ -14,12 +14,12 @@ namespace ExcelToWordProject.Syllabus.Tags
     {
         public TextBlockTag(
             string key,
-            string listName,
             TextBlockCondition[] conditions,
             string description = ""
-        ) : base(key, listName, description)
+        ) : base(key, "", description)
         {
-            Conditions = conditions.OrderBy(condition => condition.TagName).ToArray();
+            Conditions = conditions;
+            Id = -1;
         }
 
         public TextBlockTag() // для сериализации
@@ -28,7 +28,15 @@ namespace ExcelToWordProject.Syllabus.Tags
 
         private int MaxConditionLength => Conditions.Max(condition => condition.Length);
 
-        public TextBlockCondition[] Conditions { get; set; }
+        public TextBlockCondition[] Conditions { get => _conditions; set => _conditions = value.OrderBy(condition => condition.TagName).ToArray(); }
+        private TextBlockCondition[] _conditions;
+
+        private int Id { get; set; }
+
+        public bool HasId => Id != -1;
+
+        public bool CanStoreInDataBase => HasId || GetValue2() == null;
+        public bool HasDefaultValue => DefaultValue != null;
 
         public string DefaultValue => GetDefaultValue(Key);
 
@@ -47,7 +55,7 @@ namespace ExcelToWordProject.Syllabus.Tags
                 + $"WHERE {DatabaseStrings.TextBlockKeyColumnName} = \'{Key}\' "
                 + $"AND {DatabaseStrings.TextBlockConditionColumnName} = \'{ToXml()}\'";
 
-            var result = "";
+            string result = null;
             using (var connection = new SqliteConnection(DatabaseStrings.ConnectionString))
             {
                 connection.Open();
@@ -73,11 +81,20 @@ namespace ExcelToWordProject.Syllabus.Tags
 
         public void SaveToDatabase(string value)
         {
-            var sqlExpression =
-                $"INSERT INTO {DatabaseStrings.TextBlockTagTableName} " +
-                $"({DatabaseStrings.TextBlockKeyColumnName}, {DatabaseStrings.TextBlockConditionColumnName}, " +
-                $"{DatabaseStrings.TextBlockValueColumnName}) "
-                + "VALUES (@key, @condition, @value)";
+            string sqlExpression;
+            if(Id == -1)
+                sqlExpression =
+                    $"INSERT INTO {DatabaseStrings.TextBlockTagTableName} " +
+                    $"({DatabaseStrings.TextBlockKeyColumnName}, {DatabaseStrings.TextBlockConditionColumnName}, " +
+                    $"{DatabaseStrings.TextBlockValueColumnName}) "
+                    + "VALUES (@key, @condition, @value)";
+            else
+                sqlExpression =
+                    $"UPDATE {DatabaseStrings.TextBlockTagTableName} " +
+                    $"SET {DatabaseStrings.TextBlockKeyColumnName} = @key, " +
+                    $"{DatabaseStrings.TextBlockConditionColumnName} = @condition, " +
+                    $"{DatabaseStrings.TextBlockValueColumnName} = @value " +
+                    $"WHERE `{DatabaseStrings.TextBlockIdColumnName}` = @index";
 
             using (var connection = new SqliteConnection(DatabaseStrings.ConnectionString))
             {
@@ -86,6 +103,29 @@ namespace ExcelToWordProject.Syllabus.Tags
                 command.Parameters.Add(new SqliteParameter("@key", Key));
                 command.Parameters.Add(new SqliteParameter("@condition", ToXml()));
                 command.Parameters.Add(new SqliteParameter("@value", value));
+                if(Id != -1)
+                    command.Parameters.Add(new SqliteParameter("@index", Id));
+                command.ExecuteNonQuery();
+            }
+        }
+
+        public void RemoveFromDatabase()
+        {
+            if (!HasId)
+            {
+                throw new SyllabusDatabaseException(SyllabusDatabaseErrorType.DeleteError,
+                    "Данный тег не найдет в БД");
+            }
+
+            var sqlExpression =
+                $"DELETE FROM {DatabaseStrings.TextBlockTagTableName} " +
+                $"WHERE `{DatabaseStrings.TextBlockIdColumnName}` = @index";
+
+            using (var connection = new SqliteConnection(DatabaseStrings.ConnectionString))
+            {
+                connection.Open();
+                var command = new SqliteCommand(sqlExpression, connection);
+                command.Parameters.Add(new SqliteParameter("@index", Id));
                 command.ExecuteNonQuery();
             }
         }
@@ -105,12 +145,14 @@ namespace ExcelToWordProject.Syllabus.Tags
             }
         }
 
-        public static TextBlockTag FromXml(string xml)
+        public static TextBlockTag FromXml(string xml, int id = -1)
         {
             var serializer = new XmlSerializer(typeof(TextBlockTag));
             using (TextReader reader = new StringReader(xml))
             {
-                return (TextBlockTag) serializer.Deserialize(reader);
+                var tag = (TextBlockTag) serializer.Deserialize(reader);
+                tag.Id = id;
+                return tag;
             }
         }
 
@@ -139,7 +181,22 @@ namespace ExcelToWordProject.Syllabus.Tags
 
             return true;
         }
-        
+
+        public string ConditionsToGuiString()
+        {
+            var result = "";
+            if (Conditions.Length == 0)
+                return result;
+
+            for (var i = 0; i < Conditions.Length-1; i++)
+            {
+                result += $"{Conditions[i].TagName} = {Conditions[i].Condition},";
+            }
+            result += $"{Conditions[Conditions.Length-1].TagName} = {Conditions[Conditions.Length-1].Condition},";
+
+            return result;
+        }
+
         public TextBlockTag[] Split()
         {
             var maxConditionLength = Conditions.Max(condition => condition.Length);
@@ -160,7 +217,6 @@ namespace ExcelToWordProject.Syllabus.Tags
                     conditions[j] = splittedConditions[j][splittedConditions[j].Length > 1 ? i : 0];
                 splittedBlockTags[i] = new TextBlockTag(
                     Key,
-                    ListName,
                     conditions,
                     Description
                 );
@@ -172,7 +228,7 @@ namespace ExcelToWordProject.Syllabus.Tags
         public static List<TextBlockTag> GetAllTextBlockTags()
         {
             var sqlExpression =
-                $"SELECT {DatabaseStrings.TextBlockConditionColumnName} FROM {DatabaseStrings.TextBlockTagTableName}";
+                $"SELECT `{DatabaseStrings.TextBlockIdColumnName}`, {DatabaseStrings.TextBlockConditionColumnName} FROM {DatabaseStrings.TextBlockTagTableName}";
 
             var result = new List<TextBlockTag>();
             using (var connection = new SqliteConnection(DatabaseStrings.ConnectionString))
@@ -184,8 +240,9 @@ namespace ExcelToWordProject.Syllabus.Tags
                     if (reader.HasRows) // если есть данные
                         while (reader.Read()) // построчно считываем данные
                         {
-                            var xml = reader.GetString(0);
-                            result.Add(FromXml(xml));
+                            var id = reader.GetInt32(0);
+                            var xml = reader.GetString(1);
+                            result.Add(FromXml(xml, id));
                         }
                 }
             }
@@ -239,7 +296,7 @@ namespace ExcelToWordProject.Syllabus.Tags
             using (var connection = new SqliteConnection(DatabaseStrings.ConnectionString))
             {
                 connection.Open();
-                var tempCondition = new TextBlockTag(tagKey, "", Array.Empty<TextBlockCondition>(), description);
+                var tempCondition = new TextBlockTag(tagKey, Array.Empty<TextBlockCondition>(), description);
                 var command = new SqliteCommand(sqlExpression, connection);
                 command.Parameters.Add(new SqliteParameter("@key", tagKey));
                 command.Parameters.Add(new SqliteParameter("@condition", tempCondition.ToXml()));
@@ -269,7 +326,7 @@ namespace ExcelToWordProject.Syllabus.Tags
         public string TagName { get; set; }
         public string Condition { get; set; }
 
-        public string Delimiter
+        public string Delimiter // TODO: remove
         {
             get => _delimiter;
             set => _delimiter = value != "" ? value : "\n";

@@ -9,6 +9,7 @@ namespace ExcelToWordProject.Syllabus
     internal enum SyllabusDatabaseErrorType
     {
         UniqueDefaultValueError,
+        DeleteError,
     }
 
     internal abstract class SyllabusException : Exception

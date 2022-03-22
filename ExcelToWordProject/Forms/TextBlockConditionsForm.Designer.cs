@@ -1,18 +1,17 @@
 ﻿using System;
 using System.Drawing;
 using System.Windows.Forms;
-
+using ExcelToWordProject.Syllabus.Tags;
 
 namespace ExcelToWordProject.Forms
 {
-    partial class TextBlocksForm
+    partial class TextBlockConditionsForm
     {
         private const int TextBlockPanelHeight = 64;
         private const int FormWidth = 400;
         private const int IconButtonsSize = 32;
         private readonly Bitmap _arrowIcon = Properties.Resources.right_arrow;
-        private readonly Bitmap _moreIcon = Properties.Resources.more;
-
+        private readonly Bitmap _removeIcon = Properties.Resources.remove;
         /// <summary>
         /// Required designer variable.
         /// </summary>
@@ -31,11 +30,10 @@ namespace ExcelToWordProject.Forms
             base.Dispose(disposing);
         }
 
-        private void InittializeCustomComponents()
+        private void InitializeCustomComponents()
         {
-            Width = FormWidth;
+            Text = _tagName;
             BuildTextBlockTagsLayout();
-
         }
 
         private void BuildTextBlockTagsLayout()
@@ -54,26 +52,26 @@ namespace ExcelToWordProject.Forms
                 Margin = new Padding(5, 5, 5, 5),
             };
 
-            foreach (var textBlockTag in _parameters.TextBlockTags.GroupedByKey())
+            foreach (var textBlockTag in _tags)
             {
-                tableLayoutPanel1.Controls.Add(GetTextBlockPanel(textBlockTag.Key));
+                tableLayoutPanel1.Controls.Add(GetTextBlockPanel(textBlockTag));
             }
 
             textBlocksWrapper.Controls.Add(tableLayoutPanel1);
         }
 
-        private Panel GetTextBlockPanel(string tagName)
+        private Panel GetTextBlockPanel(TextBlockTag tag)
         {
             // панель
             var panel = new TableLayoutPanel
             {
-                Tag = tagName,
+                Tag = tag,
                 ColumnCount = 3,
                 RowCount = 1,
                 Top = 0,
                 Left = 0,
-                Height = TextBlockPanelHeight,
                 Width = textBlocksWrapper.Width - 25,
+                MinimumSize = new Size(0,TextBlockPanelHeight),
                 Anchor = AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Top,
                 BorderStyle = BorderStyle.FixedSingle,
                 ColumnStyles =
@@ -84,41 +82,46 @@ namespace ExcelToWordProject.Forms
                 }
             };
 
-            // иконка доп. действий
-            var morePicture = new PictureBox
+            // иконка удаления
+            var removePicture = new PictureBox
             {
                 SizeMode = PictureBoxSizeMode.StretchImage,
                 Width = IconButtonsSize,
                 Height = IconButtonsSize,
-                Image = _moreIcon,
+                Image = _removeIcon,
                 Anchor = AnchorStyles.Left,
                 Cursor = Cursors.Hand
             };
-            panel.Controls.Add(morePicture);
+            removePicture.Click += (sender, args) => TagRemove_Click(sender);
+            panel.Controls.Add(removePicture);
 
-
+            // условия
+            string conditionsString = tag.ConditionsToGuiString();
+            var conditionsLabel = new Label
+            {
+                Text = conditionsString != "" ? conditionsString : "Значение по умолчанию",
+                AutoSize = true,
+            };
             var titlePanel = new TableLayoutPanel
             {
-                Height = 48,
-                Anchor = AnchorStyles.Right | AnchorStyles.Left,
+                Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right,
+                AutoSize = true,
+                MaximumSize = new Size(0, 96),
                 Controls =
                 {
                     new Label
                     {
-                        Anchor = AnchorStyles.Top | AnchorStyles.Bottom,
                         Font = new System.Drawing.Font(Font, FontStyle.Bold),
-                        Text = @"Имя тега:",
+                        Text = @"Условия:",
                     },
-                    new Label
-                    {
-                        Anchor = AnchorStyles.Top | AnchorStyles.Bottom,
-                        Text = tagName,
-                        AutoSize = true,
-                        AutoEllipsis = true,
-                    }
+                    conditionsLabel
                 }
             };
             panel.Controls.Add(titlePanel);
+            conditionsLabel.MaximumSize = new Size(conditionsLabel.Parent.Width, 0);
+            titlePanel.AutoScroll = true;
+            titlePanel.Resize += (sender, args) =>
+                conditionsLabel.MaximumSize = new Size(conditionsLabel.Parent.Width, 0);
 
 
 
@@ -131,13 +134,12 @@ namespace ExcelToWordProject.Forms
                 Anchor = AnchorStyles.Right,
                 Cursor = Cursors.Hand,
             };
-            arrowPicture.Click += (object sender, EventArgs args) => OnGoToConditionsButtonClick(tagName);
+            arrowPicture.Click += (object sender, EventArgs args) => TagEdit_Click(sender);
 
             panel.Controls.Add(arrowPicture);
             return panel;
         }
 
-        
 
         #region Windows Form Designer generated code
 
@@ -148,7 +150,7 @@ namespace ExcelToWordProject.Forms
         private void InitializeComponent()
         {
             this.textBlocksWrapper = new System.Windows.Forms.Panel();
-            this.addNewTagButton = new System.Windows.Forms.Button();
+            this.addNewConditionButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // textBlocksWrapper
@@ -159,40 +161,42 @@ namespace ExcelToWordProject.Forms
             this.textBlocksWrapper.AutoScroll = true;
             this.textBlocksWrapper.Location = new System.Drawing.Point(0, 0);
             this.textBlocksWrapper.Name = "textBlocksWrapper";
-            this.textBlocksWrapper.Size = new System.Drawing.Size(384, 562);
-            this.textBlocksWrapper.TabIndex = 1;
+            this.textBlocksWrapper.Size = new System.Drawing.Size(384, 563);
+            this.textBlocksWrapper.TabIndex = 2;
             // 
-            // addNewTagButton
+            // addNewConditionButton
             // 
-            this.addNewTagButton.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            this.addNewConditionButton.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.addNewTagButton.Location = new System.Drawing.Point(12, 571);
-            this.addNewTagButton.Name = "addNewTagButton";
-            this.addNewTagButton.Size = new System.Drawing.Size(360, 40);
-            this.addNewTagButton.TabIndex = 0;
-            this.addNewTagButton.Text = "Добавить новый тег";
-            this.addNewTagButton.UseVisualStyleBackColor = true;
-            this.addNewTagButton.Click += new System.EventHandler(this.addNewTagButton_Click);
+            this.addNewConditionButton.Location = new System.Drawing.Point(12, 571);
+            this.addNewConditionButton.Name = "addNewConditionButton";
+            this.addNewConditionButton.Size = new System.Drawing.Size(360, 40);
+            this.addNewConditionButton.TabIndex = 1;
+            this.addNewConditionButton.Text = "Добавить новое условие";
+            this.addNewConditionButton.UseVisualStyleBackColor = true;
+            this.addNewConditionButton.Click += new System.EventHandler(this.addNewConditionButton_Click);
             // 
-            // TextBlocksForm
+            // TextBlockConditionsForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 18F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(384, 620);
-            this.Controls.Add(this.addNewTagButton);
+            this.Controls.Add(this.addNewConditionButton);
             this.Controls.Add(this.textBlocksWrapper);
             this.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.Margin = new System.Windows.Forms.Padding(4);
-            this.Name = "TextBlocksForm";
+            this.Name = "TextBlockConditionsForm";
             this.ShowIcon = false;
-            this.Text = "Группы блоков текста";
-            this.Load += new System.EventHandler(this.TextBlocksForm_Load);
+            this.Text = "TextBlockConditionsForm";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.TextBlockConditionsForm_FormClosed);
+            this.Load += new System.EventHandler(this.TextBlockConditionsForm_Load);
             this.ResumeLayout(false);
 
         }
 
         #endregion
+
         private System.Windows.Forms.Panel textBlocksWrapper;
-        private Button addNewTagButton;
+        private System.Windows.Forms.Button addNewConditionButton;
     }
 }

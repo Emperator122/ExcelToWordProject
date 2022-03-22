@@ -146,6 +146,18 @@
     <Compile Include="Forms\RegularExpressionEditForm.Designer.cs">
       <DependentUpon>RegularExpressionEditForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\TextBlockAddForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\TextBlockAddForm.Designer.cs">
+      <DependentUpon>TextBlockAddForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\TextBlockConditionsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\TextBlockConditionsForm.Designer.cs">
+      <DependentUpon>TextBlockConditionsForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\TextBlocksForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -207,6 +219,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\RegularExpressionEditForm.resx">
       <DependentUpon>RegularExpressionEditForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\TextBlockAddForm.resx">
+      <DependentUpon>TextBlockAddForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\TextBlockConditionsForm.resx">
+      <DependentUpon>TextBlockConditionsForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\TextBlocksForm.resx">
       <DependentUpon>TextBlocksForm.cs</DependentUpon>

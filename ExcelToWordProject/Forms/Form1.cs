@@ -60,7 +60,6 @@ namespace ExcelToWordProject
 
             TextBlockTag textBlockTag = new TextBlockTag(
                 key: "DefaultTagForTest",
-                listName: "",
                 description: "lalalalala",
                 conditions: new TextBlockCondition[]
                 {
@@ -75,7 +74,6 @@ namespace ExcelToWordProject
 
             textBlockTag = new TextBlockTag(
                 key: "ContentMegaTag",
-                listName: "",
                 description: "lalalalala",
                 conditions: new TextBlockCondition[]
                 {
@@ -91,7 +89,6 @@ namespace ExcelToWordProject
 
             textBlockTag = new TextBlockTag(
                     key: "ContentMegaTag",
-                    listName: "",
                     description: "lalalalala",
                     conditions: new TextBlockCondition[]
                     {
@@ -106,7 +103,6 @@ namespace ExcelToWordProject
 
             textBlockTag = new TextBlockTag(
                     key: "ContentMegaTag",
-                    listName: "",
                     description: "lalalalala",
                     conditions: new TextBlockCondition[]
                     {
@@ -121,7 +117,6 @@ namespace ExcelToWordProject
 
             textBlockTag = new TextBlockTag(
                     key: "ContentMegaTag",
-                    listName: "",
                     description: "lalalalala",
                     conditions: new TextBlockCondition[]
                     {
@@ -136,7 +131,6 @@ namespace ExcelToWordProject
 
             textBlockTag = new TextBlockTag(
                     key: "ContentMegaTag",
-                    listName: "",
                     description: "lalalalala",
                     conditions: new TextBlockCondition[]
                     {
@@ -152,7 +146,6 @@ namespace ExcelToWordProject
             // для теста
             textBlockTag = new TextBlockTag(
                     key: "RuLangTag",
-                    listName: "",
                     description: "lalalalala",
                     conditions: new TextBlockCondition[]
                     {
@@ -167,7 +160,6 @@ namespace ExcelToWordProject
 
             textBlockTag = new TextBlockTag(
                     key: "BlockNameTag",
-                    listName: "",
                     description: "BlockNameTag",
                     conditions: new TextBlockCondition[]
                     {
@@ -182,7 +174,6 @@ namespace ExcelToWordProject
 
             textBlockTag = new TextBlockTag(
                     key: "BlockNameRuTag",
-                    listName: "",
                     description: "BlockNameTag",
                     conditions: new TextBlockCondition[]
                     {
