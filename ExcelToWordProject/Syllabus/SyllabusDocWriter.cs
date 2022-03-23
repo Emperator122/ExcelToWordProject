@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using ExcelToWordProject.Models;
 using ExcelToWordProject.Syllabus.Tags;
 using ExcelToWordProject.Utils;
@@ -132,8 +133,12 @@ namespace ExcelToWordProject.Syllabus
             // обработка таблиц
             TablesHandler(doc, module, contentList);
 
+            //
+            FillTextBlocksParagraphs(doc, module, contentList);
+
             // обработка TextBlock
             TextBlocksHandler(doc, module, contentList);
+            
 
             // бежим по списку тегов
             foreach (var tag in Parameters.Tags)
@@ -169,6 +174,7 @@ namespace ExcelToWordProject.Syllabus
                 return;
 
             _tablesTags = new Dictionary<int, List<BaseSyllabusTag>>();
+            _tablesTextBlockTags = new Dictionary<int, List<TextBlockTag>>();
             for (var i = 0; i < doc.Tables.Count; i++)
             {
                 var table = doc.Tables[i];
@@ -189,7 +195,6 @@ namespace ExcelToWordProject.Syllabus
                     _tablesTags[i] = tags;
 
                 // найдем TextBlock теги
-                _tablesTextBlockTags = new Dictionary<int, List<TextBlockTag>>();
                 var textBlockTagsFilteredGroup =
                     Parameters
                         .TextBlockTags
@@ -373,6 +378,7 @@ namespace ExcelToWordProject.Syllabus
             try
             {
                 // расставим знаки препинания
+                //TODO: только для компетенций
                 if (lines.Length > 0)
                 {
                     for (var i = 0; i < lines.Length - 1; i++)
@@ -395,6 +401,76 @@ namespace ExcelToWordProject.Syllabus
 
                         paragraph.Remove(false);
                     }
+            }
+            catch
+            {
+                Console.WriteLine(@"Ошибка при заполнении параграфа");
+            }
+        }
+
+        protected void FillTextBlocksParagraphs(DocX doc, Module module = null, List<Content> contentList = null)
+        {
+            var paragraphRegex = new Regex("^<(.*)>$");
+            try
+            {
+                foreach (var paragraph in doc.Paragraphs)
+                {
+                    var match = paragraphRegex.Match(paragraph.Text.Trim());
+                    if (match.Success && match.Groups.Count > 1)
+                    {
+                        var tagKey = paragraphRegex.Match(paragraph.Text.Trim()).Groups[1].Value;
+                        var tagsGroup = 
+                            Parameters
+                                .TextBlockTags
+                                .GroupedByKey()
+                                .FirstOrDefault(group => 
+                                    group.Key == tagKey);
+
+                        if (!tagsGroup?.FirstOrDefault()?.Active ?? true) continue; // если нет активных тегов в группе
+
+                        var isValid = false;
+                        TextBlockTag outTextBlockTag = null;
+                        foreach (var textBlockTag in tagsGroup)
+                        {
+                            outTextBlockTag = textBlockTag;
+                            if (textBlockTag.IsDefault || string.IsNullOrEmpty(textBlockTag.Delimiter)) continue;
+                            isValid = textBlockTag.CheckConditions(Parameters.Tags, module, contentList,
+                                SyllabusExcelReader.ExcelData);
+                            if (isValid) break;
+                        }
+
+                        if (outTextBlockTag == null)
+                            continue;
+
+                        string[] lines = null;
+                        if (isValid)
+                        {
+                            lines = outTextBlockTag.GetValue2(module, contentList, SyllabusExcelReader.ExcelData)
+                                ?.Split(new []{ outTextBlockTag.Delimiter }, StringSplitOptions.None);
+                        }
+                        else
+                        {
+                            var defaultTag = TextBlockTag.GetDefaultTag(tagKey);
+                            if (string.IsNullOrEmpty(defaultTag.Delimiter)) continue;
+                            lines = defaultTag.DefaultValue
+                                ?.Split(new[] { outTextBlockTag.Delimiter }, StringSplitOptions.None);
+                        }
+
+                        if (lines == null) continue;
+
+
+                        var p = paragraph.InsertParagraphAfterSelf(paragraph);
+                        for (var i = 0; i < lines.Length; i++)
+                        {
+                            p.ReplaceText(outTextBlockTag.Tag, lines[i]);
+                            if (i != lines.Length - 1)
+                                p = p.InsertParagraphAfterSelf(paragraph);
+                        }
+
+                        paragraph.Remove(false);
+                    }
+                }
+            
             }
             catch
             {

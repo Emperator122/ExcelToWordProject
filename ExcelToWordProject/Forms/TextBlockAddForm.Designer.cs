@@ -34,17 +34,20 @@
             this.tagValueTextBox = new System.Windows.Forms.TextBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.conditionsGridView = new System.Windows.Forms.DataGridView();
-            this.button1 = new System.Windows.Forms.Button();
-            this.groupBox4 = new System.Windows.Forms.GroupBox();
-            this.priorityTextBox = new System.Windows.Forms.TextBox();
             this.TagNameColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.TagValueColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.TagDelimiterColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.button1 = new System.Windows.Forms.Button();
+            this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.priorityTextBox = new System.Windows.Forms.TextBox();
+            this.groupBox5 = new System.Windows.Forms.GroupBox();
+            this.delimiterTextBox = new System.Windows.Forms.TextBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.conditionsGridView)).BeginInit();
             this.groupBox4.SuspendLayout();
+            this.groupBox5.SuspendLayout();
             this.SuspendLayout();
             // 
             // tagKeyTextBox
@@ -55,7 +58,7 @@
             this.tagKeyTextBox.Location = new System.Drawing.Point(9, 24);
             this.tagKeyTextBox.Margin = new System.Windows.Forms.Padding(4);
             this.tagKeyTextBox.Name = "tagKeyTextBox";
-            this.tagKeyTextBox.Size = new System.Drawing.Size(462, 26);
+            this.tagKeyTextBox.Size = new System.Drawing.Size(335, 26);
             this.tagKeyTextBox.TabIndex = 0;
             // 
             // groupBox1
@@ -67,7 +70,7 @@
             this.groupBox1.Margin = new System.Windows.Forms.Padding(4);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Padding = new System.Windows.Forms.Padding(4);
-            this.groupBox1.Size = new System.Drawing.Size(482, 69);
+            this.groupBox1.Size = new System.Drawing.Size(355, 69);
             this.groupBox1.TabIndex = 2;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Ключ";
@@ -130,6 +133,27 @@
             this.conditionsGridView.Size = new System.Drawing.Size(589, 274);
             this.conditionsGridView.TabIndex = 1;
             // 
+            // TagNameColumn
+            // 
+            this.TagNameColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.TagNameColumn.FillWeight = 40F;
+            this.TagNameColumn.HeaderText = "Имя тега";
+            this.TagNameColumn.Name = "TagNameColumn";
+            // 
+            // TagValueColumn
+            // 
+            this.TagValueColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.TagValueColumn.FillWeight = 40F;
+            this.TagValueColumn.HeaderText = "Значение";
+            this.TagValueColumn.Name = "TagValueColumn";
+            // 
+            // TagDelimiterColumn
+            // 
+            this.TagDelimiterColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.TagDelimiterColumn.FillWeight = 20F;
+            this.TagDelimiterColumn.HeaderText = "Разделитель";
+            this.TagDelimiterColumn.Name = "TagDelimiterColumn";
+            // 
             // button1
             // 
             this.button1.Location = new System.Drawing.Point(13, 704);
@@ -165,32 +189,37 @@
             this.priorityTextBox.Size = new System.Drawing.Size(99, 26);
             this.priorityTextBox.TabIndex = 0;
             // 
-            // TagNameColumn
+            // groupBox5
             // 
-            this.TagNameColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.TagNameColumn.FillWeight = 40F;
-            this.TagNameColumn.HeaderText = "Имя тега";
-            this.TagNameColumn.Name = "TagNameColumn";
+            this.groupBox5.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox5.Controls.Add(this.delimiterTextBox);
+            this.groupBox5.Location = new System.Drawing.Point(376, 13);
+            this.groupBox5.Margin = new System.Windows.Forms.Padding(4);
+            this.groupBox5.Name = "groupBox5";
+            this.groupBox5.Padding = new System.Windows.Forms.Padding(4);
+            this.groupBox5.Size = new System.Drawing.Size(119, 69);
+            this.groupBox5.TabIndex = 4;
+            this.groupBox5.TabStop = false;
+            this.groupBox5.Text = "Разделитель";
             // 
-            // TagValueColumn
+            // delimiterTextBox
             // 
-            this.TagValueColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.TagValueColumn.FillWeight = 40F;
-            this.TagValueColumn.HeaderText = "Значение";
-            this.TagValueColumn.Name = "TagValueColumn";
-            // 
-            // TagDelimiterColumn
-            // 
-            this.TagDelimiterColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.TagDelimiterColumn.FillWeight = 20F;
-            this.TagDelimiterColumn.HeaderText = "Разделитель";
-            this.TagDelimiterColumn.Name = "TagDelimiterColumn";
+            this.delimiterTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.delimiterTextBox.Location = new System.Drawing.Point(9, 24);
+            this.delimiterTextBox.Margin = new System.Windows.Forms.Padding(4);
+            this.delimiterTextBox.Name = "delimiterTextBox";
+            this.delimiterTextBox.Size = new System.Drawing.Size(99, 26);
+            this.delimiterTextBox.TabIndex = 0;
             // 
             // TextBlockAddForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 18F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(635, 756);
+            this.Controls.Add(this.groupBox5);
             this.Controls.Add(this.groupBox4);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.groupBox3);
@@ -209,6 +238,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.conditionsGridView)).EndInit();
             this.groupBox4.ResumeLayout(false);
             this.groupBox4.PerformLayout();
+            this.groupBox5.ResumeLayout(false);
+            this.groupBox5.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -227,5 +258,7 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn TagNameColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn TagValueColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn TagDelimiterColumn;
+        private System.Windows.Forms.GroupBox groupBox5;
+        private System.Windows.Forms.TextBox delimiterTextBox;
     }
 }

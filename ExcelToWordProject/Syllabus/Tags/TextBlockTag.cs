@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Xml.Serialization;
 using ExcelToWordProject.Models;
+using ExcelToWordProject.Utils;
 using Microsoft.Data.Sqlite;
 
 namespace ExcelToWordProject.Syllabus.Tags
@@ -17,8 +18,9 @@ namespace ExcelToWordProject.Syllabus.Tags
         /// Изменение вне работы с БД не предусмотрено.
         /// </summary>
         [XmlIgnore]
-        private int Id { get; set; }/// <summary>
-        
+        private int Id { get; set; }
+
+        /// <summary>
         /// Используется для получения приоритета из БД.
         /// Изменение вне работы с БД не предусмотрено.
         /// </summary>
@@ -42,6 +44,15 @@ namespace ExcelToWordProject.Syllabus.Tags
         public TextBlockCondition[] Conditions { get => _conditions; set => _conditions = value.OrderBy(condition => condition.TagName).ToArray(); }
         private TextBlockCondition[] _conditions;
 
+        public string EscapedDelimiter
+        {
+            get => OtherUtils.EscapeString(_delimiter);
+            set => _delimiter = OtherUtils.RestoreEscapedString(value);
+        }
+
+        public string Delimiter => _delimiter;
+
+        private string _delimiter;
 
         public bool CanBeDefault => Conditions.Length == 0;
 
@@ -54,12 +65,14 @@ namespace ExcelToWordProject.Syllabus.Tags
             Conditions = conditions;
             Id = -1;
             IsDefault = false;
+            _delimiter = null;
         }
         
         public TextBlockTag() // для сериализации
         {
             Id = -1;
             IsDefault = false;
+            _delimiter = null;
         }
         
         public override string GetValue(Module module = null, List<Content> contentList = null,
@@ -368,6 +381,32 @@ namespace ExcelToWordProject.Syllabus.Tags
             return result;
         }
 
+        public static TextBlockTag GetDefaultTag(string tagKey)
+        {
+            var sqlExpression = 
+                $"SELECT `{DatabaseStrings.TextBlockIdColumnName}`, {DatabaseStrings.TextBlockConditionColumnName}, " +
+                $"{DatabaseStrings.TextBlockIsDefaultColumnName}, {DatabaseStrings.TextBlockPriorityColumnName} " +
+                $"FROM {DatabaseStrings.TextBlockTagTableName} " +
+                $"WHERE {DatabaseStrings.TextBlockKeyColumnName} = \'{tagKey}\' "
+                + $"AND {DatabaseStrings.TextBlockIsDefaultColumnName} = 1";
+
+            using (var connection = new SqliteConnection(DatabaseStrings.ConnectionString))
+            {
+                connection.Open();
+                var command = new SqliteCommand(sqlExpression, connection);
+                using (var reader = command.ExecuteReader())
+                {
+                    if (!reader.HasRows || !reader.Read()) return null;
+                    // построчно считываем данные
+                    var id = reader.GetInt32(0);
+                    var xml = reader.GetString(1);
+                    var isDefault = reader.GetBoolean(2);
+                    var priority = reader.GetInt32(3);
+                    return FromDatabaseData(xml, id, isDefault, priority);
+                }
+            }
+        }
+
         public static string GetDefaultValue(string tagKey)
         {
             var sqlExpression =
@@ -440,7 +479,24 @@ namespace ExcelToWordProject.Syllabus.Tags
 
     public class TextBlockCondition
     {
+        public string EscapedDelimiter
+        {
+            get => OtherUtils.EscapeString(_delimiter);
+            set => _delimiter = OtherUtils.RestoreEscapedString(value);
+        }
+
+        public string Delimiter => _delimiter;
+
         private string _delimiter;
+
+        public string TagName { get; set; }
+        public string Condition { get; set; }
+
+        public int Length => Subconditions.Length;
+
+        public string[] Subconditions => EscapedDelimiter == null
+            ? new[] { Condition }
+            : Condition.Split(new[] { Delimiter }, StringSplitOptions.None);
 
         public TextBlockCondition(string tagName, string condition, string escapedDelimiter = null)
         {
@@ -452,23 +508,6 @@ namespace ExcelToWordProject.Syllabus.Tags
         public TextBlockCondition()
         {
         } // для сериализации
-
-        public string TagName { get; set; }
-        public string Condition { get; set; }
-
-        public string EscapedDelimiter
-        {
-            get => _delimiter?.Replace("\n", "\\n");
-            set => _delimiter = value?.Replace("\\n", "\n");
-        }
-
-        public string Delimiter => _delimiter;
-
-        public int Length => Subconditions.Length;
-
-        public string[] Subconditions => EscapedDelimiter == null
-            ? new[] {Condition}
-            : Condition.Split(new[] {Delimiter}, StringSplitOptions.None);
 
         public TextBlockCondition[] Split()
         {

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Remoting.Messaging;
 
 namespace ExcelToWordProject.Utils
 {
@@ -38,6 +39,32 @@ namespace ExcelToWordProject.Utils
             {
                 result += (i == list.Count() - 1) ? list[i] + endDelimiter : list[i] + delimiter;
             }
+            return result;
+        }
+
+        private static readonly string[][] EscapePattern =
+        {
+                new []{"\n", "\\n"},
+                new []{"\r", "\\r"},
+                new []{"\t", "\\t"},
+        };
+        public static string EscapeString(string str)
+        {
+            if (str == null)
+                return null;
+            var result = str;
+            foreach (var pattern in EscapePattern)
+                result = result.Replace(pattern[0], pattern[1]);
+            return result;
+        }
+
+        public static string RestoreEscapedString(string str)
+        {
+            if (str == null)
+                return null;
+            var result = str;
+            foreach (var pattern in EscapePattern)
+                result = result.Replace(pattern[1], pattern[0]);
             return result;
         }
     }

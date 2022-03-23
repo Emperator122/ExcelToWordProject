@@ -41,11 +41,14 @@ namespace ExcelToWordProject.Forms
             }
 
             priorityTextBox.Text = _tag.Priority.ToString();
+
+            delimiterTextBox.Text = _tag.EscapedDelimiter;
         }
 
         private void SaveTag()
         {
             // сборка параметров тега
+            _tag.EscapedDelimiter = delimiterTextBox.Text;
             _tag.Key = tagKeyTextBox.Text;
             var conditions = new List<TextBlockCondition>();
             foreach (DataGridViewRow row in conditionsGridView.Rows)
@@ -60,8 +63,7 @@ namespace ExcelToWordProject.Forms
             }
             _tag.Conditions = conditions.ToArray();
 
-            var priority = 0;
-            int.TryParse(priorityTextBox.Text, out priority);
+            int.TryParse(priorityTextBox.Text, out var priority);
 
             // запись в бд
             if (!_tag.CanStoreInDataBase) // контроль уникальности

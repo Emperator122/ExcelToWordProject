@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text.RegularExpressions;
+using ExcelToWordProject;
+using ExcelToWordProject.Syllabus;
 
 namespace ExcelToWordProject.Syllabus
 {
@@ -219,6 +221,7 @@ internal static class SyllabusExtensions
     public static IEnumerable<IGrouping<string, TextBlockTag>> GroupedByKey(this IEnumerable<TextBlockTag> tags) 
         => tags
             .GroupBy(tag => tag.Key);
+    
     public static IOrderedEnumerable<TextBlockTag> OrderedByPriority(this IEnumerable<TextBlockTag> tags)
         => tags
             .OrderByDescending(tag => tag.Priority);
