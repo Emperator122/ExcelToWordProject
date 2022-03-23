@@ -12,6 +12,7 @@
         public static readonly string TextBlockValueColumnName = "value";
         public static readonly string TextBlockIsDefaultColumnName = "is_default";
         public static readonly string TextBlockIdColumnName = "index";
+        public static readonly string TextBlockPriorityColumnName = "priority";
 
     }
 }

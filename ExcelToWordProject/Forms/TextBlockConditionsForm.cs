@@ -27,11 +27,11 @@ namespace ExcelToWordProject.Forms
         private void FetchTags()
         {
             _tags = _parameters.TextBlockTags
+                .OrderedByPriority()
                 .Where(tag => tag.Key == _tagName)
-                .OrderBy(tag => tag.Conditions.Length)
                 .ToList();
 
-            if (_tags.First()?.Conditions.Length > 0)
+            if (!_tags.First().HasDefaultValue)
             {
                 // TODO: реализовать обработку отсутствия дефолтного значения
             }

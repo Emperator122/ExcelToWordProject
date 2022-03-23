@@ -105,7 +105,6 @@ namespace ExcelToWordProject.Forms
             var titlePanel = new TableLayoutPanel
             {
                 Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right,
-                AutoSize = true,
                 MaximumSize = new Size(0, 96),
                 Controls =
                 {
@@ -114,14 +113,24 @@ namespace ExcelToWordProject.Forms
                         Font = new System.Drawing.Font(Font, FontStyle.Bold),
                         Text = @"Условия:",
                     },
-                    conditionsLabel
+                    conditionsLabel,
+                    new Panel
+                    {
+                        Height = 10,
+                    },
+                    new Label
+                    {
+                        AutoSize = true,
+                        ForeColor = Color.DarkGray,
+                        Text = $"Приоритет: {tag.Priority}",
+                    },
                 }
             };
             panel.Controls.Add(titlePanel);
             conditionsLabel.MaximumSize = new Size(conditionsLabel.Parent.Width, 0);
-            titlePanel.AutoScroll = true;
             titlePanel.Resize += (sender, args) =>
                 conditionsLabel.MaximumSize = new Size(conditionsLabel.Parent.Width, 0);
+            titlePanel.AutoScroll = true;
 
 
 

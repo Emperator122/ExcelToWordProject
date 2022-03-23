@@ -17,7 +17,20 @@ namespace ExcelToWordProject.Syllabus.Tags
         /// Изменение вне работы с БД не предусмотрено.
         /// </summary>
         [XmlIgnore]
-        private int Id { get; set; }
+        private int Id { get; set; }/// <summary>
+        
+        /// Используется для получения приоритета из БД.
+        /// Изменение вне работы с БД не предусмотрено.
+        /// </summary>
+        [XmlIgnore]
+        public int Priority { get; set; }
+
+        /// <summary>
+        /// Используется для получения IsDefault из БД.
+        /// Изменение вне работы с БД не предусмотрено.
+        /// </summary>
+        [XmlIgnore]
+        public bool IsDefault { get; set; }
 
         public bool HasId => Id != -1;
 
@@ -29,12 +42,6 @@ namespace ExcelToWordProject.Syllabus.Tags
         public TextBlockCondition[] Conditions { get => _conditions; set => _conditions = value.OrderBy(condition => condition.TagName).ToArray(); }
         private TextBlockCondition[] _conditions;
 
-        /// <summary>
-        /// Используется для получения IsDefault из БД.
-        /// Изменение вне работы с БД не предусмотрено.
-        /// </summary>
-        [XmlIgnore]
-        public bool IsDefault { get; set; }
 
         public bool CanBeDefault => Conditions.Length == 0;
 
@@ -90,22 +97,22 @@ namespace ExcelToWordProject.Syllabus.Tags
             return result;
         }
 
-        public void SaveToDatabase(string value)
+        public void SaveToDatabase(string value, int priority = 0)
         {
             if (Id == -1)
-                CreateInDatabase(value);
+                CreateInDatabase(value, priority);
             else
-                EditInDatabase(value);
+                EditInDatabase(value, priority);
 
         }
 
-        private void CreateInDatabase(string value)
+        private void CreateInDatabase(string value, int priority = 0)
         {
             var sqlExpression =
                     $"INSERT INTO {DatabaseStrings.TextBlockTagTableName} " +
                     $"({DatabaseStrings.TextBlockKeyColumnName}, {DatabaseStrings.TextBlockConditionColumnName}, " +
-                    $"{DatabaseStrings.TextBlockValueColumnName}) "
-                    + "VALUES (@key, @condition, @value)";
+                    $"{DatabaseStrings.TextBlockValueColumnName}, {DatabaseStrings.TextBlockPriorityColumnName}) "
+                    + "VALUES (@key, @condition, @value, @priority)";
 
             var rowIdSqlExpression = "SELECT last_insert_rowid() as id";
             using (var connection = new SqliteConnection(DatabaseStrings.ConnectionString))
@@ -115,6 +122,7 @@ namespace ExcelToWordProject.Syllabus.Tags
                 command.Parameters.Add(new SqliteParameter("@key", Key));
                 command.Parameters.Add(new SqliteParameter("@condition", ToXml()));
                 command.Parameters.Add(new SqliteParameter("@value", value));
+                command.Parameters.Add(new SqliteParameter("@priority", priority));
                 command.ExecuteNonQuery();
 
                 var rowIdCommand = new SqliteCommand(rowIdSqlExpression, connection);
@@ -122,7 +130,7 @@ namespace ExcelToWordProject.Syllabus.Tags
             }
         }
 
-        private void EditInDatabase(string value)
+        private void EditInDatabase(string value, int priority = 0)
         {
             if (!HasId)
             {
@@ -134,7 +142,8 @@ namespace ExcelToWordProject.Syllabus.Tags
                 $"UPDATE {DatabaseStrings.TextBlockTagTableName} " +
                 $"SET {DatabaseStrings.TextBlockKeyColumnName} = @key, " +
                 $"{DatabaseStrings.TextBlockConditionColumnName} = @condition, " +
-                $"{DatabaseStrings.TextBlockValueColumnName} = @value " +
+                $"{DatabaseStrings.TextBlockValueColumnName} = @value, " +
+                $"{DatabaseStrings.TextBlockPriorityColumnName} = @priority " +
                 $"WHERE `{DatabaseStrings.TextBlockIdColumnName}` = @index";
             using (var connection = new SqliteConnection(DatabaseStrings.ConnectionString))
             {
@@ -144,6 +153,7 @@ namespace ExcelToWordProject.Syllabus.Tags
                 command.Parameters.Add(new SqliteParameter("@condition", ToXml()));
                 command.Parameters.Add(new SqliteParameter("@value", value));
                 command.Parameters.Add(new SqliteParameter("@index", Id));
+                command.Parameters.Add(new SqliteParameter("@priority", priority));
                 command.ExecuteNonQuery();
             }
         }
@@ -179,7 +189,7 @@ namespace ExcelToWordProject.Syllabus.Tags
 
             var sqlExpression =
                 $"SELECT {DatabaseStrings.TextBlockIsDefaultColumnName}, " +
-                $"{DatabaseStrings.TextBlockConditionColumnName} " +
+                $"{DatabaseStrings.TextBlockConditionColumnName}, {DatabaseStrings.TextBlockPriorityColumnName} " +
                 $"FROM {DatabaseStrings.TextBlockTagTableName} "
                 + $"WHERE `{DatabaseStrings.TextBlockIdColumnName}` = @index";
 
@@ -195,9 +205,10 @@ namespace ExcelToWordProject.Syllabus.Tags
                         if (!reader.Read()) return;
                         var isDefault = reader.GetBoolean(0);
                         var xml = reader.GetString(1);
+                        var priority = reader.GetInt32(2);
                             
                         // Мб надо что-то еще добавить...
-                        var tag = FromDatabaseData(xml, Id, isDefault);
+                        var tag = FromDatabaseData(xml, Id, isDefault, priority);
                         IsDefault = tag.IsDefault;
                         Conditions = tag.Conditions;
                         Key = tag.Key;
@@ -246,7 +257,7 @@ namespace ExcelToWordProject.Syllabus.Tags
             }
         }
 
-        public static TextBlockTag FromDatabaseData(string xml, int id = -1, bool isDefault = false)
+        public static TextBlockTag FromDatabaseData(string xml, int id = -1, bool isDefault = false, int priority = 0)
         {
             var serializer = new XmlSerializer(typeof(TextBlockTag));
             using (TextReader reader = new StringReader(xml))
@@ -254,6 +265,7 @@ namespace ExcelToWordProject.Syllabus.Tags
                 var tag = (TextBlockTag) serializer.Deserialize(reader);
                 tag.Id = id;
                 tag.IsDefault = isDefault;
+                tag.Priority = priority;
                 return tag;
             }
         }
@@ -331,7 +343,7 @@ namespace ExcelToWordProject.Syllabus.Tags
         {
             var sqlExpression =
                 $"SELECT `{DatabaseStrings.TextBlockIdColumnName}`, {DatabaseStrings.TextBlockConditionColumnName}, " +
-                $"{DatabaseStrings.TextBlockIsDefaultColumnName} " +
+                $"{DatabaseStrings.TextBlockIsDefaultColumnName}, {DatabaseStrings.TextBlockPriorityColumnName} " +
                 $"FROM {DatabaseStrings.TextBlockTagTableName}";
 
             var result = new List<TextBlockTag>();
@@ -347,7 +359,8 @@ namespace ExcelToWordProject.Syllabus.Tags
                             var id = reader.GetInt32(0);
                             var xml = reader.GetString(1);
                             var isDefault = reader.GetBoolean(2);
-                            result.Add(FromDatabaseData(xml, id, isDefault));
+                            var priority = reader.GetInt32(3);
+                            result.Add(FromDatabaseData(xml, id, isDefault, priority));
                         }
                 }
             }

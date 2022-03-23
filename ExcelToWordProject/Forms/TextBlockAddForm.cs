@@ -40,6 +40,7 @@ namespace ExcelToWordProject.Forms
                 conditionsGridView.Rows.Add(condition.TagName, condition.Condition, condition.EscapedDelimiter);
             }
 
+            priorityTextBox.Text = _tag.Priority.ToString();
         }
 
         private void SaveTag()
@@ -59,6 +60,9 @@ namespace ExcelToWordProject.Forms
             }
             _tag.Conditions = conditions.ToArray();
 
+            var priority = 0;
+            int.TryParse(priorityTextBox.Text, out priority);
+
             // запись в бд
             if (!_tag.CanStoreInDataBase) // контроль уникальности
             {
@@ -67,7 +71,7 @@ namespace ExcelToWordProject.Forms
                 
             }
 
-            _tag.SaveToDatabase(tagValueTextBox.Text); // в любом случае сохраняем тег в бд
+            _tag.SaveToDatabase(tagValueTextBox.Text, priority); // в любом случае сохраняем тег в бд
 
             // контроль дефолтности
             if (_tag.IsDefault && !_tag.CanBeDefault)
