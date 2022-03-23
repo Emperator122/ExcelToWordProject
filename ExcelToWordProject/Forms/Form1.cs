@@ -15,6 +15,7 @@ namespace ExcelToWordProject
         DefaultTagSettingsForm DefaultTagSettingsForm;
         SmartTagSettingsForm SmartTagSettingsForm;
         TagListForm TagListForm;
+        TextBlocksForm TextBlocksForm;
         AboutProgramForm aboutProgramForm;
         GetDataParametersForm getDataParametersForm;
 
@@ -59,7 +60,6 @@ namespace ExcelToWordProject
 
             TextBlockTag textBlockTag = new TextBlockTag(
                 key: "DefaultTagForTest",
-                listName: "",
                 description: "lalalalala",
                 conditions: new TextBlockCondition[]
                 {
@@ -74,14 +74,13 @@ namespace ExcelToWordProject
 
             textBlockTag = new TextBlockTag(
                 key: "ContentMegaTag",
-                listName: "",
                 description: "lalalalala",
                 conditions: new TextBlockCondition[]
                 {
                     new TextBlockCondition(
                             tagName: "ContentIndex",
                             condition: $"УК-1",
-                            delimiter: "\n"
+                            escapedDelimiter: "\n"
                         ),
                 }
             );
@@ -90,14 +89,13 @@ namespace ExcelToWordProject
 
             textBlockTag = new TextBlockTag(
                     key: "ContentMegaTag",
-                    listName: "",
                     description: "lalalalala",
                     conditions: new TextBlockCondition[]
                     {
                         new TextBlockCondition(
                                 tagName: "ContentIndex",
                                 condition: $"УК-2",
-                                delimiter: "\n"
+                                escapedDelimiter: "\n"
                             ),
                     }
                 );
@@ -105,14 +103,13 @@ namespace ExcelToWordProject
 
             textBlockTag = new TextBlockTag(
                     key: "ContentMegaTag",
-                    listName: "",
                     description: "lalalalala",
                     conditions: new TextBlockCondition[]
                     {
                         new TextBlockCondition(
                                 tagName: "ContentIndex",
                                 condition: $"УК-4",
-                                delimiter: "\n"
+                                escapedDelimiter: "\n"
                             ),
                     }
                 );
@@ -120,14 +117,13 @@ namespace ExcelToWordProject
 
             textBlockTag = new TextBlockTag(
                     key: "ContentMegaTag",
-                    listName: "",
                     description: "lalalalala",
                     conditions: new TextBlockCondition[]
                     {
                         new TextBlockCondition(
                                 tagName: "ContentIndex",
                                 condition: $"ОПК-1",
-                                delimiter: "\n"
+                                escapedDelimiter: "\n"
                             ),
                     }
                 );
@@ -135,14 +131,13 @@ namespace ExcelToWordProject
 
             textBlockTag = new TextBlockTag(
                     key: "ContentMegaTag",
-                    listName: "",
                     description: "lalalalala",
                     conditions: new TextBlockCondition[]
                     {
                         new TextBlockCondition(
                                 tagName: "ContentIndex",
                                 condition: $"ПК-1",
-                                delimiter: "\n"
+                                escapedDelimiter: "\n"
                             ),
                     }
                 );
@@ -151,7 +146,6 @@ namespace ExcelToWordProject
             // для теста
             textBlockTag = new TextBlockTag(
                     key: "RuLangTag",
-                    listName: "",
                     description: "lalalalala",
                     conditions: new TextBlockCondition[]
                     {
@@ -166,7 +160,6 @@ namespace ExcelToWordProject
 
             textBlockTag = new TextBlockTag(
                     key: "BlockNameTag",
-                    listName: "",
                     description: "BlockNameTag",
                     conditions: new TextBlockCondition[]
                     {
@@ -181,7 +174,6 @@ namespace ExcelToWordProject
 
             textBlockTag = new TextBlockTag(
                     key: "BlockNameRuTag",
-                    listName: "",
                     description: "BlockNameTag",
                     conditions: new TextBlockCondition[]
                     {
@@ -439,6 +431,17 @@ namespace ExcelToWordProject
             }
             else
                 getDataParametersForm.Focus();
+        }
+
+        private void блокиТекстаToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (TextBlocksForm == null || TextBlocksForm.IsDisposed)
+            {
+                TextBlocksForm = new TextBlocksForm(syllabusParameters);
+                TextBlocksForm.Show();
+            }
+            else
+                TextBlocksForm.Focus();
         }
     }
 }

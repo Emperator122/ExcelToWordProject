@@ -211,11 +211,17 @@ namespace ExcelToWordProject.Syllabus
     }
 }
 
-static class SyllabusExtensions
+internal static class SyllabusExtensions
 {
-    public static IEnumerable<IGrouping<string, TextBlockTag>> GroupedByKey(this IEnumerable<TextBlockTag> tags) 
+    public static IEnumerable<IGrouping<string, TextBlockTag>> GroupedByXml(this IEnumerable<TextBlockTag> tags) 
         => tags
             .GroupBy(tag => tag.ToXml());
+    public static IEnumerable<IGrouping<string, TextBlockTag>> GroupedByKey(this IEnumerable<TextBlockTag> tags) 
+        => tags
+            .GroupBy(tag => tag.Key);
+    public static IOrderedEnumerable<TextBlockTag> OrderedByPriority(this IEnumerable<TextBlockTag> tags)
+        => tags
+            .OrderByDescending(tag => tag.Priority);
     public static bool HasActiveSmartTags(this IEnumerable<BaseSyllabusTag> tags) => 
         tags.FirstOrDefault(el => el is SmartSyllabusTag && el.Active) != null;
 }

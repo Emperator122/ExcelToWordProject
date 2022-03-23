@@ -193,6 +193,7 @@ namespace ExcelToWordProject.Syllabus
                 var textBlockTagsFilteredGroup =
                     Parameters
                         .TextBlockTags
+                        .OrderedByPriority()
                         .GroupedByKey()
                         .Where(
                             group =>
@@ -245,7 +246,7 @@ namespace ExcelToWordProject.Syllabus
                 }
 
                 // Сгруппируем TextBlock теги по ключу
-                var textBlockTagsGroup = textBlockTags.GroupBy(tag => tag.Key).ToList();
+                var textBlockTagsGroup = textBlockTags.OrderedByPriority().GroupedByKey().ToList();
 
                 // Массив значений тегов, оставим доп место для TextBlock тегов
                 var tagsValues = new string[tags.Count + textBlockTagsGroup.Count][];
@@ -403,11 +404,11 @@ namespace ExcelToWordProject.Syllabus
 
         protected void TextBlocksHandler(DocX doc, Module module = null, List<Content> contentList = null)
         {
-            var textBlockTagsGroups = Parameters.TextBlockTags.GroupedByKey();
+            var textBlockTagsGroups = Parameters.TextBlockTags.OrderedByPriority().GroupedByKey();
 
             foreach (var textBlockTagsGroup in textBlockTagsGroups)
             {
-                if (!textBlockTagsGroup.FirstOrDefault()?.Active ?? true) continue;
+                if (!textBlockTagsGroup.FirstOrDefault()?.Active ?? true) continue; // если нет активных тегов в группе
                 var isValid = false;
                 TextBlockTag outTextBlockTag = null;
                 foreach (var textBlockTag in textBlockTagsGroup)
