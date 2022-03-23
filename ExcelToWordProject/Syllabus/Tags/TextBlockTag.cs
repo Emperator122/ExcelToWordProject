@@ -429,11 +429,11 @@ namespace ExcelToWordProject.Syllabus.Tags
     {
         private string _delimiter;
 
-        public TextBlockCondition(string tagName, string condition, string delimiter = null)
+        public TextBlockCondition(string tagName, string condition, string escapedDelimiter = null)
         {
             TagName = tagName;
             Condition = condition;
-            Delimiter = delimiter;
+            EscapedDelimiter = escapedDelimiter;
         }
 
         public TextBlockCondition()
@@ -443,15 +443,17 @@ namespace ExcelToWordProject.Syllabus.Tags
         public string TagName { get; set; }
         public string Condition { get; set; }
 
-        public string Delimiter // TODO: remove
+        public string EscapedDelimiter
         {
-            get => _delimiter;
-            set => _delimiter = value != "" ? value : "\n";
+            get => _delimiter?.Replace("\n", "\\n");
+            set => _delimiter = value?.Replace("\\n", "\n");
         }
+
+        public string Delimiter => _delimiter;
 
         public int Length => Subconditions.Length;
 
-        public string[] Subconditions => Delimiter == null
+        public string[] Subconditions => EscapedDelimiter == null
             ? new[] {Condition}
             : Condition.Split(new[] {Delimiter}, StringSplitOptions.None);
 
@@ -464,7 +466,7 @@ namespace ExcelToWordProject.Syllabus.Tags
                     new TextBlockCondition(
                         TagName,
                         subconditions[i],
-                        Delimiter
+                        EscapedDelimiter
                     );
 
             return splittedConditions;

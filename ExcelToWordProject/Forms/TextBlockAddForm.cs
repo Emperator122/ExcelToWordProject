@@ -37,7 +37,7 @@ namespace ExcelToWordProject.Forms
                 tagValueTextBox.Text = _tag.GetValue2();
             foreach (var condition in _tag.Conditions)
             {
-                conditionsGridView.Rows.Add(condition.TagName, condition.Condition);
+                conditionsGridView.Rows.Add(condition.TagName, condition.Condition, condition.EscapedDelimiter);
             }
 
         }
@@ -51,9 +51,11 @@ namespace ExcelToWordProject.Forms
             {
                 var tagName = row.Cells["TagNameColumn"].Value?.ToString();
                 var tagCondition = row.Cells["TagValueColumn"].Value?.ToString();
-                if(string.IsNullOrEmpty(tagName))
+                var tagDelimiter = row.Cells["TagDelimiterColumn"].Value?.ToString();
+                tagDelimiter = tagDelimiter == "" ? null : tagDelimiter;
+                if (string.IsNullOrEmpty(tagName))
                     continue;
-                conditions.Add(new TextBlockCondition(tagName, tagCondition));
+                conditions.Add(new TextBlockCondition(tagName, tagCondition, tagDelimiter));
             }
             _tag.Conditions = conditions.ToArray();
 

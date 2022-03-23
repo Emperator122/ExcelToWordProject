@@ -80,7 +80,7 @@ namespace ExcelToWordProject
                     new TextBlockCondition(
                             tagName: "ContentIndex",
                             condition: $"УК-1",
-                            delimiter: "\n"
+                            escapedDelimiter: "\n"
                         ),
                 }
             );
@@ -95,7 +95,7 @@ namespace ExcelToWordProject
                         new TextBlockCondition(
                                 tagName: "ContentIndex",
                                 condition: $"УК-2",
-                                delimiter: "\n"
+                                escapedDelimiter: "\n"
                             ),
                     }
                 );
@@ -109,7 +109,7 @@ namespace ExcelToWordProject
                         new TextBlockCondition(
                                 tagName: "ContentIndex",
                                 condition: $"УК-4",
-                                delimiter: "\n"
+                                escapedDelimiter: "\n"
                             ),
                     }
                 );
@@ -123,7 +123,7 @@ namespace ExcelToWordProject
                         new TextBlockCondition(
                                 tagName: "ContentIndex",
                                 condition: $"ОПК-1",
-                                delimiter: "\n"
+                                escapedDelimiter: "\n"
                             ),
                     }
                 );
@@ -137,7 +137,7 @@ namespace ExcelToWordProject
                         new TextBlockCondition(
                                 tagName: "ContentIndex",
                                 condition: $"ПК-1",
-                                delimiter: "\n"
+                                escapedDelimiter: "\n"
                             ),
                     }
                 );
