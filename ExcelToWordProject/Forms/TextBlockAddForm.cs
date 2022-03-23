@@ -1,11 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using ExcelToWordProject.Syllabus.Tags;
 
@@ -17,7 +11,7 @@ namespace ExcelToWordProject.Forms
         private readonly Form _parent;
         public TextBlockAddForm(string tagName, Form parent = null)
         {
-            _tag = new TextBlockTag(tagName, Array.Empty<TextBlockCondition>(), "");
+            _tag = new TextBlockTag(tagName, Array.Empty<TextBlockCondition>(), String.Empty);
             _parent = parent;
             Initialize();
         }
@@ -50,6 +44,7 @@ namespace ExcelToWordProject.Forms
 
         private void SaveTag()
         {
+            // сборка параметров тега
             _tag.Key = tagKeyTextBox.Text;
             var conditions = new List<TextBlockCondition>();
             foreach (DataGridViewRow row in conditionsGridView.Rows)
@@ -60,27 +55,32 @@ namespace ExcelToWordProject.Forms
                     continue;
                 conditions.Add(new TextBlockCondition(tagName, tagCondition));
             }
-
             _tag.Conditions = conditions.ToArray();
 
-            if (!_tag.HasDefaultValue)
-            {
-                TextBlockTag.SetDefaultValue(_tag.Key, "");
-                if (_tag.IsDefault)
-                {
-                    return;
-                }
-                MessageBox.Show(@"Значение по умолчанию было создано автоматически", @"Уведомление", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-
-            if (_tag.CanStoreInDataBase)
-            {
-                _tag.SaveToDatabase(tagValueTextBox.Text); // TODO: unique error
-            }
-            else
+            // запись в бд
+            if (!_tag.CanStoreInDataBase) // контроль уникальности
             {
                 MessageBox.Show(@"Данный набор условий уже существует", @"Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+                
             }
+
+            _tag.SaveToDatabase(tagValueTextBox.Text); // в любом случае сохраняем тег в бд
+
+            // контроль дефолтности
+            if (_tag.IsDefault && !_tag.CanBeDefault)
+                _tag.SetIsDefaultState(false);
+
+            if (_tag.HasDefaultValue) return;
+            if (_tag.CanBeDefault)
+            {
+                _tag.SetIsDefaultState(true);
+                return;
+            }
+            TextBlockTag.SetDefaultValue(_tag.Key, "");
+                
+            MessageBox.Show(@"Значение по умолчанию было создано автоматически", @"Уведомление", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
 
 
 

@@ -1,16 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Media;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using ExcelToWordProject.Syllabus;
 using ExcelToWordProject.Syllabus.Tags;
-using BorderStyle = System.Windows.Forms.BorderStyle;
 
 namespace ExcelToWordProject.Forms
 {
@@ -37,10 +28,19 @@ namespace ExcelToWordProject.Forms
             Hide();
         }
 
-        private void addNewTagButton_Click(object sender, EventArgs e)
+        private void AddNewTagButton_Click(object sender, EventArgs e)
         {
             var form = new TextBlockAddForm("", this);
             form.ShowDialog();
+        }
+
+        private void RemoveTag_Click(object sender)
+        {
+            if ((((sender as MenuItem)?.Parent as ContextMenu)?.SourceControl as PictureBox)?.Parent?.Tag is string tagKey)
+            {
+                TextBlockTag.RemoveTagFromDatabase(tagKey);
+                Refresh();
+            }
         }
 
         public override void Refresh()

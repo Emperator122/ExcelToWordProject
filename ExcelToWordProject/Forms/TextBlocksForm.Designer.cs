@@ -53,16 +53,16 @@ namespace ExcelToWordProject.Forms
                 AutoSizeMode = AutoSizeMode.GrowOnly,
                 Margin = new Padding(5, 5, 5, 5),
             };
-
+            var contextMenu = GetMoreActionsContextMenu();
             foreach (var textBlockTag in _parameters.TextBlockTags.GroupedByKey())
             {
-                tableLayoutPanel1.Controls.Add(GetTextBlockPanel(textBlockTag.Key));
+                tableLayoutPanel1.Controls.Add(GetTextBlockPanel(textBlockTag.Key, contextMenu));
             }
 
             textBlocksWrapper.Controls.Add(tableLayoutPanel1);
         }
 
-        private Panel GetTextBlockPanel(string tagName)
+        private Panel GetTextBlockPanel(string tagName, ContextMenu contextMenu)
         {
             // панель
             var panel = new TableLayoutPanel
@@ -85,7 +85,24 @@ namespace ExcelToWordProject.Forms
             };
 
             // иконка доп. действий
-            var morePicture = new PictureBox
+            var morePicture = GetMorePictureBox(contextMenu);
+            panel.Controls.Add(morePicture);
+
+            // описание
+            var titlePanel = GetTitlePanel(tagName);
+            panel.Controls.Add(titlePanel);
+
+
+            // кнопка "далее"
+            var arrowPicture = GetArrowPictureBox(tagName);
+            panel.Controls.Add(arrowPicture);
+            return panel;
+        }
+
+
+        private PictureBox GetMorePictureBox(ContextMenu menu)
+        {
+            var pictureBox = new PictureBox
             {
                 SizeMode = PictureBoxSizeMode.StretchImage,
                 Width = IconButtonsSize,
@@ -94,10 +111,20 @@ namespace ExcelToWordProject.Forms
                 Anchor = AnchorStyles.Left,
                 Cursor = Cursors.Hand
             };
-            panel.Controls.Add(morePicture);
 
+            pictureBox.MouseClick +=
+                (sender, args) =>
+                {
+                    if(args.Button == MouseButtons.Left)
+                        menu.Show(pictureBox, new Point(args.X, args.Y));
+                };
 
-            var titlePanel = new TableLayoutPanel
+            return pictureBox;
+        }
+
+        private TableLayoutPanel GetTitlePanel(string tagName)
+        {
+            return new TableLayoutPanel
             {
                 Height = 48,
                 Anchor = AnchorStyles.Right | AnchorStyles.Left,
@@ -118,10 +145,10 @@ namespace ExcelToWordProject.Forms
                     }
                 }
             };
-            panel.Controls.Add(titlePanel);
+        }
 
-
-
+        private PictureBox GetArrowPictureBox(string tagName)
+        {
             var arrowPicture = new PictureBox
             {
                 SizeMode = PictureBoxSizeMode.StretchImage,
@@ -132,11 +159,16 @@ namespace ExcelToWordProject.Forms
                 Cursor = Cursors.Hand,
             };
             arrowPicture.Click += (object sender, EventArgs args) => OnGoToConditionsButtonClick(tagName);
-
-            panel.Controls.Add(arrowPicture);
-            return panel;
+            return arrowPicture;
         }
 
+        private ContextMenu GetMoreActionsContextMenu()
+        {
+            var menu = new ContextMenu();
+            menu.MenuItems.Add("Удалить", (sender, args) => RemoveTag_Click(sender));
+
+            return menu;
+        }
         
 
         #region Windows Form Designer generated code
@@ -172,7 +204,7 @@ namespace ExcelToWordProject.Forms
             this.addNewTagButton.TabIndex = 0;
             this.addNewTagButton.Text = "Добавить новый тег";
             this.addNewTagButton.UseVisualStyleBackColor = true;
-            this.addNewTagButton.Click += new System.EventHandler(this.addNewTagButton_Click);
+            this.addNewTagButton.Click += new System.EventHandler(this.AddNewTagButton_Click);
             // 
             // TextBlocksForm
             // 

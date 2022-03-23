@@ -12,25 +12,11 @@ namespace ExcelToWordProject.Syllabus.Tags
 {
     public class TextBlockTag : BaseSyllabusTag
     {
-        public TextBlockTag(
-            string key,
-            TextBlockCondition[] conditions,
-            string description = ""
-        ) : base(key, "", description)
-        {
-            Conditions = conditions;
-            Id = -1;
-        }
-
-        public TextBlockTag() // для сериализации
-        {
-        }
-
-        private int MaxConditionLength => Conditions.Max(condition => condition.Length);
-
-        public TextBlockCondition[] Conditions { get => _conditions; set => _conditions = value.OrderBy(condition => condition.TagName).ToArray(); }
-        private TextBlockCondition[] _conditions;
-
+        /// <summary>
+        /// Используется для получения Id из БД.
+        /// Изменение вне работы с БД не предусмотрено.
+        /// </summary>
+        [XmlIgnore]
         private int Id { get; set; }
 
         public bool HasId => Id != -1;
@@ -40,8 +26,35 @@ namespace ExcelToWordProject.Syllabus.Tags
 
         public string DefaultValue => GetDefaultValue(Key);
 
-        public bool IsDefault => Conditions.Length == 0;
+        public TextBlockCondition[] Conditions { get => _conditions; set => _conditions = value.OrderBy(condition => condition.TagName).ToArray(); }
+        private TextBlockCondition[] _conditions;
 
+        /// <summary>
+        /// Используется для получения IsDefault из БД.
+        /// Изменение вне работы с БД не предусмотрено.
+        /// </summary>
+        [XmlIgnore]
+        public bool IsDefault { get; set; }
+
+        public bool CanBeDefault => Conditions.Length == 0;
+
+        public TextBlockTag(
+            string key,
+            TextBlockCondition[] conditions,
+            string description = ""
+        ) : base(key, "", description)
+        {
+            Conditions = conditions;
+            Id = -1;
+            IsDefault = false;
+        }
+        
+        public TextBlockTag() // для сериализации
+        {
+            Id = -1;
+            IsDefault = false;
+        }
+        
         public override string GetValue(Module module = null, List<Content> contentList = null,
             DataSet excelData = null)
         {
@@ -64,12 +77,10 @@ namespace ExcelToWordProject.Syllabus.Tags
                 {
                     if (reader.HasRows) // если есть данные
                     {
-                        var i = 0;
                         while (reader.Read()) // построчно считываем данные
                         {
                             var value = reader.GetString(3);
                             result += value;
-                            i++;
                             break; // TODO: обработка множества значений
                         }
                     }
@@ -81,21 +92,22 @@ namespace ExcelToWordProject.Syllabus.Tags
 
         public void SaveToDatabase(string value)
         {
-            string sqlExpression;
-            if(Id == -1)
-                sqlExpression =
+            if (Id == -1)
+                CreateInDatabase(value);
+            else
+                EditInDatabase(value);
+
+        }
+
+        private void CreateInDatabase(string value)
+        {
+            var sqlExpression =
                     $"INSERT INTO {DatabaseStrings.TextBlockTagTableName} " +
                     $"({DatabaseStrings.TextBlockKeyColumnName}, {DatabaseStrings.TextBlockConditionColumnName}, " +
                     $"{DatabaseStrings.TextBlockValueColumnName}) "
                     + "VALUES (@key, @condition, @value)";
-            else
-                sqlExpression =
-                    $"UPDATE {DatabaseStrings.TextBlockTagTableName} " +
-                    $"SET {DatabaseStrings.TextBlockKeyColumnName} = @key, " +
-                    $"{DatabaseStrings.TextBlockConditionColumnName} = @condition, " +
-                    $"{DatabaseStrings.TextBlockValueColumnName} = @value " +
-                    $"WHERE `{DatabaseStrings.TextBlockIdColumnName}` = @index";
 
+            var rowIdSqlExpression = "SELECT last_insert_rowid() as id";
             using (var connection = new SqliteConnection(DatabaseStrings.ConnectionString))
             {
                 connection.Open();
@@ -103,18 +115,45 @@ namespace ExcelToWordProject.Syllabus.Tags
                 command.Parameters.Add(new SqliteParameter("@key", Key));
                 command.Parameters.Add(new SqliteParameter("@condition", ToXml()));
                 command.Parameters.Add(new SqliteParameter("@value", value));
-                if(Id != -1)
-                    command.Parameters.Add(new SqliteParameter("@index", Id));
                 command.ExecuteNonQuery();
+
+                var rowIdCommand = new SqliteCommand(rowIdSqlExpression, connection);
+                Id = Convert.ToInt32(rowIdCommand.ExecuteScalar());
             }
         }
 
+        private void EditInDatabase(string value)
+        {
+            if (!HasId)
+            {
+                throw new SyllabusDatabaseException(SyllabusDatabaseErrorType.UpdateError,
+                    "Данный тег не найден в БД");
+            }
+
+            var sqlExpression =
+                $"UPDATE {DatabaseStrings.TextBlockTagTableName} " +
+                $"SET {DatabaseStrings.TextBlockKeyColumnName} = @key, " +
+                $"{DatabaseStrings.TextBlockConditionColumnName} = @condition, " +
+                $"{DatabaseStrings.TextBlockValueColumnName} = @value " +
+                $"WHERE `{DatabaseStrings.TextBlockIdColumnName}` = @index";
+            using (var connection = new SqliteConnection(DatabaseStrings.ConnectionString))
+            {
+                connection.Open();
+                var command = new SqliteCommand(sqlExpression, connection);
+                command.Parameters.Add(new SqliteParameter("@key", Key));
+                command.Parameters.Add(new SqliteParameter("@condition", ToXml()));
+                command.Parameters.Add(new SqliteParameter("@value", value));
+                command.Parameters.Add(new SqliteParameter("@index", Id));
+                command.ExecuteNonQuery();
+            }
+        }
+        
         public void RemoveFromDatabase()
         {
             if (!HasId)
             {
                 throw new SyllabusDatabaseException(SyllabusDatabaseErrorType.DeleteError,
-                    "Данный тег не найдет в БД");
+                    "Данный тег не найден в БД");
             }
 
             var sqlExpression =
@@ -130,9 +169,71 @@ namespace ExcelToWordProject.Syllabus.Tags
             }
         }
 
-        public void SetAsDefault()
+        public void UpdateFormDatabase()
         {
-            SetDefaultValue(Key, GetValue2(), Description);
+            if (!HasId)
+            {
+                throw new SyllabusDatabaseException(SyllabusDatabaseErrorType.UpdateError,
+                    "Данный тег не имеет ID");
+            }
+
+            var sqlExpression =
+                $"SELECT {DatabaseStrings.TextBlockIsDefaultColumnName}, " +
+                $"{DatabaseStrings.TextBlockConditionColumnName} " +
+                $"FROM {DatabaseStrings.TextBlockTagTableName} "
+                + $"WHERE `{DatabaseStrings.TextBlockIdColumnName}` = @index";
+
+            using (var connection = new SqliteConnection(DatabaseStrings.ConnectionString))
+            {
+                connection.Open();
+                var command = new SqliteCommand(sqlExpression, connection);
+                command.Parameters.Add(new SqliteParameter("@index", Id));
+                using (var reader = command.ExecuteReader())
+                {
+                    if (reader.HasRows) // если есть данные
+                    {
+                        if (!reader.Read()) return;
+                        var isDefault = reader.GetBoolean(0);
+                        var xml = reader.GetString(1);
+                            
+                        // Мб надо что-то еще добавить...
+                        var tag = FromDatabaseData(xml, Id, isDefault);
+                        IsDefault = tag.IsDefault;
+                        Conditions = tag.Conditions;
+                        Key = tag.Key;
+                        Active = tag.Active;
+                        RegularEx = tag.RegularEx;
+                    }
+                    else
+                    {
+                        throw new SyllabusDatabaseException(SyllabusDatabaseErrorType.UpdateError,
+                            "Тег с данным ID не найден в БД");
+                    }
+                }
+            }
+        }
+
+        public void SetIsDefaultState(bool state)
+        {
+            if (!HasId)
+            {
+                throw new SyllabusDatabaseException(SyllabusDatabaseErrorType.UpdateError,
+                    "Данный тег не найден в БД");
+            }
+
+            var sqlExpression =
+                $"UPDATE {DatabaseStrings.TextBlockTagTableName} " +
+                $"SET {DatabaseStrings.TextBlockIsDefaultColumnName} = @isDefault " +
+                $"WHERE `{DatabaseStrings.TextBlockIdColumnName}` = @index";
+            using (var connection = new SqliteConnection(DatabaseStrings.ConnectionString))
+            {
+                connection.Open();
+                var command = new SqliteCommand(sqlExpression, connection);
+                command.Parameters.Add(new SqliteParameter("@isDefault", Convert.ToInt32(state)));
+                command.Parameters.Add(new SqliteParameter("@index", Id));
+                command.ExecuteNonQuery();
+                IsDefault = state;
+            }
         }
 
         public string ToXml()
@@ -145,13 +246,14 @@ namespace ExcelToWordProject.Syllabus.Tags
             }
         }
 
-        public static TextBlockTag FromXml(string xml, int id = -1)
+        public static TextBlockTag FromDatabaseData(string xml, int id = -1, bool isDefault = false)
         {
             var serializer = new XmlSerializer(typeof(TextBlockTag));
             using (TextReader reader = new StringReader(xml))
             {
                 var tag = (TextBlockTag) serializer.Deserialize(reader);
                 tag.Id = id;
+                tag.IsDefault = isDefault;
                 return tag;
             }
         }
@@ -190,9 +292,9 @@ namespace ExcelToWordProject.Syllabus.Tags
 
             for (var i = 0; i < Conditions.Length-1; i++)
             {
-                result += $"{Conditions[i].TagName} = {Conditions[i].Condition},";
+                result += $"<{Conditions[i].TagName}> = `{Conditions[i].Condition}`, ";
             }
-            result += $"{Conditions[Conditions.Length-1].TagName} = {Conditions[Conditions.Length-1].Condition},";
+            result += $"<{Conditions[Conditions.Length-1].TagName}> = `{Conditions[Conditions.Length-1].Condition}`.";
 
             return result;
         }
@@ -228,7 +330,9 @@ namespace ExcelToWordProject.Syllabus.Tags
         public static List<TextBlockTag> GetAllTextBlockTags()
         {
             var sqlExpression =
-                $"SELECT `{DatabaseStrings.TextBlockIdColumnName}`, {DatabaseStrings.TextBlockConditionColumnName} FROM {DatabaseStrings.TextBlockTagTableName}";
+                $"SELECT `{DatabaseStrings.TextBlockIdColumnName}`, {DatabaseStrings.TextBlockConditionColumnName}, " +
+                $"{DatabaseStrings.TextBlockIsDefaultColumnName} " +
+                $"FROM {DatabaseStrings.TextBlockTagTableName}";
 
             var result = new List<TextBlockTag>();
             using (var connection = new SqliteConnection(DatabaseStrings.ConnectionString))
@@ -242,7 +346,8 @@ namespace ExcelToWordProject.Syllabus.Tags
                         {
                             var id = reader.GetInt32(0);
                             var xml = reader.GetString(1);
-                            result.Add(FromXml(xml, id));
+                            var isDefault = reader.GetBoolean(2);
+                            result.Add(FromDatabaseData(xml, id, isDefault));
                         }
                 }
             }
@@ -267,12 +372,10 @@ namespace ExcelToWordProject.Syllabus.Tags
                     if (reader.HasRows) // если есть данные
                     {
                         result = string.Empty;
-                        var i = 0;
                         while (reader.Read()) // построчно считываем данные
                         {
                             var value = reader.GetString(3);
                             result += value;
-                            i++;
                             break; // TODO: обработка множества значений
                         }
                     }
@@ -306,6 +409,20 @@ namespace ExcelToWordProject.Syllabus.Tags
             }
         }
 
+        public static void RemoveTagFromDatabase(string tagKey)
+        {
+            var sqlExpression =
+                $"DELETE FROM {DatabaseStrings.TextBlockTagTableName} " +
+                $"WHERE {DatabaseStrings.TextBlockKeyColumnName} = @key";
+
+            using (var connection = new SqliteConnection(DatabaseStrings.ConnectionString))
+            {
+                connection.Open();
+                var command = new SqliteCommand(sqlExpression, connection);
+                command.Parameters.Add(new SqliteParameter("@key", tagKey));
+                command.ExecuteNonQuery();
+            }
+        }
     }
 
     public class TextBlockCondition

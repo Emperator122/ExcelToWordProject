@@ -1,12 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using ExcelToWordProject.Syllabus;
 using ExcelToWordProject.Syllabus.Tags;
@@ -64,8 +58,7 @@ namespace ExcelToWordProject.Forms
         public override void Refresh()
         {
             base.Refresh();
-            Controls.Clear();
-            InitializeComponent();
+            textBlocksWrapper.Controls.Clear();
             FetchTags();
             InitializeCustomComponents();
         }
