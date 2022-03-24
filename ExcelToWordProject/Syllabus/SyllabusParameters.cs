@@ -1,11 +1,9 @@
-﻿using ExcelToWordProject.Models;
+﻿using System;
+using ExcelToWordProject.Models;
 using ExcelToWordProject.Syllabus.Tags;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using System.Text.RegularExpressions;
-using ExcelToWordProject;
-using ExcelToWordProject.Syllabus;
 
 namespace ExcelToWordProject.Syllabus
 {
@@ -26,8 +24,20 @@ namespace ExcelToWordProject.Syllabus
         public List<BaseSyllabusTag> Tags;
 
         [System.Xml.Serialization.XmlIgnore]
-        public List<TextBlockTag> TextBlockTags => TextBlockTag.GetAllTextBlockTags();
-        
+        public List<TextBlockTag> TextBlockTags
+        {
+            get
+            {
+                _textBlockTagsCache = TextBlockTag.GetAllTextBlockTags();
+                return _textBlockTagsCache;
+            }
+        }
+
+        [System.Xml.Serialization.XmlIgnore]
+        public List<TextBlockTag> TextBlockTagsCache => _textBlockTagsCache ?? TextBlockTags;
+        private List<TextBlockTag> _textBlockTagsCache;
+
+
         /// <summary>
         /// Конструктор без параметров. В основном нужен для сериализации.
         /// </summary>
@@ -41,7 +51,7 @@ namespace ExcelToWordProject.Syllabus
         {
             if (!fillWithValues) return;
 
-            ModulesYears = new int[0];
+            ModulesYears = Array.Empty<int>();
 
             // Инициализация базового набора параметров
             PlanListName = "План";

@@ -140,6 +140,12 @@
     <Compile Include="Forms\GetDataParametersForm.Designer.cs">
       <DependentUpon>GetDataParametersForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\InputDataDialogForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\InputDataDialogForm.Designer.cs">
+      <DependentUpon>InputDataDialogForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\RegularExpressionEditForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -216,6 +222,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\GetDataParametersForm.resx">
       <DependentUpon>GetDataParametersForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\InputDataDialogForm.resx">
+      <DependentUpon>InputDataDialogForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\RegularExpressionEditForm.resx">
       <DependentUpon>RegularExpressionEditForm.cs</DependentUpon>

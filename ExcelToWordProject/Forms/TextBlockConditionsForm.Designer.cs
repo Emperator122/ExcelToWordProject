@@ -97,9 +97,10 @@ namespace ExcelToWordProject.Forms
 
             // условия
             string conditionsString = tag.ConditionsToGuiString();
+            conditionsString = conditionsString == "" ? "Пустой набор" : conditionsString;
             var conditionsLabel = new Label
             {
-                Text = conditionsString != "" ? conditionsString : "Значение по умолчанию",
+                Text = tag.IsDefault ? "Значение по умолчанию" : conditionsString,
                 AutoSize = true,
             };
             var titlePanel = new TableLayoutPanel

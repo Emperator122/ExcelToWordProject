@@ -38,8 +38,29 @@ namespace ExcelToWordProject.Forms
         {
             if ((((sender as MenuItem)?.Parent as ContextMenu)?.SourceControl as PictureBox)?.Parent?.Tag is string tagKey)
             {
+                var dialogResult = MessageBox.Show(@"Удалить группу тегов?", @"Подтверждение действия", MessageBoxButtons.OKCancel);
+                if (dialogResult != DialogResult.OK) return;
                 TextBlockTag.RemoveTagFromDatabase(tagKey);
                 Refresh();
+            }
+        }
+
+        private void CopyTag_Click(object sender)
+        {
+            if ((((sender as MenuItem)?.Parent as ContextMenu)?.SourceControl as PictureBox)?.Parent?.Tag is string tagKey)
+            {
+                var message = "Введите ключ новой группы тегов, которая " +
+                              $"будет создана на основе группы \"{tagKey}\":";
+                const string title = "Копирование группы блоков текста";
+
+                void OnLeftAction(string newTagKey)
+                {
+                    TextBlockTag.CopyTag(tagKey, newTagKey);
+                    Refresh();
+                }
+
+                using (var dialog = new InputDataDialogForm(message, title, onLeftAction: OnLeftAction))
+                    dialog.ShowDialog(this);
             }
         }
 

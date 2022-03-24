@@ -66,6 +66,8 @@ namespace ExcelToWordProject.Forms
         {
             if ((sender as PictureBox)?.Parent?.Tag is TextBlockTag tag)
             {
+                var dialogResult = MessageBox.Show(@"Удалить тег?", @"Подтверждение действия", MessageBoxButtons.OKCancel);
+                if (dialogResult != DialogResult.OK) return;
                 tag.RemoveFromDatabase();
                 if (_tags.Count == 1)
                 {

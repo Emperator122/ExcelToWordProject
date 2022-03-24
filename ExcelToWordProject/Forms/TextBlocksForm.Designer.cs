@@ -115,7 +115,7 @@ namespace ExcelToWordProject.Forms
             pictureBox.MouseClick +=
                 (sender, args) =>
                 {
-                    if(args.Button == MouseButtons.Left)
+                    if (args.Button == MouseButtons.Left)
                         menu.Show(pictureBox, new Point(args.X, args.Y));
                 };
 
@@ -166,10 +166,11 @@ namespace ExcelToWordProject.Forms
         {
             var menu = new ContextMenu();
             menu.MenuItems.Add("Удалить", (sender, args) => RemoveTag_Click(sender));
+            menu.MenuItems.Add("Копировать", (sender, args) => CopyTag_Click(sender));
 
             return menu;
         }
-        
+
 
         #region Windows Form Designer generated code
 
@@ -185,8 +186,8 @@ namespace ExcelToWordProject.Forms
             // 
             // textBlocksWrapper
             // 
-            this.textBlocksWrapper.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.textBlocksWrapper.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.textBlocksWrapper.AutoScroll = true;
             this.textBlocksWrapper.Location = new System.Drawing.Point(0, 0);
@@ -196,7 +197,7 @@ namespace ExcelToWordProject.Forms
             // 
             // addNewTagButton
             // 
-            this.addNewTagButton.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            this.addNewTagButton.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.addNewTagButton.Location = new System.Drawing.Point(12, 571);
             this.addNewTagButton.Name = "addNewTagButton";

@@ -197,7 +197,7 @@ namespace ExcelToWordProject.Syllabus
                 // найдем TextBlock теги
                 var textBlockTagsFilteredGroup =
                     Parameters
-                        .TextBlockTags
+                        .TextBlockTagsCache
                         .OrderedByPriority()
                         .GroupedByKey()
                         .Where(
@@ -421,7 +421,7 @@ namespace ExcelToWordProject.Syllabus
                         var tagKey = paragraphRegex.Match(paragraph.Text.Trim()).Groups[1].Value;
                         var tagsGroup = 
                             Parameters
-                                .TextBlockTags
+                                .TextBlockTagsCache
                                 .GroupedByKey()
                                 .FirstOrDefault(group => 
                                     group.Key == tagKey);
@@ -480,7 +480,7 @@ namespace ExcelToWordProject.Syllabus
 
         protected void TextBlocksHandler(DocX doc, Module module = null, List<Content> contentList = null)
         {
-            var textBlockTagsGroups = Parameters.TextBlockTags.OrderedByPriority().GroupedByKey();
+            var textBlockTagsGroups = Parameters.TextBlockTagsCache.OrderedByPriority().GroupedByKey();
 
             foreach (var textBlockTagsGroup in textBlockTagsGroups)
             {
