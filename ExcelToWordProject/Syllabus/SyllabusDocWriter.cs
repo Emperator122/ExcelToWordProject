@@ -478,7 +478,8 @@ namespace ExcelToWordProject.Syllabus
 
             if (xmlValue == null) return;
 
-            paragraph.InsertPureXmlAfterSelf(XElement.Parse(xmlValue), doc);
+            paragraph.InsertDocumentAfterSelf(doc);
+            //paragraph.InsertPureXmlAfterSelf(XElement.Parse(xmlValue), doc);
         }
 
         private void TextBlocksParagraphsDelimiterProcessing(TextBlockTag tag, string tagKey, bool isValid,

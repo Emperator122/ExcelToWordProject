@@ -207,7 +207,7 @@ namespace ExcelToWordProject
             toolTip.SetToolTip(folderPathButton, "Выберите папку");
         }
 
-        public async Task ConvertProcessing(string selectedFilePath, string templateFilePath, string resultFolderPath, string prefix)
+        public void ConvertProcessing(string selectedFilePath, string templateFilePath, string resultFolderPath, string prefix)
         {
             SyllabusExcelReader syllabusExcelReader = null;
             SyllabusDocWriter syllabusDocWriter = null;
@@ -309,7 +309,7 @@ namespace ExcelToWordProject
 
 
             if (selectedExcels.Length <= 1)
-                await ConvertProcessing(selectedFilePath, templateFilePath, resultFolderPath, resultFilePrefixTextBox.Text);
+                 ConvertProcessing(selectedFilePath, templateFilePath, resultFolderPath, resultFilePrefixTextBox.Text);
             else if (selectedExcels.Length > 1)
                 for (int i = 0; i < selectedExcels.Length; i++)
                 {
@@ -321,7 +321,7 @@ namespace ExcelToWordProject
                     try
                     {
                         Directory.CreateDirectory(folderPath);
-                        await ConvertProcessing(
+                         ConvertProcessing(
                             selectedExcels[i],
                             templateFilePath,
                             folderPath,
@@ -330,7 +330,7 @@ namespace ExcelToWordProject
                     catch
                     {
                         string prefix = "[" + Path.GetFileNameWithoutExtension(selectedExcels[i]) + "] " + resultFilePrefixTextBox.Text;
-                        await ConvertProcessing(selectedExcels[i], templateFilePath, resultFolderPath, prefix);
+                         ConvertProcessing(selectedExcels[i], templateFilePath, resultFolderPath, prefix);
                     }
                 }
 

@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Runtime.Remoting.Messaging;
 
@@ -6,6 +8,8 @@ namespace ExcelToWordProject.Utils
 {
     static class OtherUtils
     {
+        public static bool TryParseInt(string s, out int result) => int.TryParse(s, NumberStyles.Any,
+            (IFormatProvider) CultureInfo.InvariantCulture, out result);
         public static int StrToInt(string str)
         {
             int result;

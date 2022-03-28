@@ -208,6 +208,7 @@
     <Compile Include="Utils\ConfigManager.cs" />
     <Compile Include="Utils\DocxExtensions.cs" />
     <Compile Include="Utils\ExcelUtils.cs" />
+    <Compile Include="Utils\CustomDocument.cs" />
     <Compile Include="Utils\OtherUtils.cs" />
     <Compile Include="Utils\PathUtils.cs" />
     <EmbeddedResource Include="Forms\AboutProgram.resx">
