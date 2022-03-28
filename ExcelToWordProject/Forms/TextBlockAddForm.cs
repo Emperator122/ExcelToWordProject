@@ -43,6 +43,8 @@ namespace ExcelToWordProject.Forms
             priorityTextBox.Text = _tag.Priority.ToString();
 
             delimiterTextBox.Text = _tag.EscapedDelimiter;
+
+            isPureXmlTextBox.Text = Convert.ToInt32(_tag.IsPureXml).ToString();
         }
 
         private void SaveTag()
@@ -64,6 +66,7 @@ namespace ExcelToWordProject.Forms
             _tag.Conditions = conditions.ToArray();
 
             int.TryParse(priorityTextBox.Text, out var priority);
+            int.TryParse(isPureXmlTextBox.Text, out var isPureXml);
 
             // запись в бд
             if (!_tag.CanStoreInDataBase) // контроль уникальности
@@ -73,7 +76,7 @@ namespace ExcelToWordProject.Forms
                 
             }
 
-            _tag.SaveToDatabase(tagValueTextBox.Text, priority); // в любом случае сохраняем тег в бд
+            _tag.SaveToDatabase(tagValueTextBox.Text, priority, Convert.ToBoolean(isPureXml)); // в любом случае сохраняем тег в бд
 
             // контроль дефолтности
             if (_tag.IsDefault && !_tag.CanBeDefault)

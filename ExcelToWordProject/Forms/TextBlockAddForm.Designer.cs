@@ -42,12 +42,15 @@
             this.priorityTextBox = new System.Windows.Forms.TextBox();
             this.groupBox5 = new System.Windows.Forms.GroupBox();
             this.delimiterTextBox = new System.Windows.Forms.TextBox();
+            this.groupBox6 = new System.Windows.Forms.GroupBox();
+            this.isPureXmlTextBox = new System.Windows.Forms.TextBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.conditionsGridView)).BeginInit();
             this.groupBox4.SuspendLayout();
             this.groupBox5.SuspendLayout();
+            this.groupBox6.SuspendLayout();
             this.SuspendLayout();
             // 
             // tagKeyTextBox
@@ -58,7 +61,7 @@
             this.tagKeyTextBox.Location = new System.Drawing.Point(9, 24);
             this.tagKeyTextBox.Margin = new System.Windows.Forms.Padding(4);
             this.tagKeyTextBox.Name = "tagKeyTextBox";
-            this.tagKeyTextBox.Size = new System.Drawing.Size(335, 26);
+            this.tagKeyTextBox.Size = new System.Drawing.Size(208, 26);
             this.tagKeyTextBox.TabIndex = 0;
             // 
             // groupBox1
@@ -70,7 +73,7 @@
             this.groupBox1.Margin = new System.Windows.Forms.Padding(4);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Padding = new System.Windows.Forms.Padding(4);
-            this.groupBox1.Size = new System.Drawing.Size(355, 69);
+            this.groupBox1.Size = new System.Drawing.Size(228, 69);
             this.groupBox1.TabIndex = 2;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Ключ";
@@ -97,6 +100,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tagValueTextBox.Location = new System.Drawing.Point(9, 24);
             this.tagValueTextBox.Margin = new System.Windows.Forms.Padding(4);
+            this.tagValueTextBox.MaxLength = 0;
             this.tagValueTextBox.Multiline = true;
             this.tagValueTextBox.Name = "tagValueTextBox";
             this.tagValueTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
@@ -196,7 +200,7 @@
             this.groupBox5.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox5.Controls.Add(this.delimiterTextBox);
-            this.groupBox5.Location = new System.Drawing.Point(376, 13);
+            this.groupBox5.Location = new System.Drawing.Point(249, 13);
             this.groupBox5.Margin = new System.Windows.Forms.Padding(4);
             this.groupBox5.Name = "groupBox5";
             this.groupBox5.Padding = new System.Windows.Forms.Padding(4);
@@ -216,11 +220,37 @@
             this.delimiterTextBox.Size = new System.Drawing.Size(99, 26);
             this.delimiterTextBox.TabIndex = 0;
             // 
+            // groupBox6
+            // 
+            this.groupBox6.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox6.Controls.Add(this.isPureXmlTextBox);
+            this.groupBox6.Location = new System.Drawing.Point(376, 13);
+            this.groupBox6.Margin = new System.Windows.Forms.Padding(4);
+            this.groupBox6.Name = "groupBox6";
+            this.groupBox6.Padding = new System.Windows.Forms.Padding(4);
+            this.groupBox6.Size = new System.Drawing.Size(119, 69);
+            this.groupBox6.TabIndex = 6;
+            this.groupBox6.TabStop = false;
+            this.groupBox6.Text = "Чистый XML";
+            // 
+            // isPureXmlTextBox
+            // 
+            this.isPureXmlTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.isPureXmlTextBox.Location = new System.Drawing.Point(9, 24);
+            this.isPureXmlTextBox.Margin = new System.Windows.Forms.Padding(4);
+            this.isPureXmlTextBox.Name = "isPureXmlTextBox";
+            this.isPureXmlTextBox.Size = new System.Drawing.Size(99, 26);
+            this.isPureXmlTextBox.TabIndex = 0;
+            // 
             // TextBlockAddForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 18F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(635, 756);
+            this.Controls.Add(this.groupBox6);
             this.Controls.Add(this.groupBox5);
             this.Controls.Add(this.groupBox4);
             this.Controls.Add(this.button1);
@@ -242,6 +272,8 @@
             this.groupBox4.PerformLayout();
             this.groupBox5.ResumeLayout(false);
             this.groupBox5.PerformLayout();
+            this.groupBox6.ResumeLayout(false);
+            this.groupBox6.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -262,5 +294,7 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn TagDelimiterColumn;
         private System.Windows.Forms.GroupBox groupBox5;
         private System.Windows.Forms.TextBox delimiterTextBox;
+        private System.Windows.Forms.GroupBox groupBox6;
+        private System.Windows.Forms.TextBox isPureXmlTextBox;
     }
 }

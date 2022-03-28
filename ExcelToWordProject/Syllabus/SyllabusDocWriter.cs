@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Xml.Linq;
 using ExcelToWordProject.Models;
 using ExcelToWordProject.Syllabus.Tags;
 using ExcelToWordProject.Utils;
@@ -433,7 +434,7 @@ namespace ExcelToWordProject.Syllabus
                         foreach (var textBlockTag in tagsGroup)
                         {
                             outTextBlockTag = textBlockTag;
-                            if (textBlockTag.IsDefault || string.IsNullOrEmpty(textBlockTag.Delimiter)) continue;
+                            if (textBlockTag.IsDefault || !textBlockTag.IsPureXml || string.IsNullOrEmpty(textBlockTag.Delimiter)) continue;
                             isValid = textBlockTag.CheckConditions(Parameters.Tags, module, contentList,
                                 SyllabusExcelReader.ExcelData);
                             if (isValid) break;
@@ -442,32 +443,14 @@ namespace ExcelToWordProject.Syllabus
                         if (outTextBlockTag == null)
                             continue;
 
-                        string[] lines = null;
-                        if (isValid)
+                        if (!string.IsNullOrEmpty(outTextBlockTag.Delimiter))
                         {
-                            lines = outTextBlockTag.GetValue2(module, contentList, SyllabusExcelReader.ExcelData)
-                                ?.Split(new []{ outTextBlockTag.Delimiter }, StringSplitOptions.None);
-                        }
-                        else
+                            TextBlocksParagraphsDelimiterProcessing(outTextBlockTag, tagKey, isValid, paragraph, module, contentList);
+                        } 
+                        else if (outTextBlockTag.IsPureXml)
                         {
-                            var defaultTag = TextBlockTag.GetDefaultTag(tagKey);
-                            if (string.IsNullOrEmpty(defaultTag.Delimiter)) continue;
-                            lines = defaultTag.DefaultValue
-                                ?.Split(new[] { outTextBlockTag.Delimiter }, StringSplitOptions.None);
+                            TextBlocksParagraphsPureXmlProcessing(outTextBlockTag, tagKey, isValid, doc, paragraph, module, contentList);
                         }
-
-                        if (lines == null) continue;
-
-
-                        var p = paragraph.InsertParagraphAfterSelf(paragraph);
-                        for (var i = 0; i < lines.Length; i++)
-                        {
-                            p.ReplaceText(outTextBlockTag.Tag, lines[i]);
-                            if (i != lines.Length - 1)
-                                p = p.InsertParagraphAfterSelf(paragraph);
-                        }
-
-                        paragraph.Remove(false);
                     }
                 }
             
@@ -476,6 +459,48 @@ namespace ExcelToWordProject.Syllabus
             {
                 Console.WriteLine(@"Ошибка при заполнении параграфа");
             }
+        }
+
+        private void TextBlocksParagraphsPureXmlProcessing(TextBlockTag tag, string tagKey, bool isValid,
+            DocX doc,Paragraph paragraph, Module module = null, List<Content> contentList = null)
+        {
+            string xmlValue;
+            if (isValid)
+            {
+                xmlValue = tag.GetValue2(module, contentList, SyllabusExcelReader.ExcelData);
+            }
+            else
+            {
+                var defaultTag = TextBlockTag.GetDefaultTag(tagKey);
+                if (!defaultTag.IsPureXml) return;
+                xmlValue = defaultTag.DefaultValue;
+            }
+
+            if (xmlValue == null) return;
+
+            paragraph.InsertPureXmlAfterSelf(XElement.Parse(xmlValue), doc);
+        }
+
+        private void TextBlocksParagraphsDelimiterProcessing(TextBlockTag tag, string tagKey, bool isValid,
+            Paragraph paragraph, Module module = null, List<Content> contentList = null)
+        {
+            string[] lines;
+            if (isValid)
+            {
+                lines = tag.GetValue2(module, contentList, SyllabusExcelReader.ExcelData)
+                    ?.Split(new[] { tag.Delimiter }, StringSplitOptions.None);
+            }
+            else
+            {
+                tag = TextBlockTag.GetDefaultTag(tagKey);
+                if (string.IsNullOrEmpty(tag.Delimiter)) return;
+                lines = tag.DefaultValue
+                    ?.Split(new[] { tag.Delimiter }, StringSplitOptions.None);
+            }
+
+            if (lines == null) return;
+
+            paragraph.InsertLinesAfterSelf(lines, tag);
         }
 
         protected void TextBlocksHandler(DocX doc, Module module = null, List<Content> contentList = null)
