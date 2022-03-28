@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -13,14 +14,24 @@ namespace ExcelToWordProject.Utils
 {
     internal static class DocxExtensions
     {
+        private static XNamespace w = (XNamespace)"http://schemas.openxmlformats.org/wordprocessingml/2006/main";
         public static void InsertPureXmlAfterSelf(this Paragraph paragraph, XElement xmlElement, DocX document)
         {
-            var p = paragraph.InsertParagraphAfterSelf("test");
             Type[] types = { typeof(DocX), typeof(XElement), typeof(int), typeof(ContainerType) };
             var p2 = typeof(Paragraph)
                 .GetConstructor(BindingFlags.NonPublic | BindingFlags.Instance, null, types, null)
                 ?.Invoke(new object[] { document, xmlElement, 0, ContainerType.None });
-            p.InsertParagraphAfterSelf(p2 as Paragraph);
+            paragraph.InsertParagraphAfterSelf(p2 as Paragraph);
+
+            var sr = new StreamReader("extracted_style.xml");
+            var data = sr.ReadToEnd();
+            var styles = GetDocumentStyles(document);
+            var style = XElement.Parse(data);
+            styles?.Element(w + "styles")?.Add((object)style);
+            
+            //document.InsertDocument();
+            Console.WriteLine(document.PackagePart);
+
             paragraph.Remove(false);
         }
 
@@ -35,6 +46,17 @@ namespace ExcelToWordProject.Utils
             }
 
             paragraph.Remove(false);
+        }
+
+        private static void InsertStyle()
+        {
+
+        }
+
+        private static XDocument GetDocumentStyles(this Document document)
+        {
+            var styles = typeof(Document).GetField("_styles", BindingFlags.NonPublic | BindingFlags.Instance)?.GetValue(document);
+            return styles as XDocument;
         }
 
 
