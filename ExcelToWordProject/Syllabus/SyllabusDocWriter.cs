@@ -58,7 +58,7 @@ namespace ExcelToWordProject.Syllabus
                 DefaultTagsDocumentHandler(resultFolderPath, baseDocument, fileNamePrefix, progress);
         }
 
-        protected void SmartTagsDocumentHandler(string resultFolderPath, string baseDocumentPath,
+        private void SmartTagsDocumentHandler(string resultFolderPath, string baseDocumentPath,
             string fileNamePrefix = "", IProgress<int> progress = null)
         {
             // Есть ли смарт-теги, работающие со списком компетенций
@@ -82,21 +82,22 @@ namespace ExcelToWordProject.Syllabus
                 safeName = PathUtils.FixFileNameLimit(safeName);
                 var resultFilePath = Path.Combine(resultFolderPath, safeName);
 
-                // Создадим новый файл с результатом
-                var doc = PathUtils.CopyFile(baseDocumentPath, resultFilePath);
-                if (doc == null)
-                    continue;
+                // Создадим новый файл с результатом'
+                using (var doc = PathUtils.CopyFile(baseDocumentPath, resultFilePath))
+                {
+                    if (doc == null)
+                        continue;
 
-                // Обработаем данный модуль
-                ModuleHandler(doc, module, hasSmartModulesContentTags);
+                    // Обработаем данный модуль
+                    ModuleHandler(doc, module, hasSmartModulesContentTags);
 
-                // Сохраняем файл
-                doc.Save();
-                doc.Dispose();
+                    // Сохраняем файл
+                    doc.Save();
+                }
             }
         }
 
-        protected void DefaultTagsDocumentHandler(string resultFolderPath, DocX baseDocument,
+        private void DefaultTagsDocumentHandler(string resultFolderPath, DocX baseDocument,
             string fileNamePrefix = "", IProgress<int> progress = null)
         {
             fileNamePrefix = fileNamePrefix == "" ? "UnsetFileName" : fileNamePrefix;
@@ -106,6 +107,8 @@ namespace ExcelToWordProject.Syllabus
             var doc = DocX.Load(resultFilePath);
 
             TablesHandler(doc); // TODO: Зачем?
+
+            FillTextBlocksParagraphs(doc);
 
             TextBlocksHandler(doc);
 
@@ -123,7 +126,7 @@ namespace ExcelToWordProject.Syllabus
         /// <param name="doc">Документ</param>
         /// <param name="module">Дисциплина</param>
         /// <param name="hasSmartModulesContentTags">Есть ли активные теги, работающие с контентом</param>
-        protected void ModuleHandler(DocX doc, Module module, bool hasSmartModulesContentTags)
+        private void ModuleHandler(DocX doc, Module module, bool hasSmartModulesContentTags)
         {
             // получаем компентенции
             List<Content> contentList = null;
@@ -133,7 +136,7 @@ namespace ExcelToWordProject.Syllabus
             // обработка таблиц
             TablesHandler(doc, module, contentList);
 
-            //
+            // заполнение параграфов с блоками текста
             FillTextBlocksParagraphs(doc, module, contentList);
 
             // обработка TextBlock
@@ -168,7 +171,7 @@ namespace ExcelToWordProject.Syllabus
         /// </summary>
         /// <param name="doc">Документ</param>
         /// <param name="refresh">Следует ли обновить поля</param>
-        protected void FindTablesTags(DocX doc, bool refresh = true)
+        private void FindTablesTags(DocX doc, bool refresh = true)
         {
             if (_tablesTags != null && _tablesTextBlockTags != null && !refresh)
                 return;
@@ -222,7 +225,7 @@ namespace ExcelToWordProject.Syllabus
         /// <param name="doc">Документ</param>
         /// <param name="module">Информация о дисциплине</param>
         /// <param name="contentList">Компетенции дисциплины</param>
-        protected void TablesHandler(DocX doc, Module module = null, List<Content> contentList = null)
+        private void TablesHandler(DocX doc, Module module = null, List<Content> contentList = null)
         {
             // Находим все теги, содержащиеся в таблицах
             FindTablesTags(doc, false);
@@ -337,7 +340,7 @@ namespace ExcelToWordProject.Syllabus
         /// <param name="table">Таблица</param>
         /// <param name="tags">Теги</param>
         /// <param name="tagsValues">Значения тегов</param>
-        protected void FillTable(Table table, List<BaseSyllabusTag> tags, string[][] tagsValues)
+        private void FillTable(Table table, List<BaseSyllabusTag> tags, string[][] tagsValues)
         {
             try
             {
@@ -373,7 +376,7 @@ namespace ExcelToWordProject.Syllabus
         /// <param name="doc">Документ DocX</param>
         /// <param name="contentTag">Тег</param>
         /// <param name="lines">Массив строк, которые станут параграфами на месте тега</param>
-        protected void ArrayToParagraphs(DocX doc, SmartSyllabusTag contentTag, string[] lines)
+        private void ArrayToParagraphs(DocX doc, SmartSyllabusTag contentTag, string[] lines)
         {
             try
             {
@@ -408,7 +411,7 @@ namespace ExcelToWordProject.Syllabus
             }
         }
 
-        protected void FillTextBlocksParagraphs(DocX doc, Module module = null, List<Content> contentList = null)
+        private void FillTextBlocksParagraphs(DocX doc, Module module = null, List<Content> contentList = null)
         {
             var paragraphRegex = new Regex("^<(.*)>$");
             try
@@ -426,14 +429,14 @@ namespace ExcelToWordProject.Syllabus
                                 .FirstOrDefault(group => 
                                     group.Key == tagKey);
 
-                        if (!tagsGroup?.FirstOrDefault()?.Active ?? true) continue; // если нет активных тегов в группе
+                        if (!(tagsGroup?.FirstOrDefault()?.Active ?? false)) continue; // если нет активных тегов в группе
 
                         var isValid = false;
                         TextBlockTag outTextBlockTag = null;
                         foreach (var textBlockTag in tagsGroup)
                         {
                             outTextBlockTag = textBlockTag;
-                            if (textBlockTag.IsDefault || string.IsNullOrEmpty(textBlockTag.Delimiter)) continue;
+                            if (textBlockTag.IsDefault || !textBlockTag.IsFilePath && string.IsNullOrEmpty(textBlockTag.Delimiter)) continue;
                             isValid = textBlockTag.CheckConditions(Parameters.Tags, module, contentList,
                                 SyllabusExcelReader.ExcelData);
                             if (isValid) break;
@@ -442,43 +445,73 @@ namespace ExcelToWordProject.Syllabus
                         if (outTextBlockTag == null)
                             continue;
 
-                        string[] lines = null;
-                        if (isValid)
+                        if (!string.IsNullOrEmpty(outTextBlockTag.Delimiter))
                         {
-                            lines = outTextBlockTag.GetValue2(module, contentList, SyllabusExcelReader.ExcelData)
-                                ?.Split(new []{ outTextBlockTag.Delimiter }, StringSplitOptions.None);
-                        }
-                        else
+                            TextBlocksParagraphsDelimiterProcessing(outTextBlockTag, tagKey, isValid, paragraph, module, contentList);
+                        } 
+                        else if (outTextBlockTag.IsFilePath)
                         {
-                            var defaultTag = TextBlockTag.GetDefaultTag(tagKey);
-                            if (string.IsNullOrEmpty(defaultTag.Delimiter)) continue;
-                            lines = defaultTag.DefaultValue
-                                ?.Split(new[] { outTextBlockTag.Delimiter }, StringSplitOptions.None);
+                            TextBlocksParagraphsFilesProcessing(outTextBlockTag, tagKey, isValid, doc, paragraph, module, contentList);
                         }
-
-                        if (lines == null) continue;
-
-
-                        var p = paragraph.InsertParagraphAfterSelf(paragraph);
-                        for (var i = 0; i < lines.Length; i++)
-                        {
-                            p.ReplaceText(outTextBlockTag.Tag, lines[i]);
-                            if (i != lines.Length - 1)
-                                p = p.InsertParagraphAfterSelf(paragraph);
-                        }
-
-                        paragraph.Remove(false);
                     }
                 }
             
             }
             catch
             {
+                // TODO: хорошо бы здесь сделать какую-то обработку...
                 Console.WriteLine(@"Ошибка при заполнении параграфа");
             }
         }
 
-        protected void TextBlocksHandler(DocX doc, Module module = null, List<Content> contentList = null)
+        private void TextBlocksParagraphsFilesProcessing(TextBlockTag tag, string tagKey, bool isValid,
+            DocX doc,Paragraph paragraph, Module module = null, List<Content> contentList = null)
+        {
+            string filePath;
+            if (isValid)
+            {
+                filePath = tag.GetValue2(module, contentList, SyllabusExcelReader.ExcelData);
+            }
+            else
+            {
+                var defaultTag = TextBlockTag.GetDefaultTag(tagKey);
+                if (!defaultTag.IsFilePath) return;
+                filePath = defaultTag.DefaultValue;
+            }
+
+            if (filePath == null || !File.Exists(filePath)) return;
+
+            filePath = Path.Combine(AppContext.BaseDirectory, filePath);
+
+            using (var insertion = DocX.Load(filePath))
+            {
+                paragraph.InsertDocumentAfterSelf(doc, insertion);
+            }
+        }
+
+        private void TextBlocksParagraphsDelimiterProcessing(TextBlockTag tag, string tagKey, bool isValid,
+            Paragraph paragraph, Module module = null, List<Content> contentList = null)
+        {
+            string[] lines;
+            if (isValid)
+            {
+                lines = tag.GetValue2(module, contentList, SyllabusExcelReader.ExcelData)
+                    ?.Split(new[] { tag.Delimiter }, StringSplitOptions.None);
+            }
+            else
+            {
+                tag = TextBlockTag.GetDefaultTag(tagKey);
+                if (string.IsNullOrEmpty(tag.Delimiter)) return;
+                lines = tag.DefaultValue
+                    ?.Split(new[] { tag.Delimiter }, StringSplitOptions.None);
+            }
+
+            if (lines == null) return;
+
+            paragraph.InsertLinesAfterSelf(lines, tag);
+        }
+
+        private void TextBlocksHandler(DocX doc, Module module = null, List<Content> contentList = null)
         {
             var textBlockTagsGroups = Parameters.TextBlockTagsCache.OrderedByPriority().GroupedByKey();
 

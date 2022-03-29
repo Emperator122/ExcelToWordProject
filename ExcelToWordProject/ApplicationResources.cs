@@ -13,6 +13,7 @@
         public static readonly string TextBlockIsDefaultColumnName = "is_default";
         public static readonly string TextBlockIdColumnName = "index";
         public static readonly string TextBlockPriorityColumnName = "priority";
+        public static readonly string TextBlockIsFilePathColumnName = "is_file_path";
 
     }
 }

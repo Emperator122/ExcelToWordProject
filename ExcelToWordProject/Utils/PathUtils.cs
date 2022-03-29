@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Text.RegularExpressions;
 using Xceed.Words.NET;
 
@@ -28,17 +29,15 @@ namespace ExcelToWordProject.Utils
         {
             try
             {
-                DocX doc = DocX.Load(baseDocumentPath);
-
-                if (randomName)
+                using (var doc = DocX.Load(baseDocumentPath))
                 {
-                    string newName = Path.GetRandomFileName() + Path.GetExtension(copyPath);
-                    string newPath = Path.Combine(Path.GetDirectoryName(copyPath), newName);
-                    doc.SaveAs(newPath);
-                    return DocX.Load(newPath);
-                }
-                else
-                {
+                    if (randomName)
+                    {
+                        var newName = Path.GetRandomFileName() + Path.GetExtension(copyPath);
+                        var newPath = Path.Combine(Path.GetDirectoryName(copyPath), newName);
+                        doc.SaveAs(newPath);
+                        return DocX.Load(newPath);
+                    }
                     doc.SaveAs(copyPath);
                     return DocX.Load(copyPath);
                 }
@@ -47,9 +46,39 @@ namespace ExcelToWordProject.Utils
             {
                 if (!randomName)
                     return CopyFile(baseDocumentPath, copyPath, true);
-                else
-                    return null;
+                return null;
             }
+        }
+
+        /// <summary>
+        /// Creates a relative path from one file or folder to another.
+        /// P.S. https://stackoverflow.com/questions/275689/how-to-get-relative-path-from-absolute-path
+        /// </summary>
+        /// <param name="fromPath">Contains the directory that defines the start of the relative path.</param>
+        /// <param name="toPath">Contains the path that defines the endpoint of the relative path.</param>
+        /// <returns>The relative path from the start directory to the end path or <c>toPath</c> if the paths are not related.</returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="UriFormatException"></exception>
+        /// <exception cref="InvalidOperationException"></exception>
+        public static string MakeRelativePath(string fromPath, string toPath)
+        {
+            if (string.IsNullOrEmpty(fromPath)) throw new ArgumentNullException("fromPath");
+            if (string.IsNullOrEmpty(toPath)) throw new ArgumentNullException("toPath");
+
+            var fromUri = new Uri(fromPath);
+            var toUri = new Uri(toPath);
+
+            if (fromUri.Scheme != toUri.Scheme) { return toPath; } // path can't be made relative.
+
+            var relativeUri = fromUri.MakeRelativeUri(toUri);
+            var relativePath = Uri.UnescapeDataString(relativeUri.ToString());
+
+            if (toUri.Scheme.Equals("file", StringComparison.InvariantCultureIgnoreCase))
+            {
+                relativePath = relativePath.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+            }
+
+            return relativePath;
         }
     }
 }

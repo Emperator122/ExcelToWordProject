@@ -54,148 +54,7 @@ namespace ExcelToWordProject
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            return;
-
-            TextBlockTag.SetDefaultValue("DefaultTagForTest", "Defalut value for 'DefaultTagForTest'");
-
-            TextBlockTag textBlockTag = new TextBlockTag(
-                key: "DefaultTagForTest",
-                description: "lalalalala",
-                conditions: new TextBlockCondition[]
-                {
-                    new TextBlockCondition(
-                        tagName: "ProgramValue",
-                        condition: "Программа \"Математическое и информационное обеспечение экономической деятельности\" "
-                    ),
-                }
-            );
-
-            textBlockTag.SaveToDatabase("It's DirectionCode value: <DirectionCode>");
-
-            textBlockTag = new TextBlockTag(
-                key: "ContentMegaTag",
-                description: "lalalalala",
-                conditions: new TextBlockCondition[]
-                {
-                    new TextBlockCondition(
-                            tagName: "ContentIndex",
-                            condition: $"УК-1",
-                            escapedDelimiter: "\n"
-                        ),
-                }
-            );
-
-            textBlockTag.SaveToDatabase("This value will be only on УК-1");
-
-            textBlockTag = new TextBlockTag(
-                    key: "ContentMegaTag",
-                    description: "lalalalala",
-                    conditions: new TextBlockCondition[]
-                    {
-                        new TextBlockCondition(
-                                tagName: "ContentIndex",
-                                condition: $"УК-2",
-                                escapedDelimiter: "\n"
-                            ),
-                    }
-                );
-            textBlockTag.SaveToDatabase("This value will be only on УК-2");
-
-            textBlockTag = new TextBlockTag(
-                    key: "ContentMegaTag",
-                    description: "lalalalala",
-                    conditions: new TextBlockCondition[]
-                    {
-                        new TextBlockCondition(
-                                tagName: "ContentIndex",
-                                condition: $"УК-4",
-                                escapedDelimiter: "\n"
-                            ),
-                    }
-                );
-            textBlockTag.SaveToDatabase("This value will be only on УК-4");
-
-            textBlockTag = new TextBlockTag(
-                    key: "ContentMegaTag",
-                    description: "lalalalala",
-                    conditions: new TextBlockCondition[]
-                    {
-                        new TextBlockCondition(
-                                tagName: "ContentIndex",
-                                condition: $"ОПК-1",
-                                escapedDelimiter: "\n"
-                            ),
-                    }
-                );
-            textBlockTag.SaveToDatabase("This value will be only on ОПК-1");
-
-            textBlockTag = new TextBlockTag(
-                    key: "ContentMegaTag",
-                    description: "lalalalala",
-                    conditions: new TextBlockCondition[]
-                    {
-                        new TextBlockCondition(
-                                tagName: "ContentIndex",
-                                condition: $"ПК-1",
-                                escapedDelimiter: "\n"
-                            ),
-                    }
-                );
-            textBlockTag.SaveToDatabase("This value will be only on ПК-1");
-
-            // для теста
-            textBlockTag = new TextBlockTag(
-                    key: "RuLangTag",
-                    description: "lalalalala",
-                    conditions: new TextBlockCondition[]
-                    {
-                        new TextBlockCondition(
-                                tagName: "ModuleName",
-                                condition: $"Русский язык  в профессиональной деятельности"
-                            ),
-                    }
-                );
-
-            textBlockTag.SaveToDatabase("This value will be only on RuLang");
-
-            textBlockTag = new TextBlockTag(
-                    key: "BlockNameTag",
-                    description: "BlockNameTag",
-                    conditions: new TextBlockCondition[]
-                    {
-                        new TextBlockCondition(
-                                tagName: "BlockName",
-                                condition: $"Блок 1.Дисциплины (модули) "
-                            ),
-                    }
-                );
-
-            textBlockTag.SaveToDatabase("This value will be only on Блок 1");
-
-            textBlockTag = new TextBlockTag(
-                    key: "BlockNameRuTag",
-                    description: "BlockNameTag",
-                    conditions: new TextBlockCondition[]
-                    {
-                        new TextBlockCondition(
-                                tagName: "ModuleName",
-                                condition: $"Русский язык  в профессиональной деятельности"
-                            ),
-                        new TextBlockCondition(
-                                tagName: "BlockName",
-                                condition: $"Блок 1.Дисциплины (модули) "
-                            ),
-                    }
-                );
-
-            textBlockTag.SaveToDatabase("This value will be only on Блок 1 && Rulang");
-
-            //string value = textBlockTag.GetValue2();
-
-            //List<TextBlockTag> tags = syllabusParameters.TextBlockTags;
-
-            Console.WriteLine("lala");
-
+        
         }
 
         private void SetToolTips()
@@ -207,7 +66,7 @@ namespace ExcelToWordProject
             toolTip.SetToolTip(folderPathButton, "Выберите папку");
         }
 
-        public async Task ConvertProcessing(string selectedFilePath, string templateFilePath, string resultFolderPath, string prefix)
+        public void ConvertProcessing(string selectedFilePath, string templateFilePath, string resultFolderPath, string prefix)
         {
             SyllabusExcelReader syllabusExcelReader = null;
             SyllabusDocWriter syllabusDocWriter = null;
@@ -309,7 +168,7 @@ namespace ExcelToWordProject
 
 
             if (selectedExcels.Length <= 1)
-                await ConvertProcessing(selectedFilePath, templateFilePath, resultFolderPath, resultFilePrefixTextBox.Text);
+                 ConvertProcessing(selectedFilePath, templateFilePath, resultFolderPath, resultFilePrefixTextBox.Text);
             else if (selectedExcels.Length > 1)
                 for (int i = 0; i < selectedExcels.Length; i++)
                 {
@@ -321,7 +180,7 @@ namespace ExcelToWordProject
                     try
                     {
                         Directory.CreateDirectory(folderPath);
-                        await ConvertProcessing(
+                         ConvertProcessing(
                             selectedExcels[i],
                             templateFilePath,
                             folderPath,
@@ -330,7 +189,7 @@ namespace ExcelToWordProject
                     catch
                     {
                         string prefix = "[" + Path.GetFileNameWithoutExtension(selectedExcels[i]) + "] " + resultFilePrefixTextBox.Text;
-                        await ConvertProcessing(selectedExcels[i], templateFilePath, resultFolderPath, prefix);
+                         ConvertProcessing(selectedExcels[i], templateFilePath, resultFolderPath, prefix);
                     }
                 }
 
@@ -368,7 +227,7 @@ namespace ExcelToWordProject
         private void TemplateFilePathButton_Click(object sender, EventArgs e)
         {
             OpenFileDialog fileDialog = new OpenFileDialog();
-            fileDialog.Filter = "Word документы|*.doc;*.docx";
+            fileDialog.Filter = @"Word документы|*.doc;*.docx";
             if (fileDialog.ShowDialog() == DialogResult.OK)
             {
                 templateFilePathTextBox.Text = fileDialog.FileName;
@@ -444,6 +303,16 @@ namespace ExcelToWordProject
             }
             else
                 TextBlocksForm.Focus();
+        }
+
+        private void templateFilePathLabel_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void templateFilePathTextBox_TextChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }
