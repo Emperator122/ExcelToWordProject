@@ -22,20 +22,16 @@ namespace ExcelToWordProject.Utils
                 .GetConstructor(BindingFlags.NonPublic | BindingFlags.Instance, null, types, null)
                 ?.Invoke(new object[] { document, xmlElement, 0, ContainerType.None });
             paragraph.InsertParagraphAfterSelf(p2 as Paragraph);
-            var sr = new StreamReader("extracted_style.xml");
-            var data = sr.ReadToEnd();
-            var styles = GetDocumentStyles(document);
-            var style = XElement.Parse(data);
-            styles?.Element(w + "styles")?.Add((object)style);
-
             paragraph.Remove(false);
         }
 
-        public static void InsertDocumentAfterSelf(this Paragraph paragraph, Document sourceDocument)
+        public static void InsertDocumentAfterSelf(this Paragraph paragraph, Document toDocument, Document fromDocument)
         {
-            DocX doc = DocX.Load("document.docx");
-            var customDocument = new CustomDocument(sourceDocument);
-            customDocument.InsertDocument(new CustomDocument(doc), paragraph);
+            var toCustomDocument = new CustomDocument(toDocument);
+            using (var fromCustomDocument = new CustomDocument(fromDocument))
+            {
+                toCustomDocument.InsertDocument(fromCustomDocument, paragraph);
+            }
         }
 
         public static void InsertLinesAfterSelf(this Paragraph paragraph, string[] lines, BaseSyllabusTag tag)
@@ -50,18 +46,6 @@ namespace ExcelToWordProject.Utils
 
             paragraph.Remove(false);
         }
-
-        private static void InsertStyle()
-        {
-
-        }
-
-        private static XDocument GetDocumentStyles(this Document document)
-        {
-            var styles = typeof(Document).GetField("_styles", BindingFlags.NonPublic | BindingFlags.Instance)?.GetValue(document);
-            return styles as XDocument;
-        }
-
 
     }
 }

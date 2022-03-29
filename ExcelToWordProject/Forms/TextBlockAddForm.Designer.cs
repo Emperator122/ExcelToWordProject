@@ -1,4 +1,8 @@
-﻿namespace ExcelToWordProject.Forms
+﻿using System;
+using System.IO;
+using System.Windows.Forms;
+
+namespace ExcelToWordProject.Forms
 {
     partial class TextBlockAddForm
     {
@@ -20,6 +24,19 @@
             base.Dispose(disposing);
         }
 
+        private void OnTextBlockValueModeSwitch()
+        {
+            delimiterTextBox.Enabled = !IsFilePathSetting;
+
+        }
+
+        private void ShowPathError()
+        {
+            MessageBox.Show("Ошибка пути к документу. Документы должны храниться в папке \"TextBlocksDocuments\" " +
+                            $"из директории программы ({Path.Combine(AppContext.BaseDirectory, "TextBlocksDocuments")}).");
+        }
+
+
         #region Windows Form Designer generated code
 
         /// <summary>
@@ -31,7 +48,15 @@
             this.tagKeyTextBox = new System.Windows.Forms.TextBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.valueModeTabs = new System.Windows.Forms.TabControl();
+            this.textValueTab = new System.Windows.Forms.TabPage();
             this.tagValueTextBox = new System.Windows.Forms.TextBox();
+            this.filePathTab = new System.Windows.Forms.TabPage();
+            this.label2 = new System.Windows.Forms.Label();
+            this.templateFilePathButton = new System.Windows.Forms.PictureBox();
+            this.templateFilePathLabel = new System.Windows.Forms.Label();
+            this.templateFilePathTextBox = new System.Windows.Forms.TextBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.conditionsGridView = new System.Windows.Forms.DataGridView();
             this.TagNameColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -42,15 +67,16 @@
             this.priorityTextBox = new System.Windows.Forms.TextBox();
             this.groupBox5 = new System.Windows.Forms.GroupBox();
             this.delimiterTextBox = new System.Windows.Forms.TextBox();
-            this.groupBox6 = new System.Windows.Forms.GroupBox();
-            this.isPureXmlTextBox = new System.Windows.Forms.TextBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
+            this.valueModeTabs.SuspendLayout();
+            this.textValueTab.SuspendLayout();
+            this.filePathTab.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.templateFilePathButton)).BeginInit();
             this.groupBox3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.conditionsGridView)).BeginInit();
             this.groupBox4.SuspendLayout();
             this.groupBox5.SuspendLayout();
-            this.groupBox6.SuspendLayout();
             this.SuspendLayout();
             // 
             // tagKeyTextBox
@@ -61,7 +87,7 @@
             this.tagKeyTextBox.Location = new System.Drawing.Point(9, 24);
             this.tagKeyTextBox.Margin = new System.Windows.Forms.Padding(4);
             this.tagKeyTextBox.Name = "tagKeyTextBox";
-            this.tagKeyTextBox.Size = new System.Drawing.Size(208, 26);
+            this.tagKeyTextBox.Size = new System.Drawing.Size(339, 26);
             this.tagKeyTextBox.TabIndex = 0;
             // 
             // groupBox1
@@ -73,7 +99,7 @@
             this.groupBox1.Margin = new System.Windows.Forms.Padding(4);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Padding = new System.Windows.Forms.Padding(4);
-            this.groupBox1.Size = new System.Drawing.Size(228, 69);
+            this.groupBox1.Size = new System.Drawing.Size(359, 69);
             this.groupBox1.TabIndex = 2;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Ключ";
@@ -83,30 +109,126 @@
             this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.groupBox2.Controls.Add(this.tagValueTextBox);
+            this.groupBox2.Controls.Add(this.label1);
+            this.groupBox2.Controls.Add(this.valueModeTabs);
             this.groupBox2.Location = new System.Drawing.Point(13, 398);
             this.groupBox2.Margin = new System.Windows.Forms.Padding(4);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Padding = new System.Windows.Forms.Padding(4);
-            this.groupBox2.Size = new System.Drawing.Size(609, 299);
+            this.groupBox2.Size = new System.Drawing.Size(595, 346);
             this.groupBox2.TabIndex = 3;
             this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "Значение";
+            this.groupBox2.Text = "Содержимое блока текста";
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(3, 27);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(299, 18);
+            this.label1.TabIndex = 1;
+            this.label1.Text = "Вы можете выбрать один из вариантов:";
+            // 
+            // valueModeTabs
+            // 
+            this.valueModeTabs.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.valueModeTabs.Controls.Add(this.textValueTab);
+            this.valueModeTabs.Controls.Add(this.filePathTab);
+            this.valueModeTabs.Location = new System.Drawing.Point(0, 55);
+            this.valueModeTabs.Name = "valueModeTabs";
+            this.valueModeTabs.SelectedIndex = 0;
+            this.valueModeTabs.Size = new System.Drawing.Size(594, 291);
+            this.valueModeTabs.TabIndex = 0;
+            this.valueModeTabs.SelectedIndexChanged += new System.EventHandler(this.valueModeTabs_SelectedIndexChanged);
+            // 
+            // textValueTab
+            // 
+            this.textValueTab.Controls.Add(this.tagValueTextBox);
+            this.textValueTab.Location = new System.Drawing.Point(4, 27);
+            this.textValueTab.Name = "textValueTab";
+            this.textValueTab.Padding = new System.Windows.Forms.Padding(3);
+            this.textValueTab.Size = new System.Drawing.Size(586, 260);
+            this.textValueTab.TabIndex = 0;
+            this.textValueTab.Text = "Текстовое значение";
+            this.textValueTab.UseVisualStyleBackColor = true;
             // 
             // tagValueTextBox
             // 
             this.tagValueTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.tagValueTextBox.Location = new System.Drawing.Point(9, 24);
+            this.tagValueTextBox.Location = new System.Drawing.Point(7, 4);
             this.tagValueTextBox.Margin = new System.Windows.Forms.Padding(4);
             this.tagValueTextBox.MaxLength = 0;
             this.tagValueTextBox.Multiline = true;
             this.tagValueTextBox.Name = "tagValueTextBox";
             this.tagValueTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.tagValueTextBox.Size = new System.Drawing.Size(589, 260);
+            this.tagValueTextBox.Size = new System.Drawing.Size(572, 249);
             this.tagValueTextBox.TabIndex = 0;
             this.tagValueTextBox.WordWrap = false;
+            // 
+            // filePathTab
+            // 
+            this.filePathTab.Controls.Add(this.label2);
+            this.filePathTab.Controls.Add(this.templateFilePathButton);
+            this.filePathTab.Controls.Add(this.templateFilePathLabel);
+            this.filePathTab.Controls.Add(this.templateFilePathTextBox);
+            this.filePathTab.Location = new System.Drawing.Point(4, 27);
+            this.filePathTab.Name = "filePathTab";
+            this.filePathTab.Padding = new System.Windows.Forms.Padding(3);
+            this.filePathTab.Size = new System.Drawing.Size(586, 260);
+            this.filePathTab.TabIndex = 1;
+            this.filePathTab.Text = "Путь к файлу";
+            this.filePathTab.UseVisualStyleBackColor = true;
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.ForeColor = System.Drawing.SystemColors.ControlDark;
+            this.label2.Location = new System.Drawing.Point(7, 73);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(430, 18);
+            this.label2.TabIndex = 13;
+            this.label2.Text = "*  Для замены тег должен находиться в отдельном абзаце";
+            // 
+            // templateFilePathButton
+            // 
+            this.templateFilePathButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.templateFilePathButton.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.templateFilePathButton.Image = global::ExcelToWordProject.Properties.Resources.document;
+            this.templateFilePathButton.Location = new System.Drawing.Point(554, 43);
+            this.templateFilePathButton.Name = "templateFilePathButton";
+            this.templateFilePathButton.Size = new System.Drawing.Size(26, 26);
+            this.templateFilePathButton.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.templateFilePathButton.TabIndex = 12;
+            this.templateFilePathButton.TabStop = false;
+            this.templateFilePathButton.Click += new System.EventHandler(this.templateFilePathButton_Click);
+            // 
+            // templateFilePathLabel
+            // 
+            this.templateFilePathLabel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.templateFilePathLabel.AutoEllipsis = true;
+            this.templateFilePathLabel.AutoSize = true;
+            this.templateFilePathLabel.Location = new System.Drawing.Point(7, 21);
+            this.templateFilePathLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.templateFilePathLabel.Name = "templateFilePathLabel";
+            this.templateFilePathLabel.Size = new System.Drawing.Size(465, 18);
+            this.templateFilePathLabel.TabIndex = 11;
+            this.templateFilePathLabel.Text = "Путь к Word файлу, на содержимое которого будет заменен тег";
+            // 
+            // templateFilePathTextBox
+            // 
+            this.templateFilePathTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.templateFilePathTextBox.Location = new System.Drawing.Point(7, 43);
+            this.templateFilePathTextBox.Margin = new System.Windows.Forms.Padding(4);
+            this.templateFilePathTextBox.Name = "templateFilePathTextBox";
+            this.templateFilePathTextBox.ReadOnly = true;
+            this.templateFilePathTextBox.Size = new System.Drawing.Size(540, 26);
+            this.templateFilePathTextBox.TabIndex = 10;
             // 
             // groupBox3
             // 
@@ -117,7 +239,7 @@
             this.groupBox3.Margin = new System.Windows.Forms.Padding(4);
             this.groupBox3.Name = "groupBox3";
             this.groupBox3.Padding = new System.Windows.Forms.Padding(4);
-            this.groupBox3.Size = new System.Drawing.Size(609, 307);
+            this.groupBox3.Size = new System.Drawing.Size(595, 307);
             this.groupBox3.TabIndex = 4;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Условия";
@@ -134,7 +256,7 @@
             this.TagDelimiterColumn});
             this.conditionsGridView.Location = new System.Drawing.Point(9, 26);
             this.conditionsGridView.Name = "conditionsGridView";
-            this.conditionsGridView.Size = new System.Drawing.Size(589, 274);
+            this.conditionsGridView.Size = new System.Drawing.Size(575, 274);
             this.conditionsGridView.TabIndex = 1;
             // 
             // TagNameColumn
@@ -162,9 +284,9 @@
             // 
             this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.button1.Location = new System.Drawing.Point(13, 704);
+            this.button1.Location = new System.Drawing.Point(13, 751);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(608, 37);
+            this.button1.Size = new System.Drawing.Size(594, 37);
             this.button1.TabIndex = 5;
             this.button1.Text = "Сохранить";
             this.button1.UseVisualStyleBackColor = true;
@@ -172,14 +294,13 @@
             // 
             // groupBox4
             // 
-            this.groupBox4.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox4.Controls.Add(this.priorityTextBox);
-            this.groupBox4.Location = new System.Drawing.Point(503, 13);
+            this.groupBox4.Location = new System.Drawing.Point(507, 13);
             this.groupBox4.Margin = new System.Windows.Forms.Padding(4);
             this.groupBox4.Name = "groupBox4";
             this.groupBox4.Padding = new System.Windows.Forms.Padding(4);
-            this.groupBox4.Size = new System.Drawing.Size(119, 69);
+            this.groupBox4.Size = new System.Drawing.Size(101, 69);
             this.groupBox4.TabIndex = 3;
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Приоритет";
@@ -192,15 +313,14 @@
             this.priorityTextBox.Location = new System.Drawing.Point(9, 24);
             this.priorityTextBox.Margin = new System.Windows.Forms.Padding(4);
             this.priorityTextBox.Name = "priorityTextBox";
-            this.priorityTextBox.Size = new System.Drawing.Size(99, 26);
+            this.priorityTextBox.Size = new System.Drawing.Size(81, 26);
             this.priorityTextBox.TabIndex = 0;
             // 
             // groupBox5
             // 
-            this.groupBox5.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox5.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox5.Controls.Add(this.delimiterTextBox);
-            this.groupBox5.Location = new System.Drawing.Point(249, 13);
+            this.groupBox5.Location = new System.Drawing.Point(380, 13);
             this.groupBox5.Margin = new System.Windows.Forms.Padding(4);
             this.groupBox5.Name = "groupBox5";
             this.groupBox5.Padding = new System.Windows.Forms.Padding(4);
@@ -220,37 +340,11 @@
             this.delimiterTextBox.Size = new System.Drawing.Size(99, 26);
             this.delimiterTextBox.TabIndex = 0;
             // 
-            // groupBox6
-            // 
-            this.groupBox6.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.groupBox6.Controls.Add(this.isPureXmlTextBox);
-            this.groupBox6.Location = new System.Drawing.Point(376, 13);
-            this.groupBox6.Margin = new System.Windows.Forms.Padding(4);
-            this.groupBox6.Name = "groupBox6";
-            this.groupBox6.Padding = new System.Windows.Forms.Padding(4);
-            this.groupBox6.Size = new System.Drawing.Size(119, 69);
-            this.groupBox6.TabIndex = 6;
-            this.groupBox6.TabStop = false;
-            this.groupBox6.Text = "Чистый XML";
-            // 
-            // isPureXmlTextBox
-            // 
-            this.isPureXmlTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.isPureXmlTextBox.Location = new System.Drawing.Point(9, 24);
-            this.isPureXmlTextBox.Margin = new System.Windows.Forms.Padding(4);
-            this.isPureXmlTextBox.Name = "isPureXmlTextBox";
-            this.isPureXmlTextBox.Size = new System.Drawing.Size(99, 26);
-            this.isPureXmlTextBox.TabIndex = 0;
-            // 
             // TextBlockAddForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 18F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(635, 756);
-            this.Controls.Add(this.groupBox6);
+            this.ClientSize = new System.Drawing.Size(621, 803);
             this.Controls.Add(this.groupBox5);
             this.Controls.Add(this.groupBox4);
             this.Controls.Add(this.button1);
@@ -266,14 +360,18 @@
             this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
+            this.valueModeTabs.ResumeLayout(false);
+            this.textValueTab.ResumeLayout(false);
+            this.textValueTab.PerformLayout();
+            this.filePathTab.ResumeLayout(false);
+            this.filePathTab.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.templateFilePathButton)).EndInit();
             this.groupBox3.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.conditionsGridView)).EndInit();
             this.groupBox4.ResumeLayout(false);
             this.groupBox4.PerformLayout();
             this.groupBox5.ResumeLayout(false);
             this.groupBox5.PerformLayout();
-            this.groupBox6.ResumeLayout(false);
-            this.groupBox6.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -294,7 +392,13 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn TagDelimiterColumn;
         private System.Windows.Forms.GroupBox groupBox5;
         private System.Windows.Forms.TextBox delimiterTextBox;
-        private System.Windows.Forms.GroupBox groupBox6;
-        private System.Windows.Forms.TextBox isPureXmlTextBox;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.TabControl valueModeTabs;
+        private System.Windows.Forms.TabPage textValueTab;
+        private System.Windows.Forms.TabPage filePathTab;
+        private System.Windows.Forms.PictureBox templateFilePathButton;
+        private System.Windows.Forms.Label templateFilePathLabel;
+        private System.Windows.Forms.TextBox templateFilePathTextBox;
+        private System.Windows.Forms.Label label2;
     }
 }

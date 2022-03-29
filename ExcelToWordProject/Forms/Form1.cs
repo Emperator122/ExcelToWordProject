@@ -368,7 +368,7 @@ namespace ExcelToWordProject
         private void TemplateFilePathButton_Click(object sender, EventArgs e)
         {
             OpenFileDialog fileDialog = new OpenFileDialog();
-            fileDialog.Filter = "Word документы|*.doc;*.docx";
+            fileDialog.Filter = @"Word документы|*.doc;*.docx";
             if (fileDialog.ShowDialog() == DialogResult.OK)
             {
                 templateFilePathTextBox.Text = fileDialog.FileName;
@@ -444,6 +444,16 @@ namespace ExcelToWordProject
             }
             else
                 TextBlocksForm.Focus();
+        }
+
+        private void templateFilePathLabel_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void templateFilePathTextBox_TextChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }

@@ -36,7 +36,7 @@ namespace ExcelToWordProject.Syllabus.Tags
         public bool IsDefault { get; set; }
 
         [XmlIgnore]
-        public bool IsPureXml { get; set; }
+        public bool IsFilePath { get; set; }
         
         [XmlIgnore]
         public bool HasId => Id != -1;
@@ -71,7 +71,7 @@ namespace ExcelToWordProject.Syllabus.Tags
             Id = -1;
             IsDefault = false;
             _delimiter = null;
-            IsPureXml = false;
+            IsFilePath = false;
         }
         
         public TextBlockTag() // для сериализации
@@ -79,7 +79,7 @@ namespace ExcelToWordProject.Syllabus.Tags
             Id = -1;
             IsDefault = false;
             _delimiter = null;
-            IsPureXml = false;
+            IsFilePath = false;
         }
         
         public override string GetValue(Module module = null, List<Content> contentList = null,
@@ -117,23 +117,23 @@ namespace ExcelToWordProject.Syllabus.Tags
             return result;
         }
 
-        public void SaveToDatabase(string value, int priority = 0, bool isPureXml = false)
+        public void SaveToDatabase(string value, int priority = 0, bool isFilePath = false)
         {
             if (Id == -1)
-                CreateInDatabase(value, priority, isPureXml);
+                CreateInDatabase(value, priority, isFilePath);
             else
-                EditInDatabase(value, priority, isPureXml);
+                EditInDatabase(value, priority, isFilePath);
 
         }
 
-        private void CreateInDatabase(string value, int priority = 0, bool isPureXml = false)
+        private void CreateInDatabase(string value, int priority = 0, bool isFilePath = false)
         {
             var sqlExpression =
                     $"INSERT INTO {DatabaseStrings.TextBlockTagTableName} " +
                     $"({DatabaseStrings.TextBlockKeyColumnName}, {DatabaseStrings.TextBlockConditionColumnName}, " +
                     $"{DatabaseStrings.TextBlockValueColumnName}, {DatabaseStrings.TextBlockPriorityColumnName}, " +
-                    $"{DatabaseStrings.TextBlockIsPureXmlColumnName} ) "
-                    + "VALUES (@key, @condition, @value, @priority, @isPureXml)";
+                    $"{DatabaseStrings.TextBlockIsFilePathColumnName} ) "
+                    + "VALUES (@key, @condition, @value, @priority, @isFilePath)";
 
             var rowIdSqlExpression = "SELECT last_insert_rowid() as id";
             using (var connection = new SqliteConnection(DatabaseStrings.ConnectionString))
@@ -144,7 +144,7 @@ namespace ExcelToWordProject.Syllabus.Tags
                 command.Parameters.Add(new SqliteParameter("@condition", ToXml()));
                 command.Parameters.Add(new SqliteParameter("@value", value));
                 command.Parameters.Add(new SqliteParameter("@priority", priority));
-                command.Parameters.Add(new SqliteParameter("@isPureXml", isPureXml));
+                command.Parameters.Add(new SqliteParameter("@isFilePath", isFilePath));
                 command.ExecuteNonQuery();
 
                 var rowIdCommand = new SqliteCommand(rowIdSqlExpression, connection);
@@ -152,7 +152,7 @@ namespace ExcelToWordProject.Syllabus.Tags
             }
         }
 
-        private void EditInDatabase(string value, int priority = 0, bool isPureXml = false)
+        private void EditInDatabase(string value, int priority = 0, bool isFilePath = false)
         {
             if (!HasId)
             {
@@ -166,7 +166,7 @@ namespace ExcelToWordProject.Syllabus.Tags
                 $"{DatabaseStrings.TextBlockConditionColumnName} = @condition, " +
                 $"{DatabaseStrings.TextBlockValueColumnName} = @value, " +
                 $"{DatabaseStrings.TextBlockPriorityColumnName} = @priority, " +
-                $"{DatabaseStrings.TextBlockIsPureXmlColumnName} = @isPureXml " +
+                $"{DatabaseStrings.TextBlockIsFilePathColumnName} = @isFilePath " +
                 $"WHERE `{DatabaseStrings.TextBlockIdColumnName}` = @index";
             using (var connection = new SqliteConnection(DatabaseStrings.ConnectionString))
             {
@@ -177,7 +177,7 @@ namespace ExcelToWordProject.Syllabus.Tags
                 command.Parameters.Add(new SqliteParameter("@value", value));
                 command.Parameters.Add(new SqliteParameter("@index", Id));
                 command.Parameters.Add(new SqliteParameter("@priority", priority));
-                command.Parameters.Add(new SqliteParameter("@isPureXml", isPureXml));
+                command.Parameters.Add(new SqliteParameter("@isFilePath", isFilePath));
                 command.ExecuteNonQuery();
             }
         }
@@ -214,7 +214,7 @@ namespace ExcelToWordProject.Syllabus.Tags
             var sqlExpression =
                 $"SELECT {DatabaseStrings.TextBlockIsDefaultColumnName}, " +
                 $"{DatabaseStrings.TextBlockConditionColumnName}, {DatabaseStrings.TextBlockPriorityColumnName}, " +
-                $"{DatabaseStrings.TextBlockKeyColumnName}, {DatabaseStrings.TextBlockIsPureXmlColumnName} " +
+                $"{DatabaseStrings.TextBlockKeyColumnName}, {DatabaseStrings.TextBlockIsFilePathColumnName} " +
                 $"FROM {DatabaseStrings.TextBlockTagTableName} "
                 + $"WHERE `{DatabaseStrings.TextBlockIdColumnName}` = @index";
 
@@ -232,16 +232,16 @@ namespace ExcelToWordProject.Syllabus.Tags
                         var xml = reader.GetString(1);
                         var priority = reader.GetInt32(2);
                         var key = reader.GetString(3);
-                        var isPureXml = reader.GetBoolean(4);
+                        var isFilePath = reader.GetBoolean(4);
                             
                         // Мб надо что-то еще добавить...
-                        var tag = FromDatabaseData(xml, key, Id, isDefault, priority, isPureXml);
+                        var tag = FromDatabaseData(xml, key, Id, isDefault, priority, isFilePath);
                         IsDefault = tag.IsDefault;
                         Conditions = tag.Conditions;
                         Key = tag.Key;
                         Active = tag.Active;
                         RegularEx = tag.RegularEx;
-                        IsPureXml = tag.IsPureXml;
+                        IsFilePath = tag.IsFilePath;
                     }
                     else
                     {
@@ -290,10 +290,10 @@ namespace ExcelToWordProject.Syllabus.Tags
             }
         }
 
-        public static TextBlockTag FromDatabaseData(string xml, string key,int id = -1, bool isDefault = false, int priority = 0, bool isPureXml = false)
+        public static TextBlockTag FromDatabaseData(string xml, string key,int id = -1, bool isDefault = false, int priority = 0, bool isFilePath = false)
         {
             // Для игнора ключа при сериализации
-            var attributes = new XmlAttributes { XmlIgnore = true };
+            var attributes = new XmlAttributes {XmlIgnore = true};
             var overrides = new XmlAttributeOverrides();
             overrides.Add(typeof(BaseSyllabusTag), "Key", attributes);
 
@@ -305,7 +305,7 @@ namespace ExcelToWordProject.Syllabus.Tags
                 tag.Id = id;
                 tag.IsDefault = isDefault;
                 tag.Priority = priority;
-                tag.IsPureXml = isPureXml;
+                tag.IsFilePath = isFilePath;
                 return tag;
             }
         }
@@ -356,7 +356,7 @@ namespace ExcelToWordProject.Syllabus.Tags
             var sqlExpression =
                 $"SELECT `{DatabaseStrings.TextBlockIdColumnName}`, {DatabaseStrings.TextBlockConditionColumnName}, " +
                 $"{DatabaseStrings.TextBlockIsDefaultColumnName}, {DatabaseStrings.TextBlockPriorityColumnName}, " +
-                $"{DatabaseStrings.TextBlockKeyColumnName}, {DatabaseStrings.TextBlockIsPureXmlColumnName}  " +
+                $"{DatabaseStrings.TextBlockKeyColumnName}, {DatabaseStrings.TextBlockIsFilePathColumnName}  " +
                 $"FROM {DatabaseStrings.TextBlockTagTableName}";
 
             var result = new List<TextBlockTag>();
@@ -374,8 +374,8 @@ namespace ExcelToWordProject.Syllabus.Tags
                             var isDefault = reader.GetBoolean(2);
                             var priority = reader.GetInt32(3);
                             var key = reader.GetString(4);
-                            var isPureXml = reader.GetBoolean(5);
-                            result.Add(FromDatabaseData(xml, key, id, isDefault, priority, isPureXml));
+                            var isFilePath = reader.GetBoolean(5);
+                            result.Add(FromDatabaseData(xml, key, id, isDefault, priority, isFilePath));
                         }
                 }
             }
@@ -388,7 +388,7 @@ namespace ExcelToWordProject.Syllabus.Tags
             var sqlExpression = 
                 $"SELECT `{DatabaseStrings.TextBlockIdColumnName}`, {DatabaseStrings.TextBlockConditionColumnName}, " +
                 $"{DatabaseStrings.TextBlockIsDefaultColumnName}, {DatabaseStrings.TextBlockPriorityColumnName}, " +
-                $"{DatabaseStrings.TextBlockIsPureXmlColumnName} " +
+                $"{DatabaseStrings.TextBlockIsFilePathColumnName} " +
                 $"FROM {DatabaseStrings.TextBlockTagTableName} " +
                 $"WHERE {DatabaseStrings.TextBlockKeyColumnName} = \'{tagKey}\' "
                 + $"AND {DatabaseStrings.TextBlockIsDefaultColumnName} = 1";
@@ -405,8 +405,8 @@ namespace ExcelToWordProject.Syllabus.Tags
                     var xml = reader.GetString(1);
                     var isDefault = reader.GetBoolean(2);
                     var priority = reader.GetInt32(3);
-                    var isPureXml = reader.GetBoolean(4);
-                    return FromDatabaseData(xml, tagKey, id, isDefault, priority, isPureXml);
+                    var isFilePath = reader.GetBoolean(4);
+                    return FromDatabaseData(xml, tagKey, id, isDefault, priority, isFilePath);
                 }
             }
         }
@@ -486,10 +486,10 @@ namespace ExcelToWordProject.Syllabus.Tags
                 $"INSERT INTO {DatabaseStrings.TextBlockTagTableName} " +
                 $"({DatabaseStrings.TextBlockKeyColumnName}, {DatabaseStrings.TextBlockConditionColumnName}, " +
                 $"{DatabaseStrings.TextBlockValueColumnName}, {DatabaseStrings.TextBlockPriorityColumnName}, " +
-                $"{DatabaseStrings.TextBlockIsPureXmlColumnName}) " +
+                $"{DatabaseStrings.TextBlockIsFilePathColumnName}) " +
                 $"SELECT @newTagKey, {DatabaseStrings.TextBlockConditionColumnName}, " +
                 $"{DatabaseStrings.TextBlockValueColumnName}, {DatabaseStrings.TextBlockPriorityColumnName}, " +
-                $"{DatabaseStrings.TextBlockIsPureXmlColumnName} " +
+                $"{DatabaseStrings.TextBlockIsFilePathColumnName} " +
                 $"FROM {DatabaseStrings.TextBlockTagTableName} " +
                 $"WHERE {DatabaseStrings.TextBlockKeyColumnName} = @oldTagKey";
 
