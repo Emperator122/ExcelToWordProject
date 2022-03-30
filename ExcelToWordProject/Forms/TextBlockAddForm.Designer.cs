@@ -24,6 +24,32 @@ namespace ExcelToWordProject.Forms
             base.Dispose(disposing);
         }
 
+        private void BuildToolTips()
+        {
+            toolTip1.ReshowDelay = 1;
+            toolTip1.InitialDelay = 1;
+            toolTip1.AutoPopDelay = 10000;
+            toolTip1.SetToolTip(tagKeyTextBox, "Строка. Ключ, который будет использоваться в шаблоне (без треугольных скобок).");
+            toolTip1.SetToolTip(delimiterTextBox, "Строка. Разделитель, по которому будет разбито значение блока текста, для переноса по абзацам в документе. " +
+                                                  "Для многострочного текста рекомендуется использовать \\r\\n (либо \\n). " +
+                                                  "Для работы тег должен быть единственной строкой в абзаце шаблона.");
+            toolTip1.SetToolTip(priorityTextBox, "Целое число. Приоритет тега в рамках данного блока текста при выводе. Нужен если мы имеем два набора условий, " +
+                                                 "которые одновременно выполняются. Значение по умолчанию всегда имеет самый низкий приоритет.");
+            toolTip1.SetToolTip(groupBox3, "При выполнении данных условий, будет произведена замена тега в шаблоне на его содержимое.\r\n" +
+                                           "Ключ тега - ключ \"умного\" или обычного тега, на значение которого налагется условие;\r\n" +
+                                           "Значение  - значение \"умного\" или обычного тега, соответсвующего ключу, при котором будет произведена замена " +
+                                           "на содержимое блока текста. Значение пишетя без разделителя;\r\n" +
+                                           "Разделитель - строка (или символ), по которой должно быть разбито значение \"умного\" или обычного тега " +
+                                           "при проверке условий. " +
+                                           "Например, пусть \"умный\" или обычный тег может принять значение 'val1;val2;val3;val4' " +
+                                           "(в любой из комбинаций). Тогда для того чтобы наложить условие на значение 'val1', мы указываем разделитель " +
+                                           "';', а в поле 'Значение' пишем 'val1'.");
+
+            toolTip1.SetToolTip(groupBox2, "Значение, которое принимает блок текста. Может быть как строкой, так и содержимым внешнего .docx документа. " +
+                                           "На строку замена может быть произведена в любом месте документа. На разделенную строку или на содержимое " +
+                                           "внешенго docx замена может быть произведена только в отдельном абзаце.");
+        }
+
         private void OnTextBlockValueModeSwitch()
         {
             delimiterTextBox.Enabled = !IsFilePathSetting;
@@ -45,6 +71,7 @@ namespace ExcelToWordProject.Forms
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.tagKeyTextBox = new System.Windows.Forms.TextBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
@@ -59,14 +86,15 @@ namespace ExcelToWordProject.Forms
             this.templateFilePathTextBox = new System.Windows.Forms.TextBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.conditionsGridView = new System.Windows.Forms.DataGridView();
-            this.TagNameColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.TagValueColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.TagDelimiterColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.button1 = new System.Windows.Forms.Button();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.priorityTextBox = new System.Windows.Forms.TextBox();
             this.groupBox5 = new System.Windows.Forms.GroupBox();
             this.delimiterTextBox = new System.Windows.Forms.TextBox();
+            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.TagNameColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.TagValueColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.TagDelimiterColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.valueModeTabs.SuspendLayout();
@@ -259,27 +287,6 @@ namespace ExcelToWordProject.Forms
             this.conditionsGridView.Size = new System.Drawing.Size(575, 274);
             this.conditionsGridView.TabIndex = 1;
             // 
-            // TagNameColumn
-            // 
-            this.TagNameColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.TagNameColumn.FillWeight = 40F;
-            this.TagNameColumn.HeaderText = "Имя тега";
-            this.TagNameColumn.Name = "TagNameColumn";
-            // 
-            // TagValueColumn
-            // 
-            this.TagValueColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.TagValueColumn.FillWeight = 40F;
-            this.TagValueColumn.HeaderText = "Значение";
-            this.TagValueColumn.Name = "TagValueColumn";
-            // 
-            // TagDelimiterColumn
-            // 
-            this.TagDelimiterColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.TagDelimiterColumn.FillWeight = 20F;
-            this.TagDelimiterColumn.HeaderText = "Разделитель";
-            this.TagDelimiterColumn.Name = "TagDelimiterColumn";
-            // 
             // button1
             // 
             this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
@@ -340,6 +347,31 @@ namespace ExcelToWordProject.Forms
             this.delimiterTextBox.Size = new System.Drawing.Size(99, 26);
             this.delimiterTextBox.TabIndex = 0;
             // 
+            // toolTip1
+            // 
+            this.toolTip1.ShowAlways = true;
+            // 
+            // TagNameColumn
+            // 
+            this.TagNameColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.TagNameColumn.FillWeight = 40F;
+            this.TagNameColumn.HeaderText = "Ключ тега";
+            this.TagNameColumn.Name = "TagNameColumn";
+            // 
+            // TagValueColumn
+            // 
+            this.TagValueColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.TagValueColumn.FillWeight = 40F;
+            this.TagValueColumn.HeaderText = "Значение";
+            this.TagValueColumn.Name = "TagValueColumn";
+            // 
+            // TagDelimiterColumn
+            // 
+            this.TagDelimiterColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.TagDelimiterColumn.FillWeight = 20F;
+            this.TagDelimiterColumn.HeaderText = "Разделитель";
+            this.TagDelimiterColumn.Name = "TagDelimiterColumn";
+            // 
             // TextBlockAddForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 18F);
@@ -387,9 +419,6 @@ namespace ExcelToWordProject.Forms
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.GroupBox groupBox4;
         private System.Windows.Forms.TextBox priorityTextBox;
-        private System.Windows.Forms.DataGridViewTextBoxColumn TagNameColumn;
-        private System.Windows.Forms.DataGridViewTextBoxColumn TagValueColumn;
-        private System.Windows.Forms.DataGridViewTextBoxColumn TagDelimiterColumn;
         private System.Windows.Forms.GroupBox groupBox5;
         private System.Windows.Forms.TextBox delimiterTextBox;
         private System.Windows.Forms.Label label1;
@@ -400,5 +429,9 @@ namespace ExcelToWordProject.Forms
         private System.Windows.Forms.Label templateFilePathLabel;
         private System.Windows.Forms.TextBox templateFilePathTextBox;
         private System.Windows.Forms.Label label2;
+        private ToolTip toolTip1;
+        private DataGridViewTextBoxColumn TagNameColumn;
+        private DataGridViewTextBoxColumn TagValueColumn;
+        private DataGridViewTextBoxColumn TagDelimiterColumn;
     }
 }
