@@ -106,10 +106,10 @@ namespace ExcelToWordProject.Syllabus
             baseDocument.SaveAs(resultFilePath);
             var doc = DocX.Load(resultFilePath);
 
-            TablesHandler(doc); // TODO: Зачем?
-
             FillTextBlocksParagraphs(doc);
 
+            TablesHandler(doc); // TODO: Зачем?
+            
             TextBlocksHandler(doc);
 
             // бежим по списку тегов
@@ -133,12 +133,12 @@ namespace ExcelToWordProject.Syllabus
             if (hasSmartModulesContentTags)
                 contentList = SyllabusExcelReader.ParseContentList(module);
 
-            // обработка таблиц
-            TablesHandler(doc, module, contentList);
-
             // заполнение параграфов с блоками текста
             FillTextBlocksParagraphs(doc, module, contentList);
 
+            // обработка таблиц
+            TablesHandler(doc, module, contentList);
+            
             // обработка TextBlock
             TextBlocksHandler(doc, module, contentList);
             
@@ -228,7 +228,7 @@ namespace ExcelToWordProject.Syllabus
         private void TablesHandler(DocX doc, Module module = null, List<Content> contentList = null)
         {
             // Находим все теги, содержащиеся в таблицах
-            FindTablesTags(doc, false);
+            FindTablesTags(doc, true);
             foreach (var kv in _tablesTags)
             {
                 var table = doc.Tables[kv.Key];
