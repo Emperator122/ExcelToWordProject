@@ -281,7 +281,7 @@ namespace ExcelToWordProject.Syllabus.Tags
             var attributes = new XmlAttributes { XmlIgnore = true };
             var overrides = new XmlAttributeOverrides();
             overrides.Add(typeof(BaseSyllabusTag), "Key", attributes);
-
+            // TODO: сделать статическим
             var serializer = new XmlSerializer(typeof(TextBlockTag), overrides);
             using (var textWriter = new StringWriter())
             {
